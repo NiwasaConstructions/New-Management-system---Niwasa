@@ -4,34 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Niwasa Constructions - Login</title>
-    <!-- CSS සඳහා Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-200 flex items-center justify-center h-screen">
 
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Niwasa Constructions<br><span class="text-sm text-gray-500">DPR System Login</span></h2>
+    <div class="bg-white p-10 rounded-xl shadow-2xl w-full max-w-md border-t-8 border-blue-900">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-800">NIWASA<br><span class="text-lg font-medium text-gray-500">Constructions (Pvt) Ltd</span></h2>
+            <p class="text-sm text-blue-600 mt-2 font-semibold">System Portal Login</p>
+        </div>
         
-        <form id="loginForm" class="space-y-4">
+        <form id="loginForm" class="space-y-6">
             <div>
-                <label class="block text-gray-700">Email Address</label>
-                <input type="email" id="email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                <label class="block text-gray-700 font-bold mb-2"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="email" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50" required>
             </div>
             <div>
-                <label class="block text-gray-700">Password</label>
-                <input type="password" id="password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                <label class="block text-gray-700 font-bold mb-2"><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="password" class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 bg-gray-50" required>
             </div>
-            <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">
-                Login
+            <button type="submit" id="loginBtn" class="w-full bg-blue-900 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition shadow-lg text-lg">
+                Secure Login <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>
             </button>
-            <p id="errorMsg" class="text-red-500 text-sm text-center hidden">Email හෝ Password වැරදියි!</p>
+            <p id="errorMsg" class="text-red-600 text-sm text-center font-bold hidden bg-red-100 p-2 rounded"></p>
         </form>
     </div>
 
-    <!-- Firebase Scripts -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
@@ -44,27 +47,40 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        document.getElementById("loginForm").addEventListener("submit", (e) => {
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
             const loginBtn = document.getElementById("loginBtn");
             const errorMsg = document.getElementById("errorMsg");
 
-            loginBtn.innerText = "Logging in...";
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+            errorMsg.classList.add("hidden");
             
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // සාර්ථකව ලොග් වුනා නම් තාවකාලිකව supervisor.html එකට යවමු
-                    // පසුව මෙය Admin/Customer ලෙස වෙන් කරගත හැක
-                    window.location.href = "supervisor.html";
-                })
-                .catch((error) => {
-                    console.error(error);
-                    errorMsg.classList.remove("hidden");
-                    loginBtn.innerText = "Login";
-                });
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Fetch User Role from Firestore
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                
+                if (userDoc.exists()) {
+                    const role = userDoc.data().role;
+                    if (role === 'admin') window.location.href = "admin.html";
+                    else if (role === 'supervisor') window.location.href = "supervisor.html";
+                    else if (role === 'customer') window.location.href = "customer.html";
+                    else throw new Error("Invalid user role assigned!");
+                } else {
+                    throw new Error("User record not found in database. Contact Admin.");
+                }
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = "Access Denied: " + error.message;
+                errorMsg.classList.remove("hidden");
+                loginBtn.innerHTML = 'Secure Login <i class="fa-solid fa-arrow-right-to-bracket ml-2"></i>';
+            }
         });
     </script>
 </body>
