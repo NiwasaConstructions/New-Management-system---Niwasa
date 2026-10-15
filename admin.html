@@ -3,151 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Niwasa</title>
+    <title>Admin Portal - Niwasa</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Excel Export Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="bg-gray-100">
 
-    <div class="max-w-7xl mx-auto">
-        <div class="bg-blue-900 text-white p-6 rounded-lg shadow-md mb-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold">Admin Dashboard</h1>
-                <p>Niwasa Constructions System Control</p>
+    <!-- Top Navigation -->
+    <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold"><i class="fa-solid fa-building-shield"></i> Niwasa Admin Portal</h1>
+        </div>
+        <div class="space-x-4">
+            <button onclick="switchTab('reports')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-file-lines"></i> Reports</button>
+            <button onclick="switchTab('sites')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-map-location-dot"></i> Manage Sites</button>
+            <button onclick="switchTab('users')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-users-gear"></i> Manage Users</button>
+            <button onclick="logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-4"><i class="fa-solid fa-power-off"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="p-6 max-w-7xl mx-auto">
+        
+        <!-- SECTION 1: REPORTS -->
+        <div id="reportsTab" class="tab-content block">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Submitted Daily Reports</h2>
+            <div class="bg-white p-6 rounded shadow">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border">
+                        <thead class="bg-gray-200">
+                            <tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border">Weather</th><th class="p-3 border">Supervisor</th><th class="p-3 border">Action</th></tr>
+                        </thead>
+                        <tbody id="reportsTable"></tbody>
+                    </table>
+                </div>
             </div>
-            <button onclick="window.location.href='index.html'" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">Logout</button>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-700">All Submitted DPR Reports</h2>
-                <input type="text" id="searchInput" placeholder="Search by Site or Date..." class="border p-2 rounded w-64">
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border">
-                    <thead class="bg-gray-200">
-                        <tr>
-                            <th class="p-3 border">Date</th>
-                            <th class="p-3 border">Site</th>
-                            <th class="p-3 border">Weather</th>
-                            <th class="p-3 border">Work Done</th>
-                            <th class="p-3 border">Prepared By</th>
-                            <th class="p-3 border">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportsTable">
-                        <tr><td colspan="6" class="text-center p-4">Loading data...</td></tr>
-                    </tbody>
-                </table>
+        <!-- SECTION 2: MANAGE SITES -->
+        <div id="sitesTab" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Manage Construction Sites</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Add Site Form -->
+                <div class="bg-white p-6 rounded shadow">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Add New Site</h3>
+                    <form id="addSiteForm" class="space-y-4">
+                        <input type="text" id="siteName" placeholder="Site Name (e.g. NS Site)" class="w-full border p-2 rounded" required>
+                        <input type="text" id="siteLocation" placeholder="Location" class="w-full border p-2 rounded" required>
+                        <select id="siteStatus" class="w-full border p-2 rounded">
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded">Add Site</button>
+                    </form>
+                </div>
+                <!-- Sites List -->
+                <div class="md:col-span-2 bg-white p-6 rounded shadow">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Existing Sites</h3>
+                    <table class="w-full border text-sm text-left">
+                        <thead class="bg-gray-100"><tr><th class="p-2 border">Site Name</th><th class="p-2 border">Location</th><th class="p-2 border">Status</th><th class="p-2 border">Action</th></tr></thead>
+                        <tbody id="sitesTable"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- SECTION 3: MANAGE USERS -->
+        <div id="usersTab" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">User Access Management</h2>
+            <div class="bg-white p-6 rounded shadow max-w-2xl">
+                <form id="addUserForm" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="email" id="uEmail" placeholder="User Email" class="border p-2 rounded" required>
+                        <input type="password" id="uPass" placeholder="Password" class="border p-2 rounded" required>
+                        <select id="uRole" class="border p-2 rounded" required>
+                            <option value="">Select Role...</option>
+                            <option value="supervisor">Site Supervisor</option>
+                            <option value="customer">Customer (Client)</option>
+                        </select>
+                        <select id="uSite" class="border p-2 rounded" required>
+                            <option value="">Assign a Site...</option>
+                            <!-- Sites will load here dynamically -->
+                        </select>
+                    </div>
+                    <button type="submit" id="createUserBtn" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Create User & Grant Access</button>
+                    <p id="userStatus" class="text-sm font-bold text-center mt-2"></p>
+                </form>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase System -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
-            authDomain: "niwasa-new-labour.firebaseapp.com",
-            projectId: "niwasa-new-labour",
-            storageBucket: "niwasa-new-labour.firebasestorage.app",
-            messagingSenderId: "963050302203",
-            appId: "1:963050302203:web:b48870480bd31079f35e5e"
+        const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
+
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // SECONDARY APP: Used ONLY for creating new users without logging out the Main Admin
+        const appSecondary = initializeApp(config, "Secondary");
+        const authSecondary = getAuth(appSecondary);
+
+        // Tab Switching Logic
+        window.switchTab = (tabName) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let allReports = [];
+        window.logout = () => { signOut(auth).then(() => window.location.href = "index.html"); };
 
-        async function fetchReports() {
-            const q = query(collection(db, "daily_reports"), orderBy("timestamp", "desc"));
-            const snapshot = await getDocs(q);
-            allReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            renderTable(allReports);
+        // --- MANAGE SITES LOGIC ---
+        async function loadSites() {
+            const snap = await getDocs(collection(db, "sites"));
+            const tbody = document.getElementById('sitesTable');
+            const uSiteDrop = document.getElementById('uSite');
+            tbody.innerHTML = ''; uSiteDrop.innerHTML = '<option value="">Assign a Site...</option><option value="ALL">ALL SITES (Supervisors only)</option>';
+            
+            snap.forEach(d => {
+                const s = d.data();
+                tbody.innerHTML += `<tr><td class="p-2 border font-bold">${s.name}</td><td class="p-2 border">${s.location}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="toggleSiteStatus('${d.id}', '${s.status}')" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">Change Status</button></td></tr>`;
+                if(s.status === 'Ongoing') uSiteDrop.innerHTML += `<option value="${s.name}">${s.name}</option>`;
+            });
         }
+        
+        document.getElementById('addSiteForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "sites"), { name: document.getElementById('siteName').value, location: document.getElementById('siteLocation').value, status: document.getElementById('siteStatus').value, createdAt: new Date() });
+            e.target.reset(); loadSites(); alert("Site Added!");
+        });
 
-        function renderTable(data) {
-            const tbody = document.getElementById('reportsTable');
-            tbody.innerHTML = '';
-            if(data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">No records found.</td></tr>';
-                return;
+        window.toggleSiteStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'Ongoing' ? 'Completed' : 'Ongoing';
+            await updateDoc(doc(db, "sites", id), { status: newStatus });
+            loadSites();
+        };
+
+        // --- MANAGE USERS LOGIC (Creates account + Adds to Firestore) ---
+        document.getElementById('addUserForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const btn = document.getElementById('createUserBtn'); const msg = document.getElementById('userStatus');
+            const email = document.getElementById('uEmail').value; const pass = document.getElementById('uPass').value;
+            const role = document.getElementById('uRole').value; const site = document.getElementById('uSite').value;
+            
+            btn.innerText = "Creating User..."; msg.innerText = "";
+            try {
+                // Create user in secondary auth (doesn't log out admin)
+                const cred = await createUserWithEmailAndPassword(authSecondary, email, pass);
+                // Save role details to Firestore
+                await setDoc(doc(db, "users", cred.user.uid), { email, role, assignedSite: site });
+                // Sign out the secondary instance immediately
+                await signOut(authSecondary);
+                
+                msg.innerText = "User successfully created!"; msg.className = "text-sm font-bold text-center mt-2 text-green-600";
+                e.target.reset();
+            } catch(err) {
+                msg.innerText = "Error: " + err.message; msg.className = "text-sm font-bold text-center mt-2 text-red-600";
             }
-            data.forEach((r, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "border-b hover:bg-gray-50";
-                tr.innerHTML = `
-                    <td class="p-3 border">${r.date || '-'}</td>
-                    <td class="p-3 border font-bold">${r.siteId || '-'}</td>
-                    <td class="p-3 border">${r.weather?.condition || '-'}</td>
-                    <td class="p-3 border truncate max-w-xs">${r.workDone?.desc || '-'}</td>
-                    <td class="p-3 border">${r.remarks?.preparedBy || '-'}</td>
-                    <td class="p-3 border">
-                        <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700" onclick="exportToExcel(${index})">
-                            Export Excel
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            btn.innerText = "Create User & Grant Access";
+        });
+
+        // --- LOAD REPORTS LOGIC ---
+        let allReports = [];
+        async function loadReports() {
+            const q = query(collection(db, "daily_reports"), orderBy("timestamp", "desc"));
+            const snap = await getDocs(q);
+            const tbody = document.getElementById('reportsTable'); tbody.innerHTML = '';
+            
+            snap.forEach((docSnap, index) => {
+                const r = docSnap.data(); allReports[index] = r;
+                tbody.innerHTML += `<tr class="border-b"><td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId}</td><td class="p-3 border">${r.weather?.condition}</td><td class="p-3 border">${r.remarks?.preparedBy}</td><td class="p-3 border"><button onclick="exportToExcel(${index})" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Export Excel</button></td></tr>`;
             });
         }
 
-        // Export Function (Uses SheetJS to format JSON to Excel)
         window.exportToExcel = function(index) {
             const report = allReports[index];
             const wb = XLSX.utils.book_new();
-            
-            // 1. General Info Sheet
-            const generalData = [
-                ["NIWASA CONSTRUCTIONS (PVT) LTD - DAILY PROGRESS REPORT"],
-                [],
-                ["Date:", report.date, "Project/Location:", report.siteId],
-                ["Weather:", report.weather?.condition, "Rain Delay:", (report.weather?.rainFrom || '-') + " to " + (report.weather?.rainTo || '-')],
-                ["Prepared By:", report.remarks?.preparedBy, "Site Visitor:", report.remarks?.visitor],
-                ["Work Description:", report.workDone?.desc],
-                ["Dimensions (L/W/H):", report.workDone?.l, report.workDone?.w, report.workDone?.h]
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(generalData);
+            const ws = XLSX.utils.aoa_to_sheet([["NIWASA CONSTRUCTIONS - DPR"], [], ["Date:", report.date, "Project:", report.siteId], ["Prepared By:", report.remarks?.preparedBy]]);
             XLSX.utils.book_append_sheet(wb, ws, "General Info");
-
-            // 2. Workers Sheet (With Financials for Admin)
-            if(report.workers && report.workers.length > 0) {
-                const wsWorkers = XLSX.utils.json_to_sheet(report.workers);
-                XLSX.utils.book_append_sheet(wb, wsWorkers, "Workers & Advances");
-            }
-
-            // 3. Equipment Sheet
-            if(report.equipment && report.equipment.length > 0) {
-                const wsEq = XLSX.utils.json_to_sheet(report.equipment);
-                XLSX.utils.book_append_sheet(wb, wsEq, "Equipment Usage");
-            }
-
-            // 4. Materials Sheet
-            if(report.materials && report.materials.length > 0) {
-                const wsMat = XLSX.utils.json_to_sheet(report.materials);
-                XLSX.utils.book_append_sheet(wb, wsMat, "Materials");
-            }
-
-            // Download File
+            if(report.workers && report.workers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.workers), "Workers");
+            if(report.materials && report.materials.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.materials), "Materials");
             XLSX.writeFile(wb, `DPR_${report.siteId}_${report.date}.xlsx`);
         };
 
-        // Search logic
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const text = e.target.value.toLowerCase();
-            const filtered = allReports.filter(r => 
-                (r.siteId || '').toLowerCase().includes(text) || 
-                (r.date || '').toLowerCase().includes(text)
-            );
-            renderTable(filtered);
-        });
-
-        // Load data on start
-        fetchReports();
+        // Init
+        loadSites(); loadReports();
     </script>
 </body>
 </html>
