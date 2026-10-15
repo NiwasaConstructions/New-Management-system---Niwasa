@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supervisor Dashboard - DPR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Daily Progress Report (DPR)</h1>
+        
+        <form id="dprForm" class="space-y-6">
+            <!-- General Info -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block font-semibold">Date</label>
+                    <input type="date" id="date" class="w-full border p-2 rounded" required>
+                </div>
+                <div>
+                    <label class="block font-semibold">Project/Location</label>
+                    <input type="text" id="siteId" value="NS Site" class="w-full border p-2 rounded bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label class="block font-semibold">Weather</label>
+                    <select id="weather" class="w-full border p-2 rounded">
+                        <option value="Sunny">Sunny (S)</option>
+                        <option value="Cloudy">Cloudy (C)</option>
+                        <option value="Light Shower">Light Shower (L)</option>
+                        <option value="Heavy Rain">Heavy Rain (H)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Labours / Workers Section -->
+            <div class="bg-blue-50 p-4 rounded border border-blue-200">
+                <h3 class="font-bold text-lg mb-2">Workers Details (සේවක විස්තර)</h3>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
+                    <input type="text" id="wName" placeholder="Name (e.g. Nimal)" class="border p-2 rounded col-span-2 md:col-span-1">
+                    <select id="wType" class="border p-2 rounded">
+                        <option value="SK">Skilled (SK)</option>
+                        <option value="USK">Unskilled (USK)</option>
+                    </select>
+                    <input type="text" id="wOT" placeholder="OT Hours" class="border p-2 rounded">
+                    <input type="number" id="wAdv" placeholder="Advanced (Rs)" class="border p-2 rounded">
+                    <button type="button" id="addWorkerBtn" class="bg-blue-600 text-white font-bold rounded p-2 hover:bg-blue-700">Add Worker</button>
+                </div>
+                
+                <!-- Added Workers List -->
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white border text-sm text-left">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="p-2 border">Name</th>
+                                <th class="p-2 border">SK/USK</th>
+                                <th class="p-2 border">OT</th>
+                                <th class="p-2 border">Advanced (Rs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workersTableBody">
+                            <!-- JS හරහා මෙතනට දත්ත එකතු වේ -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Work Done Description -->
+            <div>
+                <label class="block font-semibold">Work Done / Activity Description</label>
+                <textarea id="workDone" rows="3" class="w-full border p-2 rounded" placeholder="උදා: Ground floor brick work 4' x 9'' x 4'-6''" required></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">
+                Save & Submit System
+            </button>
+        </form>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
+            authDomain: "niwasa-new-labour.firebaseapp.com",
+            projectId: "niwasa-new-labour",
+            storageBucket: "niwasa-new-labour.firebasestorage.app",
+            messagingSenderId: "963050302203",
+            appId: "1:963050302203:web:b48870480bd31079f35e5e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Workers Array
+        let workersList = [];
+
+        // සේවකයින් Table එකට එකතු කිරීම
+        document.getElementById('addWorkerBtn').addEventListener('click', () => {
+            const name = document.getElementById('wName').value;
+            const type = document.getElementById('wType').value;
+            const ot = document.getElementById('wOT').value || "-";
+            const adv = document.getElementById('wAdv').value || "0";
+
+            if(name === "") return alert("Please enter worker name!");
+
+            workersList.push({ name, type, ot, adv });
+            updateWorkersTable();
+            
+            // Clear inputs
+            document.getElementById('wName').value = "";
+            document.getElementById('wOT').value = "";
+            document.getElementById('wAdv').value = "";
+        });
+
+        function updateWorkersTable() {
+            const tbody = document.getElementById('workersTableBody');
+            tbody.innerHTML = "";
+            workersList.forEach(w => {
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-2 border">${w.name}</td>
+                        <td class="p-2 border">${w.type}</td>
+                        <td class="p-2 border">${w.ot}</td>
+                        <td class="p-2 border font-bold text-red-600">${w.adv}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // දත්ත Firebase එකට යැවීම
+        document.getElementById('dprForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "Submitting...";
+
+            try {
+                await addDoc(collection(db, "daily_reports"), {
+                    date: document.getElementById('date').value,
+                    siteId: document.getElementById('siteId').value,
+                    weather: document.getElementById('weather').value,
+                    workDone: document.getElementById('workDone').value,
+                    workers: workersList, // Array එකම යවනවා
+                    timestamp: new Date()
+                });
+
+                alert("DPR Data Successfully Saved!");
+                document.getElementById('dprForm').reset();
+                workersList = [];
+                updateWorkersTable();
+                submitBtn.innerText = "Save & Submit System";
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Error Saving Data!");
+                submitBtn.innerText = "Save & Submit System";
+            }
+        });
+    </script>
+</body>
+</html>
