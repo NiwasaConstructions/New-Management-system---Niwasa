@@ -12,68 +12,70 @@
         <div class="flex justify-between items-center mb-6 border-b pb-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">My Project Progress</h1>
-                <p class="text-gray-500" id="clientSiteName">Loading your assigned site...</p>
+                <p class="text-gray-500 font-bold" id="clientSiteName">Loading your assigned sites...</p>
             </div>
-            <button onclick="logout()" class="bg-gray-800 text-white px-4 py-2 rounded">Logout</button>
+            <button id="btnLogout" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">Logout</button>
         </div>
-
         <div id="reportsContainer" class="space-y-6">
-            <p class="text-center text-gray-500">Fetching your daily reports...</p>
+            <p class="text-center text-gray-500 font-bold">Fetching your daily reports...</p>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
         const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
 
-        window.logout = () => signOut(auth);
+        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(()=> window.location.href="index.html"));
 
         auth.onAuthStateChanged(async user => {
-            if(!user) { window.location.href = "index.html"; return; }
+            if(!user) return window.location.href = "index.html";
             
-            // Get Customer's Assigned Site
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if(userDoc.exists() && userDoc.data().role === 'customer') {
-                const assignedSite = userDoc.data().assignedSite;
-                document.getElementById('clientSiteName').innerText = "Site: " + assignedSite;
-                loadCustomerReports(assignedSite);
-            } else {
-                document.getElementById('reportsContainer').innerHTML = "<p class='text-red-500'>Access Denied or Not Assigned to a site.</p>";
-            }
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists() && userDoc.data().role === 'customer') {
+                    const assignedSites = userDoc.data().assignedSites || [];
+                    if(assignedSites.length > 0) {
+                        document.getElementById('clientSiteName').innerText = "Assigned Sites: " + assignedSites.join(", ");
+                        loadCustomerReports(assignedSites);
+                    } else {
+                        document.getElementById('reportsContainer').innerHTML = "<p class='text-red-500 font-bold text-center'>No sites are currently assigned to you.</p>";
+                    }
+                }
+            } catch(e) { alert("Auth Error: " + e.message); }
         });
 
-        async function loadCustomerReports(siteName) {
-            const q = query(collection(db, "daily_reports"), where("siteId", "==", siteName));
-            const snap = await getDocs(q); // (Note: Firestore requires an index for orderBy + where, so we sort client-side)
-            
-            const reports = []; snap.forEach(d => reports.push(d.data()));
-            reports.sort((a,b) => b.timestamp - a.timestamp);
+        async function loadCustomerReports(sitesArray) {
+            try {
+                const q = query(collection(db, "daily_reports"), where("siteId", "in", sitesArray));
+                const snap = await getDocs(q); 
+                
+                const reports = []; snap.forEach(d => reports.push(d.data()));
+                // Use .toMillis() to safely sort Firestore Timestamps
+                reports.sort((a,b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
 
-            const container = document.getElementById('reportsContainer');
-            container.innerHTML = '';
-            
-            if(reports.length === 0) container.innerHTML = "<p class='text-center text-gray-500'>No progress reports submitted yet.</p>";
+                const container = document.getElementById('reportsContainer'); container.innerHTML = '';
+                if(reports.length === 0) container.innerHTML = "<p class='text-center text-gray-500 font-bold'>No progress reports submitted yet for your sites.</p>";
 
-            reports.forEach(r => {
-                container.innerHTML += `
-                    <div class="border rounded p-4 bg-gray-50 shadow-sm">
-                        <div class="flex justify-between border-b pb-2 mb-2">
-                            <span class="font-bold text-lg text-blue-900">${r.date}</span>
-                            <span class="text-sm bg-blue-100 text-blue-800 px-2 rounded">Weather: ${r.weather?.condition}</span>
+                reports.forEach(r => {
+                    container.innerHTML += `
+                        <div class="border rounded p-5 bg-gray-50 shadow-sm border-l-4 border-green-500">
+                            <div class="flex justify-between border-b pb-2 mb-3">
+                                <span class="font-bold text-lg text-blue-900">${r.date} <span class="text-sm text-gray-500">(${r.siteId})</span></span>
+                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Weather: ${r.weather?.condition}</span>
+                            </div>
+                            <h4 class="font-bold text-gray-700">Work Completed:</h4>
+                            <p class="text-gray-600 mb-3">${r.workDone?.desc || 'N/A'}</p>
+                            <div class="bg-white p-2 rounded border text-sm">
+                                <span class="font-bold text-green-700">Labour Force:</span> ${r.workers ? r.workers.length + ' Workers present.' : 'No record.'}
+                            </div>
                         </div>
-                        <h4 class="font-bold text-gray-700">Work Completed:</h4>
-                        <p class="text-gray-600 mb-2">${r.workDone?.desc || 'N/A'}</p>
-                        
-                        <div class="bg-white p-2 rounded border text-sm">
-                            <span class="font-bold text-green-700">Labour Force:</span> ${r.workers ? r.workers.length + ' Workers present.' : 'No record.'}
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } catch(e) { alert("Load Error: " + e.message); }
         }
     </script>
 </body>
