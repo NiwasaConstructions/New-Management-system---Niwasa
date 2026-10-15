@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Niwasa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Excel Export Library -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 p-4">
+
+    <div class="max-w-7xl mx-auto">
+        <div class="bg-blue-900 text-white p-6 rounded-lg shadow-md mb-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+                <p>Niwasa Constructions System Control</p>
+            </div>
+            <button onclick="window.location.href='index.html'" class="bg-red-500 px-4 py-2 rounded hover:bg-red-600">Logout</button>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-700">All Submitted DPR Reports</h2>
+                <input type="text" id="searchInput" placeholder="Search by Site or Date..." class="border p-2 rounded w-64">
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="p-3 border">Date</th>
+                            <th class="p-3 border">Site</th>
+                            <th class="p-3 border">Weather</th>
+                            <th class="p-3 border">Work Done</th>
+                            <th class="p-3 border">Prepared By</th>
+                            <th class="p-3 border">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTable">
+                        <tr><td colspan="6" class="text-center p-4">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
+            authDomain: "niwasa-new-labour.firebaseapp.com",
+            projectId: "niwasa-new-labour",
+            storageBucket: "niwasa-new-labour.firebasestorage.app",
+            messagingSenderId: "963050302203",
+            appId: "1:963050302203:web:b48870480bd31079f35e5e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let allReports = [];
+
+        async function fetchReports() {
+            const q = query(collection(db, "daily_reports"), orderBy("timestamp", "desc"));
+            const snapshot = await getDocs(q);
+            allReports = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderTable(allReports);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('reportsTable');
+            tbody.innerHTML = '';
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">No records found.</td></tr>';
+                return;
+            }
+            data.forEach((r, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="p-3 border">${r.date || '-'}</td>
+                    <td class="p-3 border font-bold">${r.siteId || '-'}</td>
+                    <td class="p-3 border">${r.weather?.condition || '-'}</td>
+                    <td class="p-3 border truncate max-w-xs">${r.workDone?.desc || '-'}</td>
+                    <td class="p-3 border">${r.remarks?.preparedBy || '-'}</td>
+                    <td class="p-3 border">
+                        <button class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700" onclick="exportToExcel(${index})">
+                            Export Excel
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Export Function (Uses SheetJS to format JSON to Excel)
+        window.exportToExcel = function(index) {
+            const report = allReports[index];
+            const wb = XLSX.utils.book_new();
+            
+            // 1. General Info Sheet
+            const generalData = [
+                ["NIWASA CONSTRUCTIONS (PVT) LTD - DAILY PROGRESS REPORT"],
+                [],
+                ["Date:", report.date, "Project/Location:", report.siteId],
+                ["Weather:", report.weather?.condition, "Rain Delay:", (report.weather?.rainFrom || '-') + " to " + (report.weather?.rainTo || '-')],
+                ["Prepared By:", report.remarks?.preparedBy, "Site Visitor:", report.remarks?.visitor],
+                ["Work Description:", report.workDone?.desc],
+                ["Dimensions (L/W/H):", report.workDone?.l, report.workDone?.w, report.workDone?.h]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(generalData);
+            XLSX.utils.book_append_sheet(wb, ws, "General Info");
+
+            // 2. Workers Sheet (With Financials for Admin)
+            if(report.workers && report.workers.length > 0) {
+                const wsWorkers = XLSX.utils.json_to_sheet(report.workers);
+                XLSX.utils.book_append_sheet(wb, wsWorkers, "Workers & Advances");
+            }
+
+            // 3. Equipment Sheet
+            if(report.equipment && report.equipment.length > 0) {
+                const wsEq = XLSX.utils.json_to_sheet(report.equipment);
+                XLSX.utils.book_append_sheet(wb, wsEq, "Equipment Usage");
+            }
+
+            // 4. Materials Sheet
+            if(report.materials && report.materials.length > 0) {
+                const wsMat = XLSX.utils.json_to_sheet(report.materials);
+                XLSX.utils.book_append_sheet(wb, wsMat, "Materials");
+            }
+
+            // Download File
+            XLSX.writeFile(wb, `DPR_${report.siteId}_${report.date}.xlsx`);
+        };
+
+        // Search logic
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const text = e.target.value.toLowerCase();
+            const filtered = allReports.filter(r => 
+                (r.siteId || '').toLowerCase().includes(text) || 
+                (r.date || '').toLowerCase().includes(text)
+            );
+            renderTable(filtered);
+        });
+
+        // Load data on start
+        fetchReports();
+    </script>
+</body>
+</html>
