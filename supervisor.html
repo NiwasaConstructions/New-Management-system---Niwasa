@@ -13,23 +13,23 @@
         <div class="flex justify-between items-center border-b pb-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Daily Progress Report (DPR)</h1>
-                <p class="text-gray-500 font-semibold" id="supervisorInfo">Loading...</p>
+                <p class="text-gray-500 font-semibold" id="supervisorInfo">Loading your details...</p>
             </div>
             <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">Logout</button>
         </div>
         
         <form id="dprForm" class="space-y-6">
-            <!-- 1. General Information -->
+            <!-- 1. General -->
             <div class="bg-gray-50 p-4 rounded border">
                 <h3 class="font-bold text-gray-700 mb-3 border-b pb-1">1. General Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div><label class="block text-sm font-semibold">Date</label><input type="date" id="date" class="w-full border p-2 rounded" required></div>
-                    <div><label class="block text-sm font-semibold">DOC No / Working Time</label><input type="text" id="docNo" class="w-full border p-2 rounded"></div>
+                    <div><label class="block text-sm font-semibold">DOC No / Time</label><input type="text" id="docNo" class="w-full border p-2 rounded"></div>
                     <div>
-                        <label class="block text-sm font-semibold">Project / Location</label>
-                        <!-- Dynamic Site Dropdown -->
-                        <select id="siteId" class="w-full border p-2 rounded bg-yellow-50" required>
-                            <option value="">Select a Site...</option>
+                        <label class="block text-sm font-bold text-blue-800">Select Project / Site</label>
+                        <!-- Dynamic Site Dropdown (Only their assigned sites) -->
+                        <select id="siteId" class="w-full border p-2 rounded bg-yellow-100 border-yellow-400 font-bold" required>
+                            <option value="">Fetching your assigned sites...</option>
                         </select>
                     </div>
                     <div>
@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <!-- 2. Workers Details -->
+            <!-- 2. Workers -->
             <div class="bg-blue-50 p-4 rounded border border-blue-200">
                 <h3 class="font-bold text-gray-700 mb-3 border-b border-blue-300 pb-1">2. Workers & Labours</h3>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-2">
@@ -59,7 +59,7 @@
                 <div class="mt-2"><input type="text" id="preparedBy" placeholder="Prepared By (Your Name)" class="w-full border p-2 rounded" required></div>
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg shadow-lg">Submit Final DPR</button>
+            <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg shadow-lg text-lg">Submit Final DPR</button>
         </form>
     </div>
 
@@ -67,25 +67,33 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
         const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
 
-        auth.onAuthStateChanged(user => {
-            if(!user) window.location.href = "index.html";
-            else document.getElementById('supervisorInfo').innerText = "Logged in as: " + user.email;
-        });
         window.logout = () => { signOut(auth); };
 
-        // Fetch Ongoing Sites
-        async function loadSites() {
-            const q = query(collection(db, "sites"), where("status", "==", "Ongoing"));
-            const snap = await getDocs(q);
+        auth.onAuthStateChanged(async user => {
+            if(!user) { window.location.href = "index.html"; return; }
+            document.getElementById('supervisorInfo').innerText = "Logged in as: " + user.email;
+            
+            // FETCH ASSIGNED SITES FOR THIS SUPERVISOR
+            const userDoc = await getDoc(doc(db, "users", user.uid));
             const drop = document.getElementById('siteId');
-            snap.forEach(d => drop.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`);
-        }
-        loadSites();
+            
+            if (userDoc.exists()) {
+                const assignedSites = userDoc.data().assignedSites || [];
+                drop.innerHTML = '<option value="">-- Select Your Site --</option>';
+                assignedSites.forEach(siteName => {
+                    drop.innerHTML += `<option value="${siteName}">${siteName}</option>`;
+                });
+                
+                if(assignedSites.length === 0) {
+                    drop.innerHTML = '<option value="">No sites assigned to you!</option>';
+                }
+            }
+        });
 
         let workers = [];
         window.addWorker = () => {
