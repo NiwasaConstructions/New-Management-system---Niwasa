@@ -7,6 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <!-- Modal Styles -->
+    <style>
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px; }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -52,61 +57,107 @@
 
         <!-- USERS -->
         <div id="usersTab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">User Access Management</h2>
-            <div class="bg-white p-6 rounded shadow max-w-2xl">
-                <form id="addUserForm" class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="email" id="uEmail" placeholder="User Email" class="border p-2 rounded col-span-2" required>
-                        <input type="password" id="uPass" placeholder="Password" class="border p-2 rounded" required>
-                        <select id="uRole" class="border p-2 rounded" required>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">User Access Management</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Add New User Form -->
+                <div class="bg-white p-6 rounded shadow h-fit">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Create New User</h3>
+                    <form id="addUserForm" class="space-y-4">
+                        <input type="email" id="uEmail" placeholder="User Email" class="w-full border p-2 rounded" required>
+                        <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded" required>
+                        <select id="uRole" class="w-full border p-2 rounded" required>
                             <option value="">Select Role...</option>
                             <option value="supervisor">Site Supervisor</option>
                             <option value="customer">Customer (Client)</option>
                         </select>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Assign Sites (ඔබට අදාළ සයිට් කිහිපයක් තේරිය හැක)</label>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Assign Sites</label>
                             <div id="siteCheckboxes" class="border p-3 rounded bg-gray-50 max-h-40 overflow-y-auto space-y-2">
                                 <!-- Checkboxes load here -->
                             </div>
                         </div>
+                        <button type="submit" id="createUserBtn" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Create & Grant Access</button>
+                        <p id="userStatus" class="text-sm font-bold text-center mt-2"></p>
+                    </form>
+                </div>
+
+                <!-- Existing Users List -->
+                <div class="lg:col-span-2 bg-white p-6 rounded shadow">
+                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Active Users</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full border text-sm text-left">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-2 border">Email</th>
+                                    <th class="p-2 border">Role</th>
+                                    <th class="p-2 border">Assigned Sites</th>
+                                    <th class="p-2 border text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr><td colspan="4" class="text-center p-4">Loading users...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <button type="submit" id="createUserBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700">Create User & Grant Access</button>
-                    <p id="userStatus" class="text-sm font-bold text-center mt-2"></p>
-                </form>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit User Sites Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center border-b pb-2 mb-4">
+                <h3 class="font-bold text-xl">Edit Assigned Sites</h3>
+                <span class="cursor-pointer text-2xl font-bold text-red-500 hover:text-red-700" onclick="closeEditModal()">&times;</span>
+            </div>
+            <p id="editUserEmail" class="font-semibold text-gray-700 mb-4"></p>
+            <input type="hidden" id="editUserId">
+            <div id="editSiteCheckboxes" class="border p-3 rounded bg-gray-50 max-h-60 overflow-y-auto space-y-2 mb-4">
+                <!-- Checkboxes load here -->
+            </div>
+            <button onclick="saveUserSites()" id="saveSitesBtn" class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700">Save Changes</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
         const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
         const appSecondary = initializeApp(config, "Secondary"); const authSecondary = getAuth(appSecondary);
 
-        // Navigation Logic
+        // Navigation
         const switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('text-blue-300'));
             document.getElementById(tabId + 'Tab').classList.remove('hidden');
             document.getElementById('nav' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('text-blue-300');
+            if(tabId === 'users') loadUsers(); // Load users when tab is opened
         };
         document.getElementById('navReports').addEventListener('click', () => switchTab('reports'));
         document.getElementById('navSites').addEventListener('click', () => switchTab('sites'));
         document.getElementById('navUsers').addEventListener('click', () => switchTab('users'));
         document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(() => window.location.href = "index.html"));
 
+        let globalSites = [];
+
         // Load Sites
         async function loadSites() {
             try {
                 const snap = await getDocs(collection(db, "sites"));
+                globalSites = [];
                 const tbody = document.getElementById('sitesTable'); tbody.innerHTML = '';
                 const cbDiv = document.getElementById('siteCheckboxes'); cbDiv.innerHTML = '';
                 
                 snap.forEach(d => {
                     const s = d.data();
+                    globalSites.push({ id: d.id, name: s.name, status: s.status });
                     tbody.innerHTML += `<tr><td class="p-2 border font-bold">${s.name}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button data-id="${d.id}" data-status="${s.status}" class="toggle-status-btn bg-gray-800 text-white text-xs px-2 py-1 rounded hover:bg-gray-700">Change Status</button></td></tr>`;
                     if(s.status === 'Ongoing') {
                         cbDiv.innerHTML += `<label class="flex items-center space-x-2 p-1 hover:bg-gray-200 rounded cursor-pointer"><input type="checkbox" value="${s.name}" class="site-cb w-4 h-4 text-blue-600 border-gray-300 rounded"><span class="text-gray-800 font-semibold">${s.name}</span></label>`;
@@ -124,7 +175,7 @@
             } catch(e) { alert("Error adding site: " + e.message); }
         });
 
-        // Toggle Status (Event Delegation for Dynamic Buttons)
+        // Toggle Site Status
         document.getElementById('sitesTable').addEventListener('click', async (e) => {
             if(e.target.classList.contains('toggle-status-btn')) {
                 const id = e.target.getAttribute('data-id');
@@ -132,26 +183,138 @@
                 e.target.innerText = "Wait...";
                 await updateDoc(doc(db, "sites", id), { status: newStatus });
                 loadSites();
+                loadUsers(); // Refresh users to reflect any site status changes
             }
         });
 
-        // Add User
+        // ==========================================
+        // USER MANAGEMENT LOGIC
+        // ==========================================
+
+        // Load All Users
+        async function loadUsers() {
+            try {
+                const snap = await getDocs(collection(db, "users"));
+                const tbody = document.getElementById('usersTable'); tbody.innerHTML = '';
+                
+                if(snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4">No users found.</td></tr>';
+                    return;
+                }
+
+                snap.forEach(docSnap => {
+                    const u = docSnap.data();
+                    const uid = docSnap.id;
+                    const sitesList = (u.assignedSites && u.assignedSites.length > 0) ? u.assignedSites.join(', ') : '<span class="text-red-500 text-xs">No sites</span>';
+                    const roleBadge = u.role === 'admin' ? '<span class="bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs">Admin</span>' : 
+                                      u.role === 'supervisor' ? '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">Supervisor</span>' : 
+                                      '<span class="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">Customer</span>';
+
+                    // Don't allow editing the main admin account itself from here to prevent accidental lockouts
+                    const actions = u.role === 'admin' ? '<span class="text-gray-400 text-xs italic">Protected</span>' : 
+                        `<button onclick="openEditModal('${uid}', '${u.email}', '${u.assignedSites ? u.assignedSites.join(',') : ''}')" class="bg-yellow-500 text-white text-xs px-2 py-1 rounded hover:bg-yellow-600 mr-1"><i class="fa-solid fa-pen-to-square"></i> Edit Sites</button>
+                         <button onclick="deleteUserRecord('${uid}', '${u.email}')" class="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600"><i class="fa-solid fa-trash"></i> Revoke</button>`;
+
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2 border font-medium">${u.email}</td>
+                            <td class="p-2 border">${roleBadge}</td>
+                            <td class="p-2 border max-w-[200px] truncate" title="${sitesList}">${sitesList}</td>
+                            <td class="p-2 border text-center whitespace-nowrap">${actions}</td>
+                        </tr>
+                    `;
+                });
+            } catch(e) { console.error("Error loading users:", e); }
+        }
+
+        // Add New User
         document.getElementById('addUserForm').addEventListener('submit', async(e) => {
             e.preventDefault();
             const selectedSites = Array.from(document.querySelectorAll('.site-cb:checked')).map(cb => cb.value);
-            if(selectedSites.length === 0) return alert("කරුණාකර සයිට් එකක් තෝරන්න! (Select a site)");
-
+            
             const btn = document.getElementById('createUserBtn'); const msg = document.getElementById('userStatus');
-            btn.innerText = "Creating User..."; msg.innerText = "";
+            btn.innerText = "Creating..."; msg.innerText = "";
             try {
                 const cred = await createUserWithEmailAndPassword(authSecondary, document.getElementById('uEmail').value, document.getElementById('uPass').value);
-                await setDoc(doc(db, "users", cred.user.uid), { email: document.getElementById('uEmail').value, role: document.getElementById('uRole').value, assignedSites: selectedSites });
+                await setDoc(doc(db, "users", cred.user.uid), { 
+                    email: document.getElementById('uEmail').value, 
+                    role: document.getElementById('uRole').value, 
+                    assignedSites: selectedSites 
+                });
                 await signOut(authSecondary);
-                msg.innerText = "User created & assigned to " + selectedSites.length + " site(s)!"; msg.className = "text-sm font-bold text-center mt-2 text-green-600";
+                msg.innerText = "User created successfully!"; msg.className = "text-sm font-bold text-center mt-2 text-green-600";
                 e.target.reset();
+                loadUsers(); // Refresh the table
             } catch(err) { msg.innerText = "Error: " + err.message; msg.className = "text-sm font-bold text-center mt-2 text-red-600"; }
-            btn.innerText = "Create User & Grant Access";
+            btn.innerText = "Create & Grant Access";
         });
+
+        // Delete User Record from Firestore (Revoke Access)
+        window.deleteUserRecord = async (uid, email) => {
+            if(confirm(`Are you sure you want to REVOKE ACCESS for ${email}?\n\nNote: This removes their database permissions. They will no longer see any data.`)) {
+                try {
+                    await deleteDoc(doc(db, "users", uid));
+                    alert("User access revoked successfully.");
+                    loadUsers();
+                } catch(e) { alert("Error deleting user: " + e.message); }
+            }
+        };
+
+        // Open Edit Modal
+        window.openEditModal = (uid, email, assignedSitesStr) => {
+            document.getElementById('editUserId').value = uid;
+            document.getElementById('editUserEmail').innerText = `User: ${email}`;
+            
+            const assignedSites = assignedSitesStr ? assignedSitesStr.split(',') : [];
+            const cbDiv = document.getElementById('editSiteCheckboxes');
+            cbDiv.innerHTML = '';
+
+            // Generate checkboxes based on global sites list
+            globalSites.forEach(s => {
+                if(s.status === 'Ongoing') {
+                    const isChecked = assignedSites.includes(s.name) ? 'checked' : '';
+                    cbDiv.innerHTML += `
+                        <label class="flex items-center space-x-2 p-1 hover:bg-gray-200 rounded cursor-pointer">
+                            <input type="checkbox" value="${s.name}" class="edit-site-cb w-4 h-4 text-blue-600 border-gray-300 rounded" ${isChecked}>
+                            <span class="text-gray-800 font-semibold">${s.name}</span>
+                        </label>`;
+                }
+            });
+
+            if(cbDiv.innerHTML === '') {
+                cbDiv.innerHTML = '<p class="text-sm text-red-500">No ongoing sites available.</p>';
+            }
+
+            document.getElementById('editUserModal').style.display = 'block';
+        };
+
+        window.closeEditModal = () => { document.getElementById('editUserModal').style.display = 'none'; };
+
+        // Save Edited Sites
+        window.saveUserSites = async () => {
+            const uid = document.getElementById('editUserId').value;
+            const btn = document.getElementById('saveSitesBtn');
+            const selectedSites = Array.from(document.querySelectorAll('.edit-site-cb:checked')).map(cb => cb.value);
+            
+            btn.innerText = "Saving...";
+            try {
+                await updateDoc(doc(db, "users", uid), { assignedSites: selectedSites });
+                closeEditModal();
+                loadUsers(); // Refresh table
+                alert("Assigned sites updated successfully!");
+            } catch(e) {
+                alert("Error updating sites: " + e.message);
+            }
+            btn.innerText = "Save Changes";
+        };
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editUserModal');
+            if (event.target == modal) { modal.style.display = "none"; }
+        }
+
+        // ==========================================
 
         // Load Reports
         let allReports = [];
