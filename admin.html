@@ -10,88 +10,71 @@
 </head>
 <body class="bg-gray-100">
 
-    <!-- Top Navigation -->
     <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center">
-        <div>
-            <h1 class="text-2xl font-bold"><i class="fa-solid fa-building-shield"></i> Niwasa Admin Portal</h1>
-        </div>
+        <div><h1 class="text-2xl font-bold"><i class="fa-solid fa-building-shield"></i> Niwasa Admin</h1></div>
         <div class="space-x-4">
-            <button onclick="switchTab('reports')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-file-lines"></i> Reports</button>
-            <button onclick="switchTab('sites')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-map-location-dot"></i> Manage Sites</button>
-            <button onclick="switchTab('users')" class="hover:text-blue-300 font-semibold"><i class="fa-solid fa-users-gear"></i> Manage Users</button>
-            <button onclick="logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-4"><i class="fa-solid fa-power-off"></i> Logout</button>
+            <button onclick="switchTab('reports')" class="hover:text-blue-300 font-semibold">Reports</button>
+            <button onclick="switchTab('sites')" class="hover:text-blue-300 font-semibold">Manage Sites</button>
+            <button onclick="switchTab('users')" class="hover:text-blue-300 font-semibold">Manage Users</button>
+            <button onclick="logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-4">Logout</button>
         </div>
     </nav>
 
     <div class="p-6 max-w-7xl mx-auto">
-        
-        <!-- SECTION 1: REPORTS -->
+        <!-- REPORTS -->
         <div id="reportsTab" class="tab-content block">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Submitted Daily Reports</h2>
-            <div class="bg-white p-6 rounded shadow">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border">
-                        <thead class="bg-gray-200">
-                            <tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border">Weather</th><th class="p-3 border">Supervisor</th><th class="p-3 border">Action</th></tr>
-                        </thead>
-                        <tbody id="reportsTable"></tbody>
-                    </table>
-                </div>
+            <h2 class="text-2xl font-bold mb-4">Submitted Reports</h2>
+            <div class="bg-white p-6 rounded shadow overflow-x-auto">
+                <table class="w-full text-left border">
+                    <thead class="bg-gray-200"><tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border">Weather</th><th class="p-3 border">Supervisor</th><th class="p-3 border">Action</th></tr></thead>
+                    <tbody id="reportsTable"></tbody>
+                </table>
             </div>
         </div>
 
-        <!-- SECTION 2: MANAGE SITES -->
+        <!-- SITES -->
         <div id="sitesTab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Manage Construction Sites</h2>
+            <h2 class="text-2xl font-bold mb-4">Manage Sites</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Add Site Form -->
                 <div class="bg-white p-6 rounded shadow">
-                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Add New Site</h3>
                     <form id="addSiteForm" class="space-y-4">
                         <input type="text" id="siteName" placeholder="Site Name (e.g. NS Site)" class="w-full border p-2 rounded" required>
                         <input type="text" id="siteLocation" placeholder="Location" class="w-full border p-2 rounded" required>
-                        <select id="siteStatus" class="w-full border p-2 rounded">
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Completed">Completed</option>
-                        </select>
+                        <select id="siteStatus" class="w-full border p-2 rounded"><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select>
                         <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded">Add Site</button>
                     </form>
                 </div>
-                <!-- Sites List -->
                 <div class="md:col-span-2 bg-white p-6 rounded shadow">
-                    <h3 class="font-bold text-lg mb-4 border-b pb-2">Existing Sites</h3>
-                    <table class="w-full border text-sm text-left">
-                        <thead class="bg-gray-100"><tr><th class="p-2 border">Site Name</th><th class="p-2 border">Location</th><th class="p-2 border">Status</th><th class="p-2 border">Action</th></tr></thead>
-                        <tbody id="sitesTable"></tbody>
-                    </table>
+                    <table class="w-full border text-sm text-left"><thead class="bg-gray-100"><tr><th class="p-2 border">Site</th><th class="p-2 border">Status</th><th class="p-2 border">Action</th></tr></thead><tbody id="sitesTable"></tbody></table>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION 3: MANAGE USERS -->
+        <!-- USERS -->
         <div id="usersTab" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">User Access Management</h2>
+            <h2 class="text-2xl font-bold mb-4">User Access Management</h2>
             <div class="bg-white p-6 rounded shadow max-w-2xl">
                 <form id="addUserForm" class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="email" id="uEmail" placeholder="User Email" class="border p-2 rounded" required>
+                        <input type="email" id="uEmail" placeholder="User Email" class="border p-2 rounded col-span-2" required>
                         <input type="password" id="uPass" placeholder="Password" class="border p-2 rounded" required>
                         <select id="uRole" class="border p-2 rounded" required>
                             <option value="">Select Role...</option>
                             <option value="supervisor">Site Supervisor</option>
                             <option value="customer">Customer (Client)</option>
                         </select>
-                        <select id="uSite" class="border p-2 rounded" required>
-                            <option value="">Assign a Site...</option>
-                            <!-- Sites will load here dynamically -->
-                        </select>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Assign Sites (ඔබට අදාළ සයිට් කිහිපයක් තේරිය හැක)</label>
+                            <div id="siteCheckboxes" class="border p-3 rounded bg-gray-50 max-h-40 overflow-y-auto space-y-2">
+                                <!-- Checkboxes dynamic -->
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" id="createUserBtn" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">Create User & Grant Access</button>
+                    <button type="submit" id="createUserBtn" class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700">Create User & Grant Access</button>
                     <p id="userStatus" class="text-sm font-bold text-center mt-2"></p>
                 </form>
             </div>
         </div>
-
     </div>
 
     <!-- Firebase System -->
@@ -102,65 +85,61 @@
         
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
 
-        const app = initializeApp(config);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
+        const appSecondary = initializeApp(config, "Secondary"); const authSecondary = getAuth(appSecondary);
 
-        // SECONDARY APP: Used ONLY for creating new users without logging out the Main Admin
-        const appSecondary = initializeApp(config, "Secondary");
-        const authSecondary = getAuth(appSecondary);
-
-        // Tab Switching Logic
-        window.switchTab = (tabName) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById(tabName + 'Tab').classList.remove('hidden');
-        };
-
+        window.switchTab = (t) => { document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.getElementById(t + 'Tab').classList.remove('hidden'); };
         window.logout = () => { signOut(auth).then(() => window.location.href = "index.html"); };
 
-        // --- MANAGE SITES LOGIC ---
         async function loadSites() {
             const snap = await getDocs(collection(db, "sites"));
-            const tbody = document.getElementById('sitesTable');
-            const uSiteDrop = document.getElementById('uSite');
-            tbody.innerHTML = ''; uSiteDrop.innerHTML = '<option value="">Assign a Site...</option><option value="ALL">ALL SITES (Supervisors only)</option>';
+            const tbody = document.getElementById('sitesTable'); tbody.innerHTML = '';
+            const cbDiv = document.getElementById('siteCheckboxes'); cbDiv.innerHTML = '';
             
             snap.forEach(d => {
                 const s = d.data();
-                tbody.innerHTML += `<tr><td class="p-2 border font-bold">${s.name}</td><td class="p-2 border">${s.location}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="toggleSiteStatus('${d.id}', '${s.status}')" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">Change Status</button></td></tr>`;
-                if(s.status === 'Ongoing') uSiteDrop.innerHTML += `<option value="${s.name}">${s.name}</option>`;
+                tbody.innerHTML += `<tr><td class="p-2 border font-bold">${s.name}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="toggleSiteStatus('${d.id}', '${s.status}')" class="bg-gray-800 text-white text-xs px-2 py-1 rounded">Change Status</button></td></tr>`;
+                
+                // Add Checkboxes for Ongoing Sites
+                if(s.status === 'Ongoing') {
+                    cbDiv.innerHTML += `<label class="flex items-center space-x-2 p-1 hover:bg-gray-200 rounded cursor-pointer">
+                        <input type="checkbox" value="${s.name}" class="site-cb w-4 h-4 text-blue-600 border-gray-300 rounded">
+                        <span class="text-gray-800 font-semibold">${s.name}</span>
+                    </label>`;
+                }
             });
         }
         
         document.getElementById('addSiteForm').addEventListener('submit', async(e) => {
-            e.preventDefault();
-            await addDoc(collection(db, "sites"), { name: document.getElementById('siteName').value, location: document.getElementById('siteLocation').value, status: document.getElementById('siteStatus').value, createdAt: new Date() });
+            e.preventDefault(); await addDoc(collection(db, "sites"), { name: document.getElementById('siteName').value, location: document.getElementById('siteLocation').value, status: document.getElementById('siteStatus').value, createdAt: new Date() });
             e.target.reset(); loadSites(); alert("Site Added!");
         });
 
-        window.toggleSiteStatus = async (id, currentStatus) => {
-            const newStatus = currentStatus === 'Ongoing' ? 'Completed' : 'Ongoing';
-            await updateDoc(doc(db, "sites", id), { status: newStatus });
-            loadSites();
-        };
+        window.toggleSiteStatus = async (id, status) => { await updateDoc(doc(db, "sites", id), { status: status === 'Ongoing' ? 'Completed' : 'Ongoing' }); loadSites(); };
 
-        // --- MANAGE USERS LOGIC (Creates account + Adds to Firestore) ---
+        // Create User & Save Multiple Sites
         document.getElementById('addUserForm').addEventListener('submit', async(e) => {
             e.preventDefault();
-            const btn = document.getElementById('createUserBtn'); const msg = document.getElementById('userStatus');
-            const email = document.getElementById('uEmail').value; const pass = document.getElementById('uPass').value;
-            const role = document.getElementById('uRole').value; const site = document.getElementById('uSite').value;
+            const checkedBoxes = document.querySelectorAll('.site-cb:checked');
+            const selectedSites = Array.from(checkedBoxes).map(cb => cb.value); // Array of sites
             
+            if(selectedSites.length === 0) {
+                alert("කරුණාකර අවම වශයෙන් එක් සයිට් එකක් හෝ තෝරන්න! (Select at least one site)");
+                return;
+            }
+
+            const btn = document.getElementById('createUserBtn'); const msg = document.getElementById('userStatus');
             btn.innerText = "Creating User..."; msg.innerText = "";
             try {
-                // Create user in secondary auth (doesn't log out admin)
-                const cred = await createUserWithEmailAndPassword(authSecondary, email, pass);
-                // Save role details to Firestore
-                await setDoc(doc(db, "users", cred.user.uid), { email, role, assignedSite: site });
-                // Sign out the secondary instance immediately
+                const cred = await createUserWithEmailAndPassword(authSecondary, document.getElementById('uEmail').value, document.getElementById('uPass').value);
+                // Save roles AND multiple sites to DB
+                await setDoc(doc(db, "users", cred.user.uid), { 
+                    email: document.getElementById('uEmail').value, 
+                    role: document.getElementById('uRole').value, 
+                    assignedSites: selectedSites // ARRAY
+                });
                 await signOut(authSecondary);
-                
-                msg.innerText = "User successfully created!"; msg.className = "text-sm font-bold text-center mt-2 text-green-600";
+                msg.innerText = "User created & assigned to " + selectedSites.length + " site(s)!"; msg.className = "text-sm font-bold text-center mt-2 text-green-600";
                 e.target.reset();
             } catch(err) {
                 msg.innerText = "Error: " + err.message; msg.className = "text-sm font-bold text-center mt-2 text-red-600";
@@ -168,13 +147,12 @@
             btn.innerText = "Create User & Grant Access";
         });
 
-        // --- LOAD REPORTS LOGIC ---
+        // Reports Logic
         let allReports = [];
         async function loadReports() {
             const q = query(collection(db, "daily_reports"), orderBy("timestamp", "desc"));
             const snap = await getDocs(q);
             const tbody = document.getElementById('reportsTable'); tbody.innerHTML = '';
-            
             snap.forEach((docSnap, index) => {
                 const r = docSnap.data(); allReports[index] = r;
                 tbody.innerHTML += `<tr class="border-b"><td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId}</td><td class="p-3 border">${r.weather?.condition}</td><td class="p-3 border">${r.remarks?.preparedBy}</td><td class="p-3 border"><button onclick="exportToExcel(${index})" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">Export Excel</button></td></tr>`;
@@ -182,16 +160,14 @@
         }
 
         window.exportToExcel = function(index) {
-            const report = allReports[index];
-            const wb = XLSX.utils.book_new();
+            const report = allReports[index]; const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.aoa_to_sheet([["NIWASA CONSTRUCTIONS - DPR"], [], ["Date:", report.date, "Project:", report.siteId], ["Prepared By:", report.remarks?.preparedBy]]);
             XLSX.utils.book_append_sheet(wb, ws, "General Info");
-            if(report.workers && report.workers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.workers), "Workers");
-            if(report.materials && report.materials.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.materials), "Materials");
+            if(report.workers?.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.workers), "Workers");
+            if(report.materials?.length) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(report.materials), "Materials");
             XLSX.writeFile(wb, `DPR_${report.siteId}_${report.date}.xlsx`);
         };
 
-        // Init
         loadSites(); loadReports();
     </script>
 </body>
