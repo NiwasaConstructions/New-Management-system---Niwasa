@@ -3,263 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Dashboard - DPR</title>
+    <title>Supervisor Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 p-4">
 
-    <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mb-10">
+    <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md mb-10 border-t-4 border-blue-600">
         <div class="flex justify-between items-center border-b pb-4 mb-6">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Daily Progress Report (DPR)</h1>
-                <p class="text-gray-500">Niwasa Constructions (Pvt) Ltd</p>
+                <p class="text-gray-500 font-semibold" id="supervisorInfo">Loading...</p>
             </div>
-            <button onclick="window.location.href='index.html'" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">Logout</button>
+            <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600">Logout</button>
         </div>
         
         <form id="dprForm" class="space-y-6">
-            <!-- 1. Header Information -->
+            <!-- 1. General Information -->
             <div class="bg-gray-50 p-4 rounded border">
                 <h3 class="font-bold text-gray-700 mb-3 border-b pb-1">1. General Information</h3>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold">Date</label>
-                        <input type="date" id="date" class="w-full border p-2 rounded" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold">DOC No / Working Time</label>
-                        <input type="text" id="docNo" placeholder="e.g. DOC-001 / 8AM-5PM" class="w-full border p-2 rounded">
-                    </div>
+                    <div><label class="block text-sm font-semibold">Date</label><input type="date" id="date" class="w-full border p-2 rounded" required></div>
+                    <div><label class="block text-sm font-semibold">DOC No / Working Time</label><input type="text" id="docNo" class="w-full border p-2 rounded"></div>
                     <div>
                         <label class="block text-sm font-semibold">Project / Location</label>
-                        <input type="text" id="siteId" value="NS Site" class="w-full border p-2 rounded bg-gray-200" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold">Weather Condition</label>
-                        <select id="weather" class="w-full border p-2 rounded">
-                            <option value="Sunny">Sunny (S)</option>
-                            <option value="Cloudy">Cloudy (C)</option>
-                            <option value="Light Shower">Light Shower (L)</option>
-                            <option value="Heavy Rain">Heavy Rain (H)</option>
+                        <!-- Dynamic Site Dropdown -->
+                        <select id="siteId" class="w-full border p-2 rounded bg-yellow-50" required>
+                            <option value="">Select a Site...</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Weather Time (Hidden by default, shows if Rain selected) -->
-                <div id="rainTimeDiv" class="hidden mt-4 bg-blue-100 p-3 rounded border border-blue-300">
-                    <label class="block font-semibold text-blue-800 mb-2">කාලගුණය නිසා වැඩ නැවතුණු කාලය (Rain Delay Time):</label>
-                    <div class="flex space-x-4">
-                        <div>
-                            <label class="text-sm">From Time</label>
-                            <input type="time" id="rainFrom" class="border p-1 rounded w-full">
-                        </div>
-                        <div>
-                            <label class="text-sm">To Time</label>
-                            <input type="time" id="rainTo" class="border p-1 rounded w-full">
-                        </div>
+                    <div>
+                        <label class="block text-sm font-semibold">Weather</label>
+                        <select id="weather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select>
                     </div>
                 </div>
             </div>
 
-            <!-- 2. Equipment & Machinery Usage -->
-            <div class="bg-yellow-50 p-4 rounded border border-yellow-200">
-                <h3 class="font-bold text-gray-700 mb-3 border-b border-yellow-300 pb-1">2. Equipment & Machinery (යන්ත්‍රෝපකරණ)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-2 mb-2">
-                    <select id="eqName" class="border p-2 rounded col-span-2">
-                        <option value="">Select Equipment</option>
-                        <option value="Excavator">Excavator</option>
-                        <option value="JCB">Back Hoe Loader (JCB)</option>
-                        <option value="Tractor">Tractor / Trailer</option>
-                        <option value="Mixer">Truck Mixer</option>
-                        <option value="Generator">Generator</option>
-                    </select>
-                    <input type="time" id="eqStart" class="border p-2 rounded" title="Start Time">
-                    <input type="time" id="eqFinish" class="border p-2 rounded" title="Finish Time">
-                    <input type="text" id="eqIdling" placeholder="Idling" class="border p-2 rounded">
-                    <button type="button" id="addEqBtn" class="bg-yellow-500 text-white font-bold rounded p-2 hover:bg-yellow-600">Add</button>
-                </div>
-                <div class="overflow-x-auto"><table class="w-full text-sm text-left bg-white border"><tbody id="eqTable"></tbody></table></div>
-            </div>
-
-            <!-- 3. Labour & Workers Details -->
+            <!-- 2. Workers Details -->
             <div class="bg-blue-50 p-4 rounded border border-blue-200">
-                <h3 class="font-bold text-gray-700 mb-3 border-b border-blue-300 pb-1">3. Workers & Labours (සේවක විස්තර)</h3>
+                <h3 class="font-bold text-gray-700 mb-3 border-b border-blue-300 pb-1">2. Workers & Labours</h3>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-2">
-                    <input type="text" id="wName" placeholder="Name (e.g. Nimal)" class="border p-2 rounded col-span-2 md:col-span-1">
-                    <select id="wType" class="border p-2 rounded">
-                        <option value="SK">Skilled (SK)</option>
-                        <option value="USK">Unskilled (USK)</option>
-                    </select>
+                    <input type="text" id="wName" placeholder="Name" class="border p-2 rounded col-span-2 md:col-span-1">
+                    <select id="wType" class="border p-2 rounded"><option>SK</option><option>USK</option></select>
                     <input type="text" id="wOT" placeholder="OT (Hrs)" class="border p-2 rounded">
                     <input type="number" id="wAdv" placeholder="Advance (Rs)" class="border p-2 rounded">
-                    <button type="button" id="addWorkerBtn" class="bg-blue-600 text-white font-bold rounded p-2 hover:bg-blue-700">Add</button>
+                    <button type="button" onclick="addWorker()" class="bg-blue-600 text-white font-bold rounded p-2 hover:bg-blue-700">Add</button>
                 </div>
-                <div class="overflow-x-auto"><table class="w-full text-sm text-left bg-white border"><tbody id="workersTable"></tbody></table></div>
+                <table class="w-full text-sm text-left bg-white border"><tbody id="workersTable"></tbody></table>
             </div>
 
-            <!-- 4. Material Details -->
-            <div class="bg-green-50 p-4 rounded border border-green-200">
-                <h3 class="font-bold text-gray-700 mb-3 border-b border-green-300 pb-1">4. Material Usage (ද්‍රව්‍ය භාවිතය)</h3>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-2">
-                    <input type="text" id="mName" placeholder="Material (e.g. Cement)" class="border p-2 rounded col-span-2 md:col-span-1">
-                    <input type="text" id="mUnit" placeholder="Unit (Bags/Cubes)" class="border p-2 rounded">
-                    <input type="number" id="mReq" placeholder="Req Qty" class="border p-2 rounded">
-                    <input type="number" id="mUsage" placeholder="Usage Qty" class="border p-2 rounded">
-                    <button type="button" id="addMatBtn" class="bg-green-600 text-white font-bold rounded p-2 hover:bg-green-700">Add</button>
-                </div>
-                <div class="overflow-x-auto"><table class="w-full text-sm text-left bg-white border"><tbody id="matTable"></tbody></table></div>
-            </div>
-
-            <!-- 5. Work Done & Dimensions -->
+            <!-- 3. Work Done -->
             <div class="bg-gray-50 p-4 rounded border">
-                <h3 class="font-bold text-gray-700 mb-3 border-b pb-1">5. Work Done & Dimensions (සිදු කළ වැඩ)</h3>
-                <div class="grid grid-cols-3 gap-2 mb-2">
-                    <input type="text" id="dimL" placeholder="Length (e.g. 4')" class="border p-2 rounded">
-                    <input type="text" id="dimW" placeholder="Width (e.g. 9'')" class="border p-2 rounded">
-                    <input type="text" id="dimH" placeholder="Height (e.g. 4'-6'')" class="border p-2 rounded">
-                </div>
-                <textarea id="workDesc" rows="2" class="w-full border p-2 rounded" placeholder="Activity / Description and Progress Achieved..." required></textarea>
+                <h3 class="font-bold text-gray-700 mb-3 border-b pb-1">3. Work Done & Notes</h3>
+                <textarea id="workDesc" rows="3" class="w-full border p-2 rounded" placeholder="Description of work completed..." required></textarea>
+                <div class="mt-2"><input type="text" id="preparedBy" placeholder="Prepared By (Your Name)" class="w-full border p-2 rounded" required></div>
             </div>
 
-            <!-- 6. Remarks & Notes -->
-            <div class="bg-gray-50 p-4 rounded border">
-                <h3 class="font-bold text-gray-700 mb-3 border-b pb-1">6. Other Remarks</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm">Site Visitor</label>
-                        <input type="text" id="visitor" class="w-full border p-2 rounded">
-                    </div>
-                    <div>
-                        <label class="block text-sm">Time Lost</label>
-                        <input type="text" id="timeLost" class="w-full border p-2 rounded">
-                    </div>
-                    <div class="col-span-1 md:col-span-2">
-                        <label class="block text-sm">Problems / Unforeseen Circumstances</label>
-                        <input type="text" id="problems" class="w-full border p-2 rounded">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold">Prepared By</label>
-                        <input type="text" id="preparedBy" placeholder="Supervisor Name" class="w-full border p-2 rounded" required>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg hover:bg-blue-800 text-lg shadow-lg">
-                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Submit Final DPR
-            </button>
+            <button type="submit" id="submitBtn" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg shadow-lg">Submit Final DPR</button>
         </form>
     </div>
 
-    <!-- Firebase Scripts & Logic -->
+    <!-- Script Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
-            authDomain: "niwasa-new-labour.firebaseapp.com",
-            projectId: "niwasa-new-labour",
-            storageBucket: "niwasa-new-labour.firebasestorage.app",
-            messagingSenderId: "963050302203",
-            appId: "1:963050302203:web:b48870480bd31079f35e5e"
+        const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
+        const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
+
+        auth.onAuthStateChanged(user => {
+            if(!user) window.location.href = "index.html";
+            else document.getElementById('supervisorInfo').innerText = "Logged in as: " + user.email;
+        });
+        window.logout = () => { signOut(auth); };
+
+        // Fetch Ongoing Sites
+        async function loadSites() {
+            const q = query(collection(db, "sites"), where("status", "==", "Ongoing"));
+            const snap = await getDocs(q);
+            const drop = document.getElementById('siteId');
+            snap.forEach(d => drop.innerHTML += `<option value="${d.data().name}">${d.data().name}</option>`);
+        }
+        loadSites();
+
+        let workers = [];
+        window.addWorker = () => {
+            const n = document.getElementById('wName').value; if(!n) return;
+            workers.push({ name: n, type: document.getElementById('wType').value, ot: document.getElementById('wOT').value, adv: document.getElementById('wAdv').value });
+            const tbody = document.getElementById('workersTable'); tbody.innerHTML = '';
+            workers.forEach(w => tbody.innerHTML += `<tr class="border-b"><td class="p-2 border">${w.name}</td><td class="p-2 border">${w.type}</td><td class="p-2 border">OT: ${w.ot}</td><td class="p-2 border text-red-600">Rs.${w.adv}</td></tr>`);
+            document.getElementById('wName').value = ''; document.getElementById('wAdv').value = '';
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Weather Logic
-        document.getElementById('weather').addEventListener('change', function() {
-            const val = this.value;
-            const rainDiv = document.getElementById('rainTimeDiv');
-            if(val === 'Light Shower' || val === 'Heavy Rain') {
-                rainDiv.classList.remove('hidden');
-            } else {
-                rainDiv.classList.add('hidden');
-            }
-        });
-
-        // Data Arrays
-        let equipmentList = [];
-        let workersList = [];
-        let materialList = [];
-
-        // Dynamic Table Handlers
-        const updateTable = (list, tableId, cols) => {
-            const tbody = document.getElementById(tableId);
-            tbody.innerHTML = list.length === 0 ? "" : `<tr class="bg-gray-200 text-xs uppercase">${cols.map(c=>`<th class="p-2 border">\${c}</th>`).join('')}</tr>`;
-            list.forEach(item => {
-                tbody.innerHTML += `<tr class="border-b">${Object.values(item).map(v => `<td class="p-2 border">\${v}</td>`).join('')}</tr>`;
-            });
-        };
-
-        document.getElementById('addEqBtn').addEventListener('click', () => {
-            const name = document.getElementById('eqName').value;
-            if(!name) return;
-            equipmentList.push({ name, start: document.getElementById('eqStart').value, finish: document.getElementById('eqFinish').value, idle: document.getElementById('eqIdling').value });
-            updateTable(equipmentList, 'eqTable', ['Equipment', 'Start', 'Finish', 'Idling']);
-            ['eqName','eqStart','eqFinish','eqIdling'].forEach(id => document.getElementById(id).value = '');
-        });
-
-        document.getElementById('addWorkerBtn').addEventListener('click', () => {
-            const name = document.getElementById('wName').value;
-            if(!name) return;
-            workersList.push({ name, type: document.getElementById('wType').value, ot: document.getElementById('wOT').value || '-', adv: document.getElementById('wAdv').value || '0' });
-            updateTable(workersList, 'workersTable', ['Name', 'Type', 'OT', 'Advance (Rs)']);
-            ['wName','wOT','wAdv'].forEach(id => document.getElementById(id).value = '');
-        });
-
-        document.getElementById('addMatBtn').addEventListener('click', () => {
-            const name = document.getElementById('mName').value;
-            if(!name) return;
-            materialList.push({ name, unit: document.getElementById('mUnit').value, req: document.getElementById('mReq').value, usage: document.getElementById('mUsage').value });
-            updateTable(materialList, 'matTable', ['Material', 'Unit', 'Req Qty', 'Usage Qty']);
-            ['mName','mUnit','mReq','mUsage'].forEach(id => document.getElementById(id).value = '');
-        });
-
-        // Submit Form
-        document.getElementById('dprForm').addEventListener('submit', async (e) => {
+        document.getElementById('dprForm').addEventListener('submit', async(e) => {
             e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Saving...';
-            
-            const payload = {
-                date: document.getElementById('date').value,
-                docNo: document.getElementById('docNo').value,
-                siteId: document.getElementById('siteId').value,
-                weather: {
-                    condition: document.getElementById('weather').value,
-                    rainFrom: document.getElementById('rainFrom').value,
-                    rainTo: document.getElementById('rainTo').value
-                },
-                equipment: equipmentList,
-                workers: workersList,
-                materials: materialList,
-                workDone: {
-                    l: document.getElementById('dimL').value,
-                    w: document.getElementById('dimW').value,
-                    h: document.getElementById('dimH').value,
-                    desc: document.getElementById('workDesc').value
-                },
-                remarks: {
-                    visitor: document.getElementById('visitor').value,
-                    timeLost: document.getElementById('timeLost').value,
-                    problems: document.getElementById('problems').value,
-                    preparedBy: document.getElementById('preparedBy').value
-                },
+            document.getElementById('submitBtn').innerText = "Submitting...";
+            await addDoc(collection(db, "daily_reports"), {
+                date: document.getElementById('date').value, docNo: document.getElementById('docNo').value, siteId: document.getElementById('siteId').value,
+                weather: { condition: document.getElementById('weather').value },
+                workers: workers,
+                workDone: { desc: document.getElementById('workDesc').value },
+                remarks: { preparedBy: document.getElementById('preparedBy').value },
                 timestamp: new Date()
-            };
-
-            try {
-                await addDoc(collection(db, "daily_reports"), payload);
-                alert("DPR Data Successfully Saved!");
-                window.location.reload();
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error Saving Data!");
-                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i> Submit Final DPR';
-            }
+            });
+            alert("Report Submitted Successfully!"); window.location.reload();
         });
     </script>
 </body>
