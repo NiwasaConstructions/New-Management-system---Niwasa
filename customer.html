@@ -7,9 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 90%; max-width: 800px; }
-        .modal-close { float: right; font-size: 28px; font-weight: bold; color: #dc2626; cursor: pointer; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 800px; }
     </style>
 </head>
 <body class="bg-gray-100 p-6">
@@ -22,18 +21,14 @@
             </div>
             <button onclick="logout()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
-        <div id="reportsContainer" class="space-y-4"></div>
+        <div id="reportsContainer" class="space-y-4"><p class="text-center font-bold text-gray-500">Fetching daily reports...</p></div>
     </div>
 
-    <!-- CUSTOMER VIEW MODAL (NO FINANCIALS) -->
-    <div id="viewReportModal" class="modal">
+    <!-- CUSTOMER VIEW MODAL -->
+    <div id="modalView" class="modal">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeViewModal()">&times;</span>
-            <div class="border-b-2 border-green-700 pb-3 mb-4"><h2 class="text-2xl font-black text-green-900">Project Update</h2></div>
-            
-            <div id="vCustomerContent" class="space-y-4">
-                <!-- Content will be injected here -->
-            </div>
+            <div class="flex justify-between items-center border-b pb-2 mb-4"><h2 class="text-2xl font-black text-green-900">Project Update</h2><button onclick="closeModal('modalView')" class="text-red-600 font-bold text-2xl">&times;</button></div>
+            <div id="vContent" class="space-y-4 max-h-[70vh] overflow-y-auto"></div>
         </div>
     </div>
 
@@ -46,69 +41,60 @@
         const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
 
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
         let clientReports = [];
 
         auth.onAuthStateChanged(async user => {
             if(!user) return window.location.href = "index.html";
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if(userDoc.exists() && userDoc.data().role === 'customer') {
-                const assignedSites = userDoc.data().assignedSites || [];
-                document.getElementById('clientSiteName').innerText = assignedSites.length > 0 ? "Sites: " + assignedSites.join(", ") : "No sites assigned.";
-                if(assignedSites.length > 0) loadCustomerReports(assignedSites);
-            }
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists() && userDoc.data().role === 'customer') {
+                    const assignedSites = userDoc.data().assignedSites || [];
+                    document.getElementById('clientSiteName').innerText = assignedSites.length > 0 ? "Sites: " + assignedSites.join(", ") : "No sites assigned.";
+                    if(assignedSites.length > 0) { window.loadCustomerReports(assignedSites); }
+                    else { document.getElementById('reportsContainer').innerHTML = "<p class='text-center text-red-500 font-bold'>You don't have any assigned sites.</p>"; }
+                }
+            } catch(e) { console.log(e); }
         });
 
-        async function loadCustomerReports(sites) {
-            const q = query(collection(db, "daily_reports"), where("siteId", "in", sites));
-            const snap = await getDocs(q); 
-            
-            clientReports = []; snap.forEach(d => clientReports.push(d.data()));
-            clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
-
-            const container = document.getElementById('reportsContainer'); container.innerHTML = '';
-            
-            clientReports.forEach((r, index) => {
-                container.innerHTML += `
-                    <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-50 transition">
-                        <div>
-                            <span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span>
-                            <p class="text-sm text-gray-600 truncate max-w-sm mt-1">${r.workDone}</p>
-                        </div>
-                        <button onclick="viewCustomerReport(${index})" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-green-700">Open Report</button>
-                    </div>`;
-            });
-        }
-
-        window.viewCustomerReport = (index) => {
-            const r = clientReports[index];
-            let content = `
-                <div class="bg-green-50 p-4 rounded mb-4">
-                    <p class="text-lg"><strong>Date:</strong> ${r.date}</p>
-                    <p class="text-lg"><strong>Site:</strong> ${r.siteId}</p>
-                    <p class="text-lg"><strong>Weather:</strong> ${r.weather}</p>
-                </div>
+        window.loadCustomerReports = async (sites) => {
+            const container = document.getElementById('reportsContainer');
+            try {
+                const q = query(collection(db, "daily_reports"), where("siteId", "in", sites));
+                const snap = await getDocs(q); clientReports = []; snap.forEach(d => clientReports.push(d.data()));
+                if(clientReports.length === 0) { container.innerHTML = "<p class='text-center font-bold'>No reports found.</p>"; return; }
                 
-                <h4 class="font-bold text-gray-800 text-xl border-b pb-2 mb-2"><i class="fa-solid fa-clipboard-check"></i> Work Completed Today</h4>
-                <p class="text-gray-700 bg-gray-50 p-4 rounded border text-lg leading-relaxed whitespace-pre-wrap">${r.workDone}</p>
+                clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
+                container.innerHTML = clientReports.map((r, i) => `
+                    <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-100 transition cursor-pointer" onclick="viewRep(${i})">
+                        <div><span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span><p class="text-sm text-gray-600 truncate max-w-sm mt-1">${r.workDone}</p></div>
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Open Report</button>
+                    </div>`).join('');
+            } catch(e) { console.log(e); container.innerHTML = "<p class='text-center text-red-500'>Error loading reports.</p>"; }
+        };
+
+        window.viewRep = (i) => {
+            const r = clientReports[i];
+            const content = `
+                <div class="bg-green-50 p-4 rounded mb-4 text-sm font-bold flex justify-between"><span>Date: ${r.date}</span><span>Site: ${r.siteId}</span><span>Weather: ${r.weather}</span></div>
+                <h4 class="font-bold text-xl border-b pb-2 mb-2"><i class="fa-solid fa-clipboard-check"></i> Work Completed Today</h4>
+                <p class="text-gray-700 bg-gray-50 p-4 rounded border text-md whitespace-pre-wrap leading-relaxed">${r.workDone || 'No details provided.'}</p>
                 
                 <div class="mt-4 grid grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-4 rounded border border-blue-200">
-                        <h4 class="font-bold text-blue-800"><i class="fa-solid fa-users"></i> Labour Force</h4>
-                        <p class="text-2xl font-black text-blue-900 mt-2">${r.workers?.length || 0} Workers</p>
-                        <p class="text-xs text-gray-500 mt-1">*Financial details are hidden.</p>
+                        <h4 class="font-bold text-blue-800">Labour Force</h4>
+                        <p class="text-3xl font-black text-blue-900 mt-2">${r.workers?.length || 0} <span class="text-sm">Workers</span></p>
                     </div>
                     <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                        <h4 class="font-bold text-orange-800"><i class="fa-solid fa-box"></i> Materials Delivered</h4>
-                        <p class="text-2xl font-black text-orange-900 mt-2">${r.materials?.length || 0} Deliveries</p>
+                        <h4 class="font-bold text-orange-800">Materials Received</h4>
+                        <p class="text-3xl font-black text-orange-900 mt-2">${r.materials?.length || 0} <span class="text-sm">Deliveries</span></p>
                     </div>
                 </div>
             `;
-            document.getElementById('vCustomerContent').innerHTML = content;
-            document.getElementById('viewReportModal').style.display = 'block';
+            document.getElementById('vContent').innerHTML = content;
+            document.getElementById('modalView').style.display = 'block';
         };
-
-        window.closeViewModal = () => document.getElementById('viewReportModal').style.display = 'none';
     </script>
 </body>
 </html>
