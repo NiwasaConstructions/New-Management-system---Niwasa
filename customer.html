@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Portal - Niwasa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 90%; max-width: 800px; }
+        .modal-close { float: right; font-size: 28px; font-weight: bold; color: #dc2626; cursor: pointer; }
+    </style>
 </head>
 <body class="bg-gray-100 p-6">
 
@@ -14,10 +20,20 @@
                 <h1 class="text-3xl font-bold text-gray-800">My Project Progress</h1>
                 <p class="text-gray-500 font-bold" id="clientSiteName">Loading your assigned sites...</p>
             </div>
-            <button id="btnLogout" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">Logout</button>
+            <button onclick="logout()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
-        <div id="reportsContainer" class="space-y-6">
-            <p class="text-center text-gray-500 font-bold">Fetching your daily reports...</p>
+        <div id="reportsContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- CUSTOMER VIEW MODAL (NO FINANCIALS) -->
+    <div id="viewReportModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeViewModal()">&times;</span>
+            <div class="border-b-2 border-green-700 pb-3 mb-4"><h2 class="text-2xl font-black text-green-900">Project Update</h2></div>
+            
+            <div id="vCustomerContent" class="space-y-4">
+                <!-- Content will be injected here -->
+            </div>
         </div>
     </div>
 
@@ -29,54 +45,70 @@
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
         const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
 
-        document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(()=> window.location.href="index.html"));
+        window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
+
+        let clientReports = [];
 
         auth.onAuthStateChanged(async user => {
             if(!user) return window.location.href = "index.html";
-            
-            try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if(userDoc.exists() && userDoc.data().role === 'customer') {
-                    const assignedSites = userDoc.data().assignedSites || [];
-                    if(assignedSites.length > 0) {
-                        document.getElementById('clientSiteName').innerText = "Assigned Sites: " + assignedSites.join(", ");
-                        loadCustomerReports(assignedSites);
-                    } else {
-                        document.getElementById('reportsContainer').innerHTML = "<p class='text-red-500 font-bold text-center'>No sites are currently assigned to you.</p>";
-                    }
-                }
-            } catch(e) { alert("Auth Error: " + e.message); }
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if(userDoc.exists() && userDoc.data().role === 'customer') {
+                const assignedSites = userDoc.data().assignedSites || [];
+                document.getElementById('clientSiteName').innerText = assignedSites.length > 0 ? "Sites: " + assignedSites.join(", ") : "No sites assigned.";
+                if(assignedSites.length > 0) loadCustomerReports(assignedSites);
+            }
         });
 
-        async function loadCustomerReports(sitesArray) {
-            try {
-                const q = query(collection(db, "daily_reports"), where("siteId", "in", sitesArray));
-                const snap = await getDocs(q); 
-                
-                const reports = []; snap.forEach(d => reports.push(d.data()));
-                // Use .toMillis() to safely sort Firestore Timestamps
-                reports.sort((a,b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
+        async function loadCustomerReports(sites) {
+            const q = query(collection(db, "daily_reports"), where("siteId", "in", sites));
+            const snap = await getDocs(q); 
+            
+            clientReports = []; snap.forEach(d => clientReports.push(d.data()));
+            clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
 
-                const container = document.getElementById('reportsContainer'); container.innerHTML = '';
-                if(reports.length === 0) container.innerHTML = "<p class='text-center text-gray-500 font-bold'>No progress reports submitted yet for your sites.</p>";
-
-                reports.forEach(r => {
-                    container.innerHTML += `
-                        <div class="border rounded p-5 bg-gray-50 shadow-sm border-l-4 border-green-500">
-                            <div class="flex justify-between border-b pb-2 mb-3">
-                                <span class="font-bold text-lg text-blue-900">${r.date} <span class="text-sm text-gray-500">(${r.siteId})</span></span>
-                                <span class="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded font-semibold">Weather: ${r.weather?.condition}</span>
-                            </div>
-                            <h4 class="font-bold text-gray-700">Work Completed:</h4>
-                            <p class="text-gray-600 mb-3">${r.workDone?.desc || 'N/A'}</p>
-                            <div class="bg-white p-2 rounded border text-sm">
-                                <span class="font-bold text-green-700">Labour Force:</span> ${r.workers ? r.workers.length + ' Workers present.' : 'No record.'}
-                            </div>
+            const container = document.getElementById('reportsContainer'); container.innerHTML = '';
+            
+            clientReports.forEach((r, index) => {
+                container.innerHTML += `
+                    <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-50 transition">
+                        <div>
+                            <span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span>
+                            <p class="text-sm text-gray-600 truncate max-w-sm mt-1">${r.workDone}</p>
                         </div>
-                    `;
-                });
-            } catch(e) { alert("Load Error: " + e.message); }
+                        <button onclick="viewCustomerReport(${index})" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold shadow-md hover:bg-green-700">Open Report</button>
+                    </div>`;
+            });
         }
+
+        window.viewCustomerReport = (index) => {
+            const r = clientReports[index];
+            let content = `
+                <div class="bg-green-50 p-4 rounded mb-4">
+                    <p class="text-lg"><strong>Date:</strong> ${r.date}</p>
+                    <p class="text-lg"><strong>Site:</strong> ${r.siteId}</p>
+                    <p class="text-lg"><strong>Weather:</strong> ${r.weather}</p>
+                </div>
+                
+                <h4 class="font-bold text-gray-800 text-xl border-b pb-2 mb-2"><i class="fa-solid fa-clipboard-check"></i> Work Completed Today</h4>
+                <p class="text-gray-700 bg-gray-50 p-4 rounded border text-lg leading-relaxed whitespace-pre-wrap">${r.workDone}</p>
+                
+                <div class="mt-4 grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded border border-blue-200">
+                        <h4 class="font-bold text-blue-800"><i class="fa-solid fa-users"></i> Labour Force</h4>
+                        <p class="text-2xl font-black text-blue-900 mt-2">${r.workers?.length || 0} Workers</p>
+                        <p class="text-xs text-gray-500 mt-1">*Financial details are hidden.</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded border border-orange-200">
+                        <h4 class="font-bold text-orange-800"><i class="fa-solid fa-box"></i> Materials Delivered</h4>
+                        <p class="text-2xl font-black text-orange-900 mt-2">${r.materials?.length || 0} Deliveries</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('vCustomerContent').innerHTML = content;
+            document.getElementById('viewReportModal').style.display = 'block';
+        };
+
+        window.closeViewModal = () => document.getElementById('viewReportModal').style.display = 'none';
     </script>
 </body>
 </html>
