@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Portal</title>
+    <title>Supervisor Portal - Niwasa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,6 +11,7 @@
         .tab-content.active { display: block; }
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 900px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-close { float: right; font-size: 28px; font-weight: bold; color: #dc2626; cursor: pointer; }
     </style>
 </head>
 <body class="bg-gray-100 p-4">
@@ -147,9 +148,23 @@
             } catch(e) { console.log(e); }
         });
 
-        // Arrays & UI
+        // Arrays & UI FIXED (Using correct backticks ` instead of ')
         let delays=[], transfers=[], materials=[], workers=[];
-        const renderTb = (arr, id, keys) => { document.getElementById(id).innerHTML = arr.map(i => `<tr>${keys.map(k=>`<td class="border p-1">\${i[k]||'-'}</td>`).join('')}</tr>`).join(''); };
+        
+        const renderTb = (arr, id, keys) => {
+            const tbody = document.getElementById(id);
+            tbody.innerHTML = '';
+            arr.forEach(item => {
+                let tr = document.createElement('tr');
+                keys.forEach(k => {
+                    let td = document.createElement('td');
+                    td.className = "border p-1";
+                    td.innerHTML = item[k] || '-';
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        };
 
         window.addDelay = () => { delays.push({f:document.getElementById('delayFrom').value, t:document.getElementById('delayTo').value, r:document.getElementById('delayReason').value}); renderTb(delays,'delayTable',['f','t','r']); ['delayFrom','delayTo','delayReason'].forEach(id=>document.getElementById(id).value=''); };
         window.addEq = () => { let typ = document.getElementById('eqType').value; transfers.push({tBadge: typ==='Received'?'<span class="text-green-600 font-bold">IN</span>':'<span class="text-red-600 font-bold">OUT</span>', t:typ, i:document.getElementById('eqItem').value, s:document.getElementById('eqSite').value, n:document.getElementById('eqNote').value}); renderTb(transfers,'eqTable',['tBadge','i','s','n']); ['eqItem','eqSite','eqNote'].forEach(id=>document.getElementById(id).value=''); };
@@ -180,7 +195,6 @@
                 const snap = await getDocs(q); myReports = []; snap.forEach(d => myReports.push(d.data()));
                 if(myReports.length === 0) { tb.innerHTML = '<tr><td colspan="3" class="text-center p-4">No reports found.</td></tr>'; return; }
                 
-                // Client-side sort by timestamp
                 myReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
                 tb.innerHTML = myReports.map((r, i) => `<tr class="border-b"><td class="p-3 border font-semibold">${r.date}</td><td class="p-3 border font-bold text-blue-900">${r.siteId}</td><td class="p-3 border text-center"><button onclick="viewRep(${i})" class="bg-blue-500 text-white px-3 py-1 rounded">View</button></td></tr>`).join('');
             } catch(e) { console.log(e); }
