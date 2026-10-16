@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - Niwasa</title>
+    <title>Admin Portal - Niwasa Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- ExcelJS & FileSaver for Super Styling Export -->
+    <!-- ExcelJS & FileSaver -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
@@ -19,19 +22,61 @@
 <body class="bg-gray-100">
 
     <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center">
-        <div><h1 class="text-2xl font-bold"><i class="fa-solid fa-building-shield"></i> Niwasa Admin</h1></div>
+        <div><h1 class="text-2xl font-bold"><i class="fa-solid fa-chart-pie mr-2"></i>Niwasa Admin & Analytics</h1></div>
         <div class="space-x-4">
-            <button id="navReports" class="nav-btn text-blue-300 font-semibold">Reports</button>
-            <button id="navSites" class="nav-btn hover:text-blue-300 font-semibold">Manage Sites</button>
-            <button id="navUsers" class="nav-btn hover:text-blue-300 font-semibold">Manage Users</button>
-            <button id="btnLogout" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-4">Logout</button>
+            <button id="navDashboard" class="nav-btn text-blue-300 font-semibold"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+            <button id="navReports" class="nav-btn hover:text-blue-300 font-semibold"><i class="fa-solid fa-file-excel"></i> Reports</button>
+            <button id="navSites" class="nav-btn hover:text-blue-300 font-semibold"><i class="fa-solid fa-map-location-dot"></i> Manage Sites</button>
+            <button id="navUsers" class="nav-btn hover:text-blue-300 font-semibold"><i class="fa-solid fa-users-gear"></i> Manage Users</button>
+            <button id="btnLogout" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-4"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
     </nav>
 
     <div class="p-6 max-w-7xl mx-auto">
+        
+        <!-- DASHBOARD TAB (අලුත් Analytics කොටස) -->
+        <div id="dashboardTab" class="tab-content block">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-extrabold text-gray-800">Company Overview</h2>
+                <button onclick="calculateAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"><i class="fa-solid fa-rotate mr-2"></i>Refresh Data</button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+                    <h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3>
+                    <p class="text-4xl font-black text-blue-900 mt-2" id="statSites">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+                    <h3 class="text-gray-500 font-bold text-sm uppercase">Total Labours Today</h3>
+                    <p class="text-4xl font-black text-green-700 mt-2" id="statLabours">0</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-red-500">
+                    <h3 class="text-gray-500 font-bold text-sm uppercase">Total Advances Today (Rs)</h3>
+                    <p class="text-4xl font-black text-red-600 mt-2" id="statAdvances">0.00</p>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Bar Chart: Rain Delays -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-gray-700 mb-4 border-b pb-2"><i class="fa-solid fa-cloud-showers-heavy text-blue-500"></i> Weather Delays (Hours per Site)</h3>
+                    <canvas id="delayChart" height="200"></canvas>
+                </div>
+                <!-- Pie Chart: Labour Type -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-gray-700 mb-4 border-b pb-2"><i class="fa-solid fa-helmet-safety text-yellow-500"></i> Labour Force Distribution (Today)</h3>
+                    <div class="w-full max-w-xs mx-auto">
+                        <canvas id="labourChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- REPORTS TAB -->
-        <div id="reportsTab" class="tab-content block">
-            <h2 class="text-2xl font-bold mb-4">Submitted Reports</h2>
+        <div id="reportsTab" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-4">Submitted DPR Reports</h2>
             <div class="bg-white p-6 rounded shadow overflow-x-auto">
                 <table class="w-full text-left border">
                     <thead class="bg-gray-200"><tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border">Weather</th><th class="p-3 border">Prepared By</th><th class="p-3 border">Action</th></tr></thead>
@@ -40,7 +85,7 @@
             </div>
         </div>
 
-        <!-- SITES TAB (Same as before) -->
+        <!-- SITES TAB -->
         <div id="sitesTab" class="tab-content hidden">
             <h2 class="text-2xl font-bold mb-4">Manage Sites</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -58,9 +103,9 @@
             </div>
         </div>
 
-        <!-- USERS TAB (Same as before) -->
+        <!-- USERS TAB -->
         <div id="usersTab" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold text-gray-800">User Access Management</h2></div>
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">User Access Management</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded shadow h-fit">
                     <form id="addUserForm" class="space-y-4">
@@ -73,7 +118,7 @@
                     </form>
                 </div>
                 <div class="lg:col-span-2 bg-white p-6 rounded shadow">
-                    <div class="overflow-x-auto"><table class="w-full border text-sm text-left"><thead class="bg-gray-100"><tr><th class="p-2 border">Email</th><th class="p-2 border">Role</th><th class="p-2 border">Sites</th><th class="p-2 border text-center">Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div>
+                    <table class="w-full border text-sm text-left"><thead class="bg-gray-100"><tr><th class="p-2 border">Email</th><th class="p-2 border">Role</th><th class="p-2 border">Sites</th><th class="p-2 border text-center">Actions</th></tr></thead><tbody id="usersTable"></tbody></table>
                 </div>
             </div>
         </div>
@@ -96,9 +141,125 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden')); document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('text-blue-300'));
             document.getElementById(tabId + 'Tab').classList.remove('hidden'); document.getElementById('nav' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('text-blue-300');
             if(tabId === 'users') loadUsers();
+            if(tabId === 'dashboard') calculateAnalytics();
         };
-        document.getElementById('navReports').addEventListener('click', () => switchTab('reports')); document.getElementById('navSites').addEventListener('click', () => switchTab('sites')); document.getElementById('navUsers').addEventListener('click', () => switchTab('users'));
+        document.getElementById('navDashboard').addEventListener('click', () => switchTab('dashboard'));
+        document.getElementById('navReports').addEventListener('click', () => switchTab('reports')); 
+        document.getElementById('navSites').addEventListener('click', () => switchTab('sites')); 
+        document.getElementById('navUsers').addEventListener('click', () => switchTab('users'));
         document.getElementById('btnLogout').addEventListener('click', () => signOut(auth).then(() => window.location.href = "index.html"));
+        
+        // =====================================
+        // ADMIN ANALYTICS & DASHBOARD LOGIC
+        // =====================================
+        let chartInstances = {}; // Store charts to destroy them before re-rendering
+
+        window.calculateAnalytics = async () => {
+            try {
+                // 1. Get Ongoing Sites Count
+                const sitesSnap = await getDocs(collection(db, "sites"));
+                let activeSitesCount = 0;
+                sitesSnap.forEach(d => { if(d.data().status === 'Ongoing') activeSitesCount++; });
+                document.getElementById('statSites').innerText = activeSitesCount;
+
+                // 2. Fetch All Reports for Data Crunching
+                const reportsSnap = await getDocs(collection(db, "daily_reports"));
+                
+                // Today's Date String (YYYY-MM-DD)
+                const todayStr = new Date().toISOString().split('T')[0];
+                
+                let todayLabours = 0;
+                let todayAdvances = 0;
+                
+                let delayHoursPerSite = {}; // { "Polgolla Site": 4.5, "Kandy Site": 2.0 }
+                let skCount = 0;
+                let uskCount = 0;
+
+                reportsSnap.forEach(docSnap => {
+                    const r = docSnap.data();
+                    
+                    // --- Calculate Today's Stats ---
+                    if (r.date === todayStr && r.workers) {
+                        todayLabours += r.workers.length;
+                        r.workers.forEach(w => {
+                            if(w.adv && !isNaN(w.adv)) todayAdvances += parseFloat(w.adv);
+                            // Labour Type pie chart data (Only for today's active workforce)
+                            if(w.type === 'SK') skCount++;
+                            if(w.type === 'USK') uskCount++;
+                        });
+                    }
+
+                    // --- Calculate Delay Hours (All Time / This Month) ---
+                    if (r.siteId && r.delays && r.delays.length > 0) {
+                        if(!delayHoursPerSite[r.siteId]) delayHoursPerSite[r.siteId] = 0;
+                        
+                        r.delays.forEach(delay => {
+                            // Simple logic to calculate hours from 'HH:MM' string
+                            if(delay.from && delay.to && delay.from !== '-' && delay.to !== '-') {
+                                let start = new Date(`1970-01-01T${delay.from}:00`);
+                                let end = new Date(`1970-01-01T${delay.to}:00`);
+                                let diffHours = (end - start) / 1000 / 60 / 60;
+                                if(diffHours > 0) delayHoursPerSite[r.siteId] += diffHours;
+                            }
+                        });
+                    }
+                });
+
+                // Update UI Summary Cards
+                document.getElementById('statLabours').innerText = todayLabours;
+                document.getElementById('statAdvances').innerText = todayAdvances.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+                // Render Charts
+                renderDelayChart(delayHoursPerSite);
+                renderLabourChart(skCount, uskCount);
+
+            } catch (e) {
+                console.error("Analytics Error:", e);
+            }
+        };
+
+        function renderDelayChart(dataObj) {
+            const ctx = document.getElementById('delayChart').getContext('2d');
+            if(chartInstances.delay) chartInstances.delay.destroy();
+            
+            chartInstances.delay = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dataObj), // Site Names
+                    datasets: [{
+                        label: 'Total Delay Hours',
+                        data: Object.values(dataObj), // Hours
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)', // Blue-500
+                        borderColor: 'rgb(37, 99, 235)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function renderLabourChart(sk, usk) {
+            const ctx = document.getElementById('labourChart').getContext('2d');
+            if(chartInstances.labour) chartInstances.labour.destroy();
+
+            // If no data today, show a grey placeholder
+            const labels = (sk === 0 && usk === 0) ? ['No Data Today'] : ['Skilled (SK)', 'Unskilled (USK)'];
+            const data = (sk === 0 && usk === 0) ? [1] : [sk, usk];
+            const colors = (sk === 0 && usk === 0) ? ['#e5e7eb'] : ['#10b981', '#f59e0b']; // Green, Amber
+
+            chartInstances.labour = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: data, backgroundColor: colors, borderWidth: 1 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // =====================================
+        // ORIGINAL SITES, USERS & EXCEL EXPORT LOGIC
+        // =====================================
         
         let globalSites = [];
         async function loadSites() {
@@ -141,9 +302,6 @@
         window.closeEditModal = () => document.getElementById('editUserModal').style.display = 'none';
         window.saveUserSites = async () => { await updateDoc(doc(db, "users", document.getElementById('editUserId').value), { assignedSites: Array.from(document.querySelectorAll('.edit-site-cb:checked')).map(cb => cb.value) }); closeEditModal(); loadUsers(); alert("Sites Updated!"); };
 
-        // -----------------------------------------------------
-        // REPORTS & SUPER EXCEL EXPORT (EXCELJS)
-        // -----------------------------------------------------
         let allReports = [];
         async function loadReports() {
             const q = query(collection(db, "daily_reports"), orderBy("timestamp", "desc"));
@@ -154,7 +312,6 @@
             });
         }
 
-        // Professional Export Logic
         document.getElementById('reportsTable').addEventListener('click', async (e) => {
             if(e.target.closest('.export-excel-btn')) {
                 const index = e.target.closest('.export-excel-btn').getAttribute('data-index');
@@ -163,7 +320,6 @@
                 const wb = new ExcelJS.Workbook();
                 const ws = wb.addWorksheet('DPR Report');
 
-                // Fonts & Colors
                 const tFont = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
                 const hFont = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
                 const subFont = { name: 'Arial', size: 10, bold: true };
@@ -174,73 +330,37 @@
                 const secFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
                 const border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
 
-                // 1. Header
-                ws.mergeCells('A1:I2');
-                ws.getCell('A1').value = "NIWASA CONSTRUCTIONS (PVT) LTD - DAILY PROGRESS REPORT";
-                ws.getCell('A1').font = tFont; ws.getCell('A1').fill = tFill; ws.getCell('A1').alignment = {horizontal:'center', vertical:'middle'};
-
-                // 2. Info
-                ws.getCell('A4').value = "Date:"; ws.getCell('A4').font = subFont;
-                ws.getCell('B4').value = r.date || '-'; ws.getCell('B4').font = nFont;
-                
-                ws.getCell('D4').value = "Project/Site:"; ws.getCell('D4').font = subFont;
-                ws.getCell('E4').value = r.siteId || '-'; ws.getCell('E4').font = nFont;
-                
-                ws.getCell('G4').value = "Prepared By:"; ws.getCell('G4').font = subFont;
-                ws.getCell('H4').value = r.preparedBy || '-'; ws.getCell('H4').font = nFont;
+                ws.mergeCells('A1:I2'); ws.getCell('A1').value = "NIWASA CONSTRUCTIONS (PVT) LTD - DAILY PROGRESS REPORT"; ws.getCell('A1').font = tFont; ws.getCell('A1').fill = tFill; ws.getCell('A1').alignment = {horizontal:'center', vertical:'middle'};
+                ws.getCell('A4').value = "Date:"; ws.getCell('A4').font = subFont; ws.getCell('B4').value = r.date || '-'; ws.getCell('B4').font = nFont;
+                ws.getCell('D4').value = "Project/Site:"; ws.getCell('D4').font = subFont; ws.getCell('E4').value = r.siteId || '-'; ws.getCell('E4').font = nFont;
+                ws.getCell('G4').value = "Prepared By:"; ws.getCell('G4').font = subFont; ws.getCell('H4').value = r.preparedBy || '-'; ws.getCell('H4').font = nFont;
 
                 let rowNum = 6;
-
-                // Helper to draw tables
                 const buildSection = (title, headers, dataArr, dataKeys) => {
-                    ws.mergeCells(`A${rowNum}:I${rowNum}`);
-                    ws.getCell(`A${rowNum}`).value = title; ws.getCell(`A${rowNum}`).font = subFont; ws.getCell(`A${rowNum}`).fill = secFill;
-                    rowNum++;
-                    
-                    headers.forEach((h, i) => {
-                        let c = ws.getCell(rowNum, i+1);
-                        c.value = h; c.font = hFont; c.fill = hFill; c.border = border;
-                    });
-                    rowNum++;
-
-                    if(dataArr && dataArr.length > 0) {
-                        dataArr.forEach(item => {
-                            dataKeys.forEach((k, i) => {
-                                let c = ws.getCell(rowNum, i+1);
-                                c.value = item[k] || '-'; c.font = nFont; c.border = border;
-                            });
-                            rowNum++;
-                        });
-                    } else {
-                        ws.getCell(rowNum, 1).value = "No records added."; ws.getCell(rowNum, 1).font = nFont;
-                        rowNum++;
-                    }
+                    ws.mergeCells(`A${rowNum}:I${rowNum}`); ws.getCell(`A${rowNum}`).value = title; ws.getCell(`A${rowNum}`).font = subFont; ws.getCell(`A${rowNum}`).fill = secFill; rowNum++;
+                    headers.forEach((h, i) => { let c = ws.getCell(rowNum, i+1); c.value = h; c.font = hFont; c.fill = hFill; c.border = border; }); rowNum++;
+                    if(dataArr && dataArr.length > 0) { dataArr.forEach(item => { dataKeys.forEach((k, i) => { let c = ws.getCell(rowNum, i+1); c.value = item[k] || '-'; c.font = nFont; c.border = border; }); rowNum++; }); } else { ws.getCell(rowNum, 1).value = "No records added."; ws.getCell(rowNum, 1).font = nFont; rowNum++; }
                     rowNum++;
                 };
 
-                // Build Tables
                 buildSection("1. WEATHER & DELAY TRACKING", ["From", "To", "Reason"], r.delays, ["from", "to", "reason"]);
                 buildSection("2. EQUIPMENT TRANSFERS (IN / OUT)", ["Type", "Equipment", "From/To", "Notes"], r.transfers, ["type", "item", "site", "note"]);
                 buildSection("3. MATERIALS RECEIVED (SUB-CONTRACT)", ["Material", "Qty", "Supplier", "Notes/Vehicle"], r.materials, ["name", "qty", "sup", "note"]);
                 buildSection("4. LABOUR FORCE & ADVANCES", ["Name", "Category", "OT (Hrs)", "Advance (Rs)"], r.workers, ["name", "type", "ot", "adv"]);
 
-                // Work Done Section
-                ws.mergeCells(`A${rowNum}:I${rowNum}`);
-                ws.getCell(`A${rowNum}`).value = "5. WORK DONE / ACTIVITY DESCRIPTION"; ws.getCell(`A${rowNum}`).font = subFont; ws.getCell(`A${rowNum}`).fill = secFill;
-                rowNum++;
-                ws.mergeCells(`A${rowNum}:I${rowNum+2}`);
-                ws.getCell(`A${rowNum}`).value = r.workDone || '-'; ws.getCell(`A${rowNum}`).font = nFont; ws.getCell(`A${rowNum}`).alignment = {wrapText: true, vertical:'top'};
+                ws.mergeCells(`A${rowNum}:I${rowNum}`); ws.getCell(`A${rowNum}`).value = "5. WORK DONE / ACTIVITY DESCRIPTION"; ws.getCell(`A${rowNum}`).font = subFont; ws.getCell(`A${rowNum}`).fill = secFill; rowNum++;
+                ws.mergeCells(`A${rowNum}:I${rowNum+2}`); ws.getCell(`A${rowNum}`).value = r.workDone || '-'; ws.getCell(`A${rowNum}`).font = nFont; ws.getCell(`A${rowNum}`).alignment = {wrapText: true, vertical:'top'};
                 
-                // Set Column Widths
                 ws.columns = [ {width:15}, {width:20}, {width:25}, {width:25}, {width:15}, {width:15}, {width:15}, {width:15}, {width:15} ];
-
-                // Export File
-                const buffer = await wb.xlsx.writeBuffer();
-                saveAs(new Blob([buffer]), `DPR_${r.siteId}_${r.date}.xlsx`);
+                const buffer = await wb.xlsx.writeBuffer(); saveAs(new Blob([buffer]), `DPR_${r.siteId}_${r.date}.xlsx`);
             }
         });
 
-        loadSites(); loadReports();
+        // Initialize All Functions
+        loadSites().then(() => {
+            loadReports();
+            calculateAnalytics(); // Load dashboard on startup
+        });
     </script>
 </body>
 </html>
