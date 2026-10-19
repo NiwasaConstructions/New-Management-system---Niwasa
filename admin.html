@@ -20,20 +20,19 @@
     <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center flex-wrap gap-3">
         <div><h1 class="text-2xl font-bold"><i class="fa-solid fa-shield mr-2"></i>Niwasa Admin</h1></div>
         <div class="space-x-2 flex flex-wrap">
-            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn text-blue-300 font-bold px-2 py-1">Dashboard</button>
-            <button onclick="switchTab('entry')" id="nav-entry" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Data Entry</button>
-            <button onclick="switchTab('reports')" id="nav-reports" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Approve Reports</button>
-            <button onclick="switchTab('sites')" id="nav-sites" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Sites</button>
-            <button onclick="switchTab('users')" id="nav-users" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Users</button>
-            <button onclick="logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-2">Logout</button>
+            <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="nav-btn text-blue-300 font-bold px-2 py-1">Dashboard</button>
+            <button onclick="window.switchTab('entry')" id="nav-entry" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Data Entry</button>
+            <button onclick="window.switchTab('reports')" id="nav-reports" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Approve Reports</button>
+            <button onclick="window.switchTab('sites')" id="nav-sites" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Sites</button>
+            <button onclick="window.switchTab('users')" id="nav-users" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Users</button>
+            <button onclick="window.logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-2">Logout</button>
         </div>
     </nav>
 
     <div class="p-6 max-w-7xl mx-auto">
-        
         <!-- 1. DASHBOARD -->
         <div id="tab-dashboard" class="tab-content active">
-            <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-extrabold text-gray-800">Company Overview</h2><button onclick="calculateAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded shadow"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+            <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-extrabold text-gray-800">Company Overview</h2><button onclick="window.calculateAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded shadow"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500"><h3 class="text-gray-500 font-bold text-sm">Active Sites</h3><p class="text-4xl font-black text-blue-900 mt-2" id="statSites">0</p></div>
                 <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500"><h3 class="text-gray-500 font-bold text-sm">Total Labours Today</h3><p class="text-4xl font-black text-green-700 mt-2" id="statLabours">0</p></div>
@@ -49,12 +48,11 @@
         <div id="tab-entry" class="tab-content">
             <h2 class="text-2xl font-bold mb-4 text-gray-800">Submit Daily Progress Report (Admin)</h2>
             <div class="bg-white p-6 rounded-lg shadow border-t-4 border-blue-600">
-                <form id="dprForm" onsubmit="submitAdminDPR(event)" class="space-y-6">
+                <form id="dprForm" onsubmit="window.submitAdminDPR(event)" class="space-y-6">
                     <div class="bg-gray-50 p-4 rounded border">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div><label class="font-semibold text-sm">Date</label><input type="date" id="eDate" class="w-full border p-2 rounded" required></div>
                             <div><label class="font-semibold text-sm">DOC No</label><input type="text" id="eDocNo" class="w-full border p-2 rounded"></div>
-                            <!-- FIXED ID HERE: eSite instead of eSiteId to match the script -->
                             <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="eSite" class="w-full border p-2 rounded bg-yellow-100 font-bold" required><option value="">Select...</option></select></div>
                             <div><label class="font-semibold text-sm">Weather</label><select id="eWeather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                         </div>
@@ -62,25 +60,25 @@
 
                     <div class="bg-orange-50 p-4 rounded border border-orange-200">
                         <h3 class="font-bold text-orange-800 mb-2">Weather Delays</h3>
-                        <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded"><input type="time" id="dTo" class="border p-2 rounded"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded flex-1"><button type="button" onclick="addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded px-4">Add</button></div>
+                        <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded"><input type="time" id="dTo" class="border p-2 rounded"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded flex-1"><button type="button" onclick="window.addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded px-4">Add</button></div>
                         <table class="w-full text-sm bg-white border"><tbody id="tb-delays"></tbody></table>
                     </div>
 
                     <div class="bg-teal-50 p-4 rounded border border-teal-200">
                         <h3 class="font-bold text-teal-800 mb-2">Work Measurements</h3>
-                        <div class="flex gap-2 mb-2"><input type="text" id="mDesc" placeholder="Work Desc" class="border p-2 rounded flex-1"><input type="text" id="mUnit" placeholder="Unit/Qty" class="border p-2 rounded"><button type="button" onclick="addD('measures',['mDesc','mUnit'],['d','u'])" class="bg-teal-600 text-white font-bold rounded px-4">Add</button></div>
+                        <div class="flex gap-2 mb-2"><input type="text" id="mDesc" placeholder="Work Desc" class="border p-2 rounded flex-1"><input type="text" id="mUnit" placeholder="Unit/Qty" class="border p-2 rounded"><button type="button" onclick="window.addD('measures',['mDesc','mUnit'],['d','u'])" class="bg-teal-600 text-white font-bold rounded px-4">Add</button></div>
                         <table class="w-full text-sm bg-white border"><tbody id="tb-measures"></tbody></table>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-green-50 p-4 rounded border border-green-200">
                             <h3 class="font-bold text-green-800 mb-2">Suppliers</h3>
-                            <div class="flex gap-1 mb-2"><input type="text" id="sMat" placeholder="Material" class="border p-1 rounded flex-1"><input type="text" id="sQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="sName" placeholder="Supplier" class="border p-1 rounded"><button type="button" onclick="addD('sups',['sMat','sQty','sName'],['m','q','n'])" class="bg-green-600 text-white font-bold rounded px-2">Add</button></div>
+                            <div class="flex gap-1 mb-2"><input type="text" id="sMat" placeholder="Material" class="border p-1 rounded flex-1"><input type="text" id="sQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="sName" placeholder="Supplier" class="border p-1 rounded"><button type="button" onclick="window.addD('sups',['sMat','sQty','sName'],['m','q','n'])" class="bg-green-600 text-white font-bold rounded px-2">Add</button></div>
                             <table class="w-full text-xs bg-white border"><tbody id="tb-sups"></tbody></table>
                         </div>
                         <div class="bg-lime-50 p-4 rounded border border-lime-200">
                             <h3 class="font-bold text-lime-800 mb-2">Sub-Contractors</h3>
-                            <div class="flex gap-1 mb-2"><input type="text" id="subTask" placeholder="Task" class="border p-1 rounded flex-1"><input type="text" id="subQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="subName" placeholder="Name" class="border p-1 rounded"><button type="button" onclick="addD('subs',['subTask','subQty','subName'],['t','q','n'])" class="bg-lime-600 text-white font-bold rounded px-2">Add</button></div>
+                            <div class="flex gap-1 mb-2"><input type="text" id="subTask" placeholder="Task" class="border p-1 rounded flex-1"><input type="text" id="subQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="subName" placeholder="Name" class="border p-1 rounded"><button type="button" onclick="window.addD('subs',['subTask','subQty','subName'],['t','q','n'])" class="bg-lime-600 text-white font-bold rounded px-2">Add</button></div>
                             <table class="w-full text-xs bg-white border"><tbody id="tb-subs"></tbody></table>
                         </div>
                     </div>
@@ -90,7 +88,7 @@
                         <div class="flex gap-2 mb-2">
                             <select id="vName" class="border p-2 rounded w-1/4 font-bold text-purple-900"><option value="">Select...</option><option value="Engineer">Engineer</option><option value="Architect">Architect</option><option value="Boss">Boss</option><option value="QS">QS</option><option value="Client">Client</option><option value="Client's Party">Client's Party</option></select>
                             <input type="text" id="vNote" placeholder="Special Note" class="border p-2 rounded flex-1"><input type="time" id="vTime" class="border p-2 rounded">
-                            <button type="button" onclick="addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
+                            <button type="button" onclick="window.addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
                         </div>
                         <table class="w-full text-sm bg-white border"><tbody id="tb-visits"></tbody></table>
                     </div>
@@ -103,7 +101,7 @@
                             <input type="text" id="wOT" placeholder="OT Hrs" class="border p-2 rounded w-20">
                             <input type="number" id="wAdv" placeholder="Adv Rs" class="border p-2 rounded w-24">
                             <input type="text" id="wRem" placeholder="Remarks (Transfers/Leaves)" class="border p-2 rounded flex-1">
-                            <button type="button" onclick="addD('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'])" class="bg-blue-600 text-white font-bold rounded px-4">Add</button>
+                            <button type="button" onclick="window.addD('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'])" class="bg-blue-600 text-white font-bold rounded px-4">Add</button>
                         </div>
                         <table class="w-full text-sm bg-white border"><tbody id="tb-workers"></tbody></table>
                     </div>
@@ -125,11 +123,11 @@
             <h2 class="text-2xl font-bold mb-4">Manage Sites</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded shadow h-fit">
-                    <form onsubmit="addSite(event)" class="space-y-4">
+                    <form onsubmit="window.addSite(event)" class="space-y-4">
                         <input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded font-bold text-lg" required>
                         <div class="bg-blue-50 p-3 rounded border border-blue-200">
                             <label class="text-xs font-bold text-blue-800 mb-1 block">Google Maps Link</label>
-                            <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" placeholder="Paste full map link here..." class="w-full border p-2 rounded text-sm"><button type="button" onclick="extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
+                            <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" placeholder="Paste map link here..." class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
                             <input type="text" id="sLoc" placeholder="City or Extracted GPS" class="w-full border p-2 rounded font-bold text-gray-700 bg-white" required>
                         </div>
                         <select id="sStat" class="w-full border p-2 rounded font-bold"><option>Ongoing</option><option>Completed</option></select>
@@ -145,7 +143,7 @@
             <h2 class="text-2xl font-bold mb-4">Manage Users</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white p-6 rounded shadow h-fit">
-                    <form onsubmit="addUser(event)" class="space-y-4">
+                    <form onsubmit="window.addUser(event)" class="space-y-4">
                         <input type="email" id="uEmail" placeholder="Email" class="w-full border p-2 rounded" required>
                         <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded" required>
                         <select id="uRole" class="w-full border p-2 rounded" required><option value="">Role...</option><option value="supervisor">Supervisor</option><option value="customer">Customer</option></select>
@@ -177,23 +175,32 @@
         </div>
     </div>
     
-    <div id="modalEditUser" class="modal"><div class="modal-content" style="max-width: 500px;"><div class="flex justify-between items-center border-b pb-2 mb-4"><h3 class="font-bold text-xl">Edit Sites</h3><button onclick="document.getElementById('modalEditUser').style.display='none'" class="text-red-600 font-bold text-2xl">&times;</button></div><input type="hidden" id="muId"><div id="muCheckboxes" class="border p-2 bg-gray-50 h-40 overflow-y-auto mb-4"></div><button onclick="saveUserSites()" class="w-full bg-green-600 text-white font-bold py-2 rounded">Save</button></div></div>
+    <div id="modalEditUser" class="modal"><div class="modal-content" style="max-width: 500px;"><div class="flex justify-between items-center border-b pb-2 mb-4"><h3 class="font-bold text-xl">Edit Sites</h3><button onclick="document.getElementById('modalEditUser').style.display='none'" class="text-red-600 font-bold text-2xl">&times;</button></div><input type="hidden" id="muId"><div id="muCheckboxes" class="border p-2 bg-gray-50 h-40 overflow-y-auto mb-4"></div><button onclick="window.saveUserSites()" class="w-full bg-green-600 text-white font-bold py-2 rounded">Save</button></div></div>
     
     <input type="hidden" id="adminEmail">
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
-        const app = initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" }); 
+        const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" };
+        const app = !getApps().length ? initializeApp(config) : getApp();
         const auth = getAuth(app); const db = getFirestore(app);
-        const authSecondary = getAuth(initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" }, "Secondary"));
+        
+        // Anti-crash safety for secondary app creation
+        const authSecondary = getAuth(getApps().find(a => a.name === "Secondary") || initializeApp(config, "Secondary"));
 
+        // Global functions mapped securely
         window.switchTab = (tab) => { 
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('text-blue-300'));
-            document.getElementById('tab-'+tab).classList.add('active'); document.getElementById('nav-'+tab).classList.add('text-blue-300');
-            if(tab === 'dashboard') window.calculateAnalytics(); if(tab === 'reports') window.loadReports(); if(tab === 'sites') window.loadSites(); if(tab === 'users') window.loadUsers();
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); 
+            document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('text-blue-300'));
+            document.getElementById('tab-'+tab).classList.add('active'); 
+            document.getElementById('nav-'+tab).classList.add('text-blue-300');
+            if(tab === 'dashboard') window.calculateAnalytics(); 
+            if(tab === 'reports') window.loadReports(); 
+            if(tab === 'sites') window.loadSites(); 
+            if(tab === 'users') window.loadUsers();
         };
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
 
@@ -211,13 +218,10 @@
 
         window.submitAdminDPR = async (e) => {
             e.preventDefault(); document.getElementById('btnSubmitDPR').innerText="Submitting...";
-            // FIXED BUG HERE: Correctly getting siteId from 'eSite' input field
             const siteVal = document.getElementById('eSite').value;
             try {
                 await addDoc(collection(db, "daily_reports"), {
-                    date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, 
-                    siteId: siteVal, // Corrected variable
-                    weather: document.getElementById('eWeather').value,
+                    date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, siteId: siteVal, weather: document.getElementById('eWeather').value,
                     data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: "Approved", approvedBy: document.getElementById('adminName').value, timestamp: new Date()
                 });
                 alert("Report Saved & Approved!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]}; ['tb-delays','tb-measures','tb-sups','tb-subs','tb-visits','tb-workers'].forEach(id=>document.getElementById(id).innerHTML='');
@@ -233,7 +237,7 @@
             tb.innerHTML=''; cb.innerHTML=''; eDrop.innerHTML='<option value="">Select...</option>';
             snap.forEach(d => {
                 const s = d.data(); globalSites.push({id:d.id, name:s.name, status:s.status});
-                let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border font-bold">${s.name}</td><td class="p-2 border text-xs">${s.location}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="toggleSite('${d.id}','${s.status}')" class="bg-gray-800 text-white px-2 rounded">Toggle</button></td>`; tb.appendChild(tr);
+                let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border font-bold">${s.name}</td><td class="p-2 border text-xs">${s.location}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="window.toggleSite('${d.id}','${s.status}')" class="bg-gray-800 text-white px-2 rounded">Toggle</button></td>`; tb.appendChild(tr);
                 if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='block'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="scb mr-2">${s.name}`; cb.appendChild(lbl); let opt=document.createElement('option'); opt.value=s.name; opt.innerText=s.name; eDrop.appendChild(opt); }
             });
         };
@@ -242,73 +246,87 @@
 
         window.loadUsers = async () => {
             const snap = await getDocs(collection(db, "users")); const tb = document.getElementById('usersTable'); tb.innerHTML='';
-            snap.forEach(d => { const u = d.data(); const sites = (u.assignedSites||[]).join(', '); const acts = u.role==='admin'?'-':`<button onclick="openEditU('${d.id}','${sites}')" class="bg-yellow-500 text-white px-2 rounded mr-1">Edit</button><button onclick="delU('${d.id}')" class="bg-red-500 text-white px-2 rounded">Del</button>`; let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border">${u.email}</td><td class="p-2 border">${u.role}</td><td class="p-2 border">${sites}</td><td class="p-2 border">${acts}</td>`; tb.appendChild(tr); });
+            snap.forEach(d => { const u = d.data(); const sites = (u.assignedSites||[]).join(', '); const acts = u.role==='admin'?'-':`<button onclick="window.openEditU('${d.id}','${sites}')" class="bg-yellow-500 text-white px-2 rounded mr-1">Edit</button><button onclick="window.delU('${d.id}')" class="bg-red-500 text-white px-2 rounded">Del</button>`; let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border">${u.email}</td><td class="p-2 border">${u.role}</td><td class="p-2 border">${sites}</td><td class="p-2 border">${acts}</td>`; tb.appendChild(tr); });
         };
         window.addUser = async (e) => { e.preventDefault(); const sel = Array.from(document.querySelectorAll('.scb:checked')).map(c=>c.value); try { const cred = await createUserWithEmailAndPassword(authSecondary, document.getElementById('uEmail').value, document.getElementById('uPass').value); await setDoc(doc(db, "users", cred.user.uid), { email: document.getElementById('uEmail').value, role: document.getElementById('uRole').value, assignedSites: sel }); await signOut(authSecondary); e.target.reset(); window.loadUsers(); } catch(err) { alert(err.message); } };
         window.delU = async (id) => { if(confirm('Delete User?')) { await deleteDoc(doc(db, "users", id)); window.loadUsers(); } };
         window.openEditU = (id, curSites) => { document.getElementById('muId').value = id; const arr = curSites.split(', '); const cbCon = document.getElementById('muCheckboxes'); cbCon.innerHTML=''; globalSites.forEach(s => { if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='block'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="mucb mr-2" ${arr.includes(s.name)?'checked':''}>${s.name}`; cbCon.appendChild(lbl); } }); document.getElementById('modalEditUser').style.display='block'; };
         window.saveUserSites = async () => { await updateDoc(doc(db, "users", document.getElementById('muId').value), {assignedSites: Array.from(document.querySelectorAll('.mucb:checked')).map(c=>c.value)}); document.getElementById('modalEditUser').style.display='none'; window.loadUsers(); };
 
+        // ===============================================
+        // REPORTS MANAGEMENT - 100% FIXED BY USING UNIQUE IDs
+        // ===============================================
         let allReports = [];
         window.loadReports = async () => {
             const snap = await getDocs(query(collection(db, "daily_reports"), orderBy("timestamp", "desc")));
             const tb = document.getElementById('tbReportsList'); tb.innerHTML=''; allReports=[];
-            snap.forEach((d, i) => {
+            snap.forEach((d) => {
                 const r = d.data(); r.id = d.id; allReports.push(r);
                 if(r.status === "Draft") return; 
                 let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-800 px-2 rounded">Approved</span>` : `<span class="bg-yellow-100 text-yellow-800 px-2 rounded font-bold animate-pulse">Pending</span>`;
-                let acts = `<button data-act="view" data-idx="${i}" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i></button><button data-act="excel" data-idx="${i}" class="bg-gray-600 text-white px-2 rounded mr-1">Excel</button>`;
-                if(r.status !== "Approved") acts += `<button data-act="approve" data-id="${r.id}" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
-                acts += `<button data-act="delete" data-id="${r.id}" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
+                
+                // Using exact IDs now instead of array indexes to guarantee no undefined errors
+                let acts = `<button onclick="window.viewRep('${r.id}')" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i> View</button>`;
+                acts += `<button onclick="window.exportRep('${r.id}')" class="bg-gray-600 text-white px-2 rounded mr-1"><i class="fa-solid fa-file-excel"></i> Excel</button>`;
+                
+                if(r.status !== "Approved") acts += `<button onclick="window.approveRep('${r.id}')" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
+                acts += `<button onclick="window.delRep('${r.id}')" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
+                
                 let tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId || 'Unknown'}</td><td class="p-3 border">${badge}</td><td class="p-3 border text-center">${acts}</td>`; tb.appendChild(tr);
             });
         };
 
-        document.getElementById('tbReportsList').addEventListener('click', async (e) => {
-            const btn = e.target.closest('button'); if(!btn) return;
-            const act = btn.getAttribute('data-act'); const idx = btn.getAttribute('data-idx'); const id = btn.getAttribute('data-id');
+        window.viewRep = (id) => {
+            const r = allReports.find(x => x.id === id);
+            if(!r) return alert("Report data error!");
+            document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + (r.siteId || 'Unknown'); document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
+            const d = r.data || {};
+            const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
+            rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'rem']);
+            document.getElementById('modalView').style.display='block';
+        };
 
-            if(act === 'view') {
-                const r = allReports[idx];
-                document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + (r.siteId || 'Unknown'); document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
-                const d = r.data || {};
-                const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
-                rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'rem']);
-                document.getElementById('modalView').style.display='block';
-            }
-            if(act === 'excel') {
-                try {
-                    const r = allReports[idx]; 
-                    // FIXED EXCEL EXPORT BUG: If siteId is missing, provide a fallback to prevent 'undefined' error
-                    const siteNameForFile = r.siteId || 'Unknown_Site';
-                    
-                    const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
-                    const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10};
-                    ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
-                    ws.getCell('A4').value="Date: "+r.date; ws.getCell('D4').value="Weather: "+r.weather; ws.getCell('G4').value="Status: "+r.status;
-                    let row = 6;
-                    const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:I${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; };
-                    const d=r.data||{};
-                    addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
-                    ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15}];
-                    const buf = await wb.xlsx.writeBuffer(); window.saveAs(new Blob([buf]), `DPR_${siteNameForFile}_${r.date}.xlsx`);
-                } catch(err) { alert("Export Error: " + err.message); }
-            }
-            if(act === 'approve') { if(confirm("Approve this report?")) { await updateDoc(doc(db, "daily_reports", id), { status: "Approved", approvedBy: document.getElementById('adminEmail').value }); window.loadReports(); } }
-            if(act === 'delete') { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, "daily_reports", id)); window.loadReports(); window.calculateAnalytics(); } }
-        });
+        window.exportRep = async (id) => {
+            try {
+                const r = allReports.find(x => x.id === id);
+                if(!r) return alert("Report data error!");
+                const siteNameForFile = r.siteId || 'Unknown_Site';
+                
+                const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
+                const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10};
+                ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
+                ws.getCell('A4').value="Date: "+r.date; ws.getCell('D4').value="Weather: "+r.weather; ws.getCell('G4').value="Status: "+r.status;
+                let row = 6;
+                const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:I${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; };
+                const d=r.data||{};
+                addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
+                ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15}];
+                
+                const buf = await wb.xlsx.writeBuffer(); 
+                const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`);
+            } catch(err) { alert("Export Error: " + err.message); }
+        };
+
+        window.approveRep = async (id) => { if(confirm("Approve this report?")) { await updateDoc(doc(db, "daily_reports", id), { status: "Approved", approvedBy: document.getElementById('adminEmail').value }); window.loadReports(); } };
+        window.delRep = async (id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, "daily_reports", id)); window.loadReports(); window.calculateAnalytics(); } };
 
         window.calculateAnalytics = async () => {
-            const rSnap = await getDocs(collection(db, "daily_reports")); const today = new Date().toISOString().split('T')[0];
-            let tLab=0, tAdv=0, dHrs={}, sk=0, usk=0;
-            rSnap.forEach(d => {
-                const r = d.data();
-                if(r.date===today && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{if(w.a)tAdv+=parseFloat(w.a); if(w.t==='SK')sk++; if(w.t==='USK')usk++;}); }
-                if(r.siteId && r.data && r.data.delays) { if(!dHrs[r.siteId])dHrs[r.siteId]=0; r.data.delays.forEach(dy=>{if(dy.f&&dy.t){let h=(new Date(`1970-01-01T${dy.t}:00`)-new Date(`1970-01-01T${dy.f}:00`))/3600000; if(h>0)dHrs[r.siteId]+=h;}}); }
-            });
-            document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tAdv;
-            if(window.charts?.d) window.charts.d.destroy(); window.charts={}; window.charts.d = new Chart(document.getElementById('delayChart'), {type:'bar', data:{labels:Object.keys(dHrs), datasets:[{label:'Delay Hrs', data:Object.values(dHrs), backgroundColor:'#3b82f6'}]}});
-            if(window.charts?.l) window.charts.l.destroy(); window.charts.l = new Chart(document.getElementById('labourChart'), {type:'doughnut', data:{labels:['SK','USK'], datasets:[{data:[sk,usk], backgroundColor:['#10b981','#f59e0b']}]}});
+            try {
+                const rSnap = await getDocs(collection(db, "daily_reports")); const today = new Date().toISOString().split('T')[0];
+                let tLab=0, tAdv=0, dHrs={}, sk=0, usk=0;
+                rSnap.forEach(d => {
+                    const r = d.data();
+                    if(r.date===today && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{if(w.a)tAdv+=parseFloat(w.a); if(w.t==='SK')sk++; if(w.t==='USK')usk++;}); }
+                    if(r.siteId && r.data && r.data.delays) { if(!dHrs[r.siteId])dHrs[r.siteId]=0; r.data.delays.forEach(dy=>{if(dy.f&&dy.t){let h=(new Date(`1970-01-01T${dy.t}:00`)-new Date(`1970-01-01T${dy.f}:00`))/3600000; if(h>0)dHrs[r.siteId]+=h;}}); }
+                });
+                document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tAdv;
+                if(typeof Chart !== 'undefined') {
+                    if(window.charts?.d) window.charts.d.destroy(); if(window.charts?.l) window.charts.l.destroy(); window.charts={};
+                    window.charts.d = new Chart(document.getElementById('delayChart'), {type:'bar', data:{labels:Object.keys(dHrs), datasets:[{label:'Delay Hrs', data:Object.values(dHrs), backgroundColor:'#3b82f6'}]}});
+                    window.charts.l = new Chart(document.getElementById('labourChart'), {type:'doughnut', data:{labels:['SK','USK'], datasets:[{data:[sk,usk], backgroundColor:['#10b981','#f59e0b']}]}});
+                }
+            } catch(e) { console.log(e); }
         };
 
         window.onload = async () => { await window.loadSites(); window.loadUsers(); window.loadReports(); window.calculateAnalytics(); };
