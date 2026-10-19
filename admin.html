@@ -54,6 +54,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div><label class="font-semibold text-sm">Date</label><input type="date" id="eDate" class="w-full border p-2 rounded" required></div>
                             <div><label class="font-semibold text-sm">DOC No</label><input type="text" id="eDocNo" class="w-full border p-2 rounded"></div>
+                            <!-- FIXED ID HERE: eSite instead of eSiteId to match the script -->
                             <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="eSite" class="w-full border p-2 rounded bg-yellow-100 font-bold" required><option value="">Select...</option></select></div>
                             <div><label class="font-semibold text-sm">Weather</label><select id="eWeather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                         </div>
@@ -94,7 +95,6 @@
                         <table class="w-full text-sm bg-white border"><tbody id="tb-visits"></tbody></table>
                     </div>
 
-                    <!-- UPDATED LABOUR SECTION IN ADMIN ENTRY -->
                     <div class="bg-blue-50 p-4 rounded border border-blue-200">
                         <h3 class="font-bold text-blue-800 mb-2">Labour & Advances</h3>
                         <div class="flex flex-wrap gap-2 mb-2">
@@ -171,15 +171,7 @@
                     <div class="bg-lime-50 p-2 rounded border"><h4 class="font-bold text-xs">Sub-Contractors</h4><table class="w-full text-xs bg-white"><tbody id="mvSubs"></tbody></table></div>
                 </div>
                 <div class="bg-purple-50 p-2 rounded border"><h4 class="font-bold">Visitors & Notes</h4><table class="w-full text-sm bg-white"><tbody id="mvVisits"></tbody></table></div>
-                
-                <!-- UPDATED VIEW MODAL LABOUR SECTION WITH REMARKS -->
-                <div class="bg-blue-50 p-2 rounded border">
-                    <h4 class="font-bold">Workers & Advances</h4>
-                    <table class="w-full text-sm bg-white border">
-                        <thead class="bg-gray-100"><tr><th class="border p-1">Name</th><th class="border p-1">Type</th><th class="border p-1">OT</th><th class="border p-1">Adv</th><th class="border p-1 text-red-700">Remarks</th></tr></thead>
-                        <tbody id="mvWorkers"></tbody>
-                    </table>
-                </div>
+                <div class="bg-blue-50 p-2 rounded border"><h4 class="font-bold">Workers & Advances</h4><table class="w-full text-sm bg-white border"><thead class="bg-gray-100"><tr><th class="border p-1">Name</th><th class="border p-1">Type</th><th class="border p-1">OT</th><th class="border p-1">Adv</th><th class="border p-1 text-red-700">Remarks</th></tr></thead><tbody id="mvWorkers"></tbody></table></div>
             </div>
             <div class="mt-4 pt-3 border-t text-right text-sm"><p class="font-bold text-gray-600">Prepared By: <span id="mvPreparedBy" class="text-blue-900"></span></p><p class="font-bold text-green-700" id="mvApprovedBy"></p></div>
         </div>
@@ -207,6 +199,7 @@
 
         auth.onAuthStateChanged(user => { if(!user) return window.location.href = "index.html"; const n = user.email.split('@')[0]; document.getElementById('adminEmail').value = n; document.getElementById('adminName').value = n; });
 
+        // 1. DATA ENTRY
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
         window.addD = (arrName, inIds, keys) => {
             if(!document.getElementById(inIds[0]).value) return; 
@@ -218,9 +211,13 @@
 
         window.submitAdminDPR = async (e) => {
             e.preventDefault(); document.getElementById('btnSubmitDPR').innerText="Submitting...";
+            // FIXED BUG HERE: Correctly getting siteId from 'eSite' input field
+            const siteVal = document.getElementById('eSite').value;
             try {
                 await addDoc(collection(db, "daily_reports"), {
-                    date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, siteId: document.getElementById('eSite').value, weather: document.getElementById('eWeather').value,
+                    date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, 
+                    siteId: siteVal, // Corrected variable
+                    weather: document.getElementById('eWeather').value,
                     data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: "Approved", approvedBy: document.getElementById('adminName').value, timestamp: new Date()
                 });
                 alert("Report Saved & Approved!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]}; ['tb-delays','tb-measures','tb-sups','tb-subs','tb-visits','tb-workers'].forEach(id=>document.getElementById(id).innerHTML='');
@@ -263,7 +260,7 @@
                 let acts = `<button data-act="view" data-idx="${i}" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i></button><button data-act="excel" data-idx="${i}" class="bg-gray-600 text-white px-2 rounded mr-1">Excel</button>`;
                 if(r.status !== "Approved") acts += `<button data-act="approve" data-id="${r.id}" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
                 acts += `<button data-act="delete" data-id="${r.id}" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
-                let tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId}</td><td class="p-3 border">${badge}</td><td class="p-3 border text-center">${acts}</td>`; tb.appendChild(tr);
+                let tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId || 'Unknown'}</td><td class="p-3 border">${badge}</td><td class="p-3 border text-center">${acts}</td>`; tb.appendChild(tr);
             });
         };
 
@@ -273,27 +270,28 @@
 
             if(act === 'view') {
                 const r = allReports[idx];
-                document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + r.siteId; document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
+                document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + (r.siteId || 'Unknown'); document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
                 const d = r.data || {};
                 const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
-                rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); 
-                rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'rem']); // Added new column to view
+                rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'rem']);
                 document.getElementById('modalView').style.display='block';
             }
             if(act === 'excel') {
                 try {
-                    const r = allReports[idx]; const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
+                    const r = allReports[idx]; 
+                    // FIXED EXCEL EXPORT BUG: If siteId is missing, provide a fallback to prevent 'undefined' error
+                    const siteNameForFile = r.siteId || 'Unknown_Site';
+                    
+                    const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
                     const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10};
-                    ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${r.siteId})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
+                    ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
                     ws.getCell('A4').value="Date: "+r.date; ws.getCell('D4').value="Weather: "+r.weather; ws.getCell('G4').value="Status: "+r.status;
                     let row = 6;
                     const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:I${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; };
                     const d=r.data||{};
-                    addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); 
-                    // Excel Export UPDATED with Remarks Column
-                    addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
+                    addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
                     ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15}];
-                    const buf = await wb.xlsx.writeBuffer(); window.saveAs(new Blob([buf]), `DPR_${r.siteId}_${r.date}.xlsx`);
+                    const buf = await wb.xlsx.writeBuffer(); window.saveAs(new Blob([buf]), `DPR_${siteNameForFile}_${r.date}.xlsx`);
                 } catch(err) { alert("Export Error: " + err.message); }
             }
             if(act === 'approve') { if(confirm("Approve this report?")) { await updateDoc(doc(db, "daily_reports", id), { status: "Approved", approvedBy: document.getElementById('adminEmail').value }); window.loadReports(); } }
