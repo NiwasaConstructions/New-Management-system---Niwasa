@@ -6,28 +6,22 @@
     <title>Client Portal - Niwasa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 800px; }
-    </style>
+    <style> .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); } .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 800px; } </style>
 </head>
 <body class="bg-gray-100 p-6">
 
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md border-t-4 border-green-600">
         <div class="flex justify-between items-center mb-6 border-b pb-4">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">My Project Progress</h1>
-                <p class="text-gray-500 font-bold" id="clientSiteName">Loading your assigned sites...</p>
-            </div>
+            <div><h1 class="text-3xl font-bold text-gray-800">My Project Progress</h1><p class="text-gray-500 font-bold" id="clientSiteName">Loading your assigned sites...</p></div>
             <button onclick="logout()" class="bg-gray-800 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-power-off"></i> Logout</button>
         </div>
-        <div id="reportsContainer" class="space-y-4"><p class="text-center font-bold text-gray-500">Fetching daily reports...</p></div>
+        <div id="reportsContainer" class="space-y-4"></div>
     </div>
 
     <!-- CUSTOMER VIEW MODAL -->
     <div id="modalView" class="modal">
         <div class="modal-content">
-            <div class="flex justify-between items-center border-b pb-2 mb-4"><h2 class="text-2xl font-black text-green-900">Project Update</h2><button onclick="closeModal('modalView')" class="text-red-600 font-bold text-2xl">&times;</button></div>
+            <div class="flex justify-between items-center border-b pb-2 mb-4"><h2 class="text-2xl font-black text-green-900">Project Update</h2><button onclick="document.getElementById('modalView').style.display='none'" class="text-red-600 font-bold text-2xl">&times;</button></div>
             <div id="vContent" class="space-y-4 max-h-[70vh] overflow-y-auto"></div>
         </div>
     </div>
@@ -37,58 +31,56 @@
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
-        const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour", storageBucket: "niwasa-new-labour.firebasestorage.app", messagingSenderId: "963050302203", appId: "1:963050302203:web:b48870480bd31079f35e5e" };
-        const app = initializeApp(config); const auth = getAuth(app); const db = getFirestore(app);
+        const app = initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" }); 
+        const auth = getAuth(app); const db = getFirestore(app);
 
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
-        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
         let clientReports = [];
 
         auth.onAuthStateChanged(async user => {
             if(!user) return window.location.href = "index.html";
-            try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if(userDoc.exists() && userDoc.data().role === 'customer') {
-                    const assignedSites = userDoc.data().assignedSites || [];
-                    document.getElementById('clientSiteName').innerText = assignedSites.length > 0 ? "Sites: " + assignedSites.join(", ") : "No sites assigned.";
-                    if(assignedSites.length > 0) { window.loadCustomerReports(assignedSites); }
-                    else { document.getElementById('reportsContainer').innerHTML = "<p class='text-center text-red-500 font-bold'>You don't have any assigned sites.</p>"; }
-                }
-            } catch(e) { console.log(e); }
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if(userDoc.exists() && userDoc.data().role === 'customer') {
+                const assignedSites = userDoc.data().assignedSites || [];
+                document.getElementById('clientSiteName').innerText = assignedSites.length > 0 ? "Sites: " + assignedSites.join(", ") : "No sites assigned.";
+                if(assignedSites.length > 0) window.loadCustomerReports(assignedSites);
+            }
         });
 
         window.loadCustomerReports = async (sites) => {
             const container = document.getElementById('reportsContainer');
-            try {
-                const q = query(collection(db, "daily_reports"), where("siteId", "in", sites));
-                const snap = await getDocs(q); clientReports = []; snap.forEach(d => clientReports.push(d.data()));
-                if(clientReports.length === 0) { container.innerHTML = "<p class='text-center font-bold'>No reports found.</p>"; return; }
-                
-                clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
-                container.innerHTML = clientReports.map((r, i) => `
-                    <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-100 transition cursor-pointer" onclick="viewRep(${i})">
-                        <div><span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span><p class="text-sm text-gray-600 truncate max-w-sm mt-1">${r.workDone}</p></div>
-                        <button class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Open Report</button>
-                    </div>`).join('');
-            } catch(e) { console.log(e); container.innerHTML = "<p class='text-center text-red-500'>Error loading reports.</p>"; }
+            // Show only APPROVED reports to customer
+            const q = query(collection(db, "daily_reports"), where("siteId", "in", sites), where("status", "==", "Approved"));
+            const snap = await getDocs(q); clientReports = []; snap.forEach(d => clientReports.push(d.data()));
+            if(clientReports.length === 0) { container.innerHTML = "<p class='text-center font-bold'>No approved reports found yet.</p>"; return; }
+            
+            clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
+            container.innerHTML = clientReports.map((r, i) => `
+                <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-100 transition cursor-pointer" onclick="viewRep(${i})">
+                    <div><span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span></div>
+                    <button class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Open Report</button>
+                </div>`).join('');
         };
 
         window.viewRep = (i) => {
-            const r = clientReports[i];
+            const r = clientReports[i]; const d = r.data || {};
+            const workerCount = d.workers ? d.workers.length : 0;
+            const measuresText = d.measures ? d.measures.map(m => m.d + " (" + m.u + ")").join('<br>') : 'No specific measurements today.';
+
             const content = `
                 <div class="bg-green-50 p-4 rounded mb-4 text-sm font-bold flex justify-between"><span>Date: ${r.date}</span><span>Site: ${r.siteId}</span><span>Weather: ${r.weather}</span></div>
-                <h4 class="font-bold text-xl border-b pb-2 mb-2"><i class="fa-solid fa-clipboard-check"></i> Work Completed Today</h4>
-                <p class="text-gray-700 bg-gray-50 p-4 rounded border text-md whitespace-pre-wrap leading-relaxed">${r.workDone || 'No details provided.'}</p>
-                
+                <h4 class="font-bold text-xl border-b pb-2 mb-2"><i class="fa-solid fa-ruler-combined"></i> Work Completed Today</h4>
+                <p class="text-gray-700 bg-gray-50 p-4 rounded border text-md whitespace-pre-wrap leading-relaxed">${measuresText}</p>
                 <div class="mt-4 grid grid-cols-2 gap-4">
                     <div class="bg-blue-50 p-4 rounded border border-blue-200">
                         <h4 class="font-bold text-blue-800">Labour Force</h4>
-                        <p class="text-3xl font-black text-blue-900 mt-2">${r.workers?.length || 0} <span class="text-sm">Workers</span></p>
+                        <p class="text-3xl font-black text-blue-900 mt-2">${workerCount} <span class="text-sm">Workers present</span></p>
+                        <p class="text-xs text-gray-500 mt-1">*Financial details are hidden.</p>
                     </div>
                     <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                        <h4 class="font-bold text-orange-800">Materials Received</h4>
-                        <p class="text-3xl font-black text-orange-900 mt-2">${r.materials?.length || 0} <span class="text-sm">Deliveries</span></p>
+                        <h4 class="font-bold text-orange-800">Status</h4>
+                        <p class="text-xl font-bold text-green-700 mt-2">Verified & Approved</p>
                     </div>
                 </div>
             `;
