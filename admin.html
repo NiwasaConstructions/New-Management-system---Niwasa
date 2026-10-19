@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <style> .tab-content{display:none;} .tab-content.active{display:block;} </style>
+    <style> 
+        .tab-content{display:none;} .tab-content.active{display:block;} 
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 900px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-close { float: right; font-size: 28px; font-weight: bold; color: #dc2626; cursor: pointer; }
+    </style>
 </head>
 <body class="bg-gray-100">
 
@@ -33,6 +38,28 @@
     <!-- Hidden element to hold admin email -->
     <input type="hidden" id="adminEmail">
 
+    <!-- VIEW REPORT MODAL -->
+    <div id="modalView" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center border-b pb-2 mb-4"><h2 class="text-2xl font-black text-blue-900">DPR DETAILS</h2><button onclick="closeModal('modalView')" class="text-red-600 font-bold text-2xl">&times;</button></div>
+            <div class="flex justify-between mb-4 font-bold text-sm"><span id="mvDate"></span><span id="mvSite" class="text-blue-800"></span><span id="mvWeather" class="bg-gray-200 px-2 rounded"></span></div>
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <div class="bg-orange-50 p-2 rounded border"><h4 class="font-bold">Delays</h4><table class="w-full text-sm bg-white"><tbody id="mvDelays"></tbody></table></div>
+                <div class="bg-teal-50 p-2 rounded border"><h4 class="font-bold">Measurements</h4><table class="w-full text-sm bg-white"><tbody id="mvMeasures"></tbody></table></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-green-50 p-2 rounded border"><h4 class="font-bold text-xs">Suppliers</h4><table class="w-full text-xs bg-white"><tbody id="mvSups"></tbody></table></div>
+                    <div class="bg-lime-50 p-2 rounded border"><h4 class="font-bold text-xs">Sub-Contractors</h4><table class="w-full text-xs bg-white"><tbody id="mvSubs"></tbody></table></div>
+                </div>
+                <div class="bg-purple-50 p-2 rounded border"><h4 class="font-bold">Visitors & Notes</h4><table class="w-full text-sm bg-white"><tbody id="mvVisits"></tbody></table></div>
+                <div class="bg-blue-50 p-2 rounded border"><h4 class="font-bold">Workers & Advances</h4><table class="w-full text-sm bg-white"><tbody id="mvWorkers"></tbody></table></div>
+            </div>
+            <div class="mt-4 pt-3 border-t text-right text-sm">
+                <p class="font-bold text-gray-600">Prepared By: <span id="mvPreparedBy" class="text-blue-900"></span></p>
+                <p class="font-bold text-green-700" id="mvApprovedBy"></p>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
@@ -43,6 +70,7 @@
 
         window.switchTab = (tab) => { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active'); };
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
         auth.onAuthStateChanged(user => {
             if(!user) return window.location.href = "index.html";
@@ -57,18 +85,52 @@
             snap.forEach((d, i) => {
                 const r = d.data(); r.id = d.id; allReports.push(r);
                 let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-800 px-2 rounded">Approved</span>` : `<span class="bg-yellow-100 text-yellow-800 px-2 rounded font-bold animate-pulse">Pending</span>`;
-                let acts = `<button onclick="exportRep(${i})" class="bg-blue-600 text-white px-2 rounded">Excel</button>`;
+                
+                // Add View button + Approve/Delete/Export
+                let acts = `<button onclick="viewRep(${i})" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i> View</button>`;
+                acts += `<button onclick="exportRep(${i})" class="bg-gray-600 text-white px-2 rounded mr-1">Excel</button>`;
                 
                 // Show Approve button only if pending
                 if(r.status !== "Approved") {
-                    acts += `<button onclick="approveRep('${r.id}')" class="bg-green-600 text-white px-2 rounded ml-1">Approve</button>`;
+                    acts += `<button onclick="approveRep('${r.id}')" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
                 }
-                acts += `<button onclick="delRep('${r.id}')" class="bg-red-500 text-white px-2 rounded ml-1">Del</button>`;
+                acts += `<button onclick="delRep('${r.id}')" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
                 
                 let tr = document.createElement('tr');
                 tr.innerHTML = `<td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId}</td><td class="p-3 border">${badge}</td><td class="p-3 border text-center">${acts}</td>`;
                 tb.appendChild(tr);
             });
+        };
+
+        const renderTb = (arr, id, keys) => {
+            const tbody = document.getElementById(id); tbody.innerHTML = '';
+            if(!arr || arr.length === 0) return tbody.innerHTML = '<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>';
+            arr.forEach(item => {
+                let tr = document.createElement('tr');
+                keys.forEach(k => { let td = document.createElement('td'); td.className = "border p-1"; td.innerHTML = item[k] || '-'; tr.appendChild(td); });
+                tbody.appendChild(tr);
+            });
+        };
+
+        // View Report Function for Admin
+        window.viewRep = (i) => {
+            const r = allReports[i];
+            document.getElementById('mvDate').innerText = "Date: " + r.date; 
+            document.getElementById('mvSite').innerText = "Site: " + r.siteId; 
+            document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); 
+            document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown';
+            document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
+
+            // Using the new Phase 1 data structure (dData object)
+            const d = r.data || {};
+            renderTb(d.delays || [], 'mvDelays', ['f', 't', 'r']);
+            renderTb(d.measures || [], 'mvMeasures', ['d', 'u']);
+            renderTb(d.sups || [], 'mvSups', ['m', 'q', 'n']);
+            renderTb(d.subs || [], 'mvSubs', ['t', 'q', 'n']);
+            renderTb(d.visits || [], 'mvVisits', ['n', 'no', 't']);
+            renderTb(d.workers || [], 'mvWorkers', ['n', 't', 'o', 'a']);
+
+            document.getElementById('modalView').style.display='block';
         };
 
         window.approveRep = async (id) => {
@@ -84,8 +146,7 @@
         window.exportRep = async (i) => {
             const r = allReports[i]; const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
             ws.getCell('A1').value = `DPR - ${r.siteId} (Status: ${r.status})`;
-            // Basic Export for Phase 1. Will fully format in Phase 2.
-            ws.getCell('A3').value = "Please download full detailed format code later.";
+            ws.getCell('A3').value = "Please download full detailed format code later in Phase 2.";
             const buf = await wb.xlsx.writeBuffer(); saveAs(new Blob([buf]), `DPR_${r.siteId}.xlsx`);
         };
 
