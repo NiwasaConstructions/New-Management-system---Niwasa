@@ -35,13 +35,16 @@
                         <div><label class="font-semibold text-sm">Date</label><input type="date" id="date" class="w-full border p-2 rounded" required></div>
                         <div><label class="font-semibold text-sm">DOC No</label><input type="text" id="docNo" class="w-full border p-2 rounded"></div>
                         <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="siteId" class="w-full border p-2 rounded bg-yellow-100 font-bold" required><option value="">Select...</option></select></div>
-                        <div><label class="font-semibold text-sm">Weather</label><select id="weather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
+                        <div><label class="font-semibold text-sm">General Weather</label><select id="weather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                     </div>
                 </div>
 
-                <!-- 2. Delays -->
+                <!-- 2. Delays (Auto Sync Button added) -->
                 <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                    <h3 class="font-bold text-orange-800 mb-2">2. Weather Delays</h3>
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-orange-800">2. Weather Delays</h3>
+                        <button type="button" id="btnAutoWeather" onclick="autoFetchRainDelays()" class="bg-blue-600 text-white text-xs font-bold rounded px-3 py-1 shadow hover:bg-blue-700 transition"><i class="fa-solid fa-satellite-dish"></i> Auto Sync Rain via Satellite</button>
+                    </div>
                     <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded"><input type="time" id="dTo" class="border p-2 rounded"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded flex-1"><button type="button" onclick="addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded px-4">Add</button></div>
                     <table class="w-full text-sm bg-white border"><tbody id="tb-delays"></tbody></table>
                 </div>
@@ -67,10 +70,18 @@
                     </div>
                 </div>
 
-                <!-- 5. Site Visits & Notes (Supervisor adds this) -->
+                <!-- 5. Site Visits & Notes (Dropdown Updated) -->
                 <div class="bg-purple-50 p-4 rounded border border-purple-200">
                     <h3 class="font-bold text-purple-800 mb-2">5. Site Visitors & Special Notes</h3>
-                    <div class="flex gap-2 mb-2"><input type="text" id="vName" placeholder="Name/Designation" class="border p-2 rounded flex-1"><input type="text" id="vNote" placeholder="Special Note / Instruction given" class="border p-2 rounded flex-1"><input type="time" id="vTime" class="border p-2 rounded"><button type="button" onclick="addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button></div>
+                    <div class="flex gap-2 mb-2">
+                        <select id="vName" class="border p-2 rounded flex-1 font-bold text-purple-900">
+                            <option value="">Select Person...</option><option value="Engineer">Engineer</option><option value="Architect">Architect</option>
+                            <option value="Boss">Boss</option><option value="QS">QS</option><option value="Client">Client</option><option value="Client's Party">Client's Party</option>
+                        </select>
+                        <input type="text" id="vNote" placeholder="Special Note / Instruction given" class="border p-2 rounded flex-1">
+                        <input type="time" id="vTime" class="border p-2 rounded">
+                        <button type="button" onclick="addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
+                    </div>
                     <table class="w-full text-sm bg-white border"><tbody id="tb-visits"></tbody></table>
                 </div>
 
@@ -114,7 +125,7 @@
 
         auth.onAuthStateChanged(async user => {
             if(!user) return window.location.href = "index.html";
-            const uName = user.email.split('@')[0]; // Auto get name from email
+            const uName = user.email.split('@')[0];
             document.getElementById('prepBy').value = uName;
             document.getElementById('supInfo').innerText = "Logged in: " + uName;
             
@@ -126,8 +137,8 @@
             }
         });
 
-        // Universal Add & Render Function (Fixing literal string issues)
         window.addD = (arrName, inIds, keys) => {
+            if(!document.getElementById(inIds[0]).value) return; 
             let obj = {}; inIds.forEach((id, i) => { obj[keys[i]] = document.getElementById(id).value || '-'; document.getElementById(id).value = ''; });
             dData[arrName].push(obj);
             const tb = document.getElementById('tb-'+arrName); tb.innerHTML='';
@@ -138,14 +149,84 @@
             });
         };
 
+        // SUPERVISOR AUTO RAIN SYNC LOGIC (RETROACTIVE)
+        window.autoFetchRainDelays = async () => {
+            const siteName = document.getElementById('siteId').value;
+            if(!siteName) return alert("කරුණාකර පළමුව Site එක තෝරන්න!");
+
+            const btn = document.getElementById('btnAutoWeather');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+
+            try {
+                const sitesSnap = await getDocs(collection(db, "sites"));
+                let locText = "Kandy";
+                sitesSnap.forEach(d => { if(d.data().name === siteName) locText = d.data().location; });
+
+                let lat, lon;
+                const mapRegex = /@(-?\d+\.\d+),(-?\d+\.\d+)/; // Check for Google Maps link
+                const coordRegex = /(-?\d+\.\d+),\s*(-?\d+\.\d+)/; // Check for raw coords
+
+                let mapMatch = locText.match(mapRegex);
+                let coordMatch = locText.match(coordRegex);
+
+                if (mapMatch) { lat = parseFloat(mapMatch[1]); lon = parseFloat(mapMatch[2]); }
+                else if (coordMatch) { lat = parseFloat(coordMatch[1]); lon = parseFloat(coordMatch[2]); }
+                else {
+                    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locText)}&count=1`);
+                    const geoData = await geoRes.json();
+                    if(!geoData.results) throw new Error("සයිට් එකේ Location එක සොයාගත නොහැක.");
+                    lat = geoData.results[0].latitude; lon = geoData.results[0].longitude;
+                }
+
+                const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=weathercode&timezone=auto`);
+                const wData = await wRes.json();
+                
+                const today = new Date().toISOString().split('T')[0];
+                let rainBlocks = []; let curBlock = null;
+
+                wData.hourly.time.forEach((tStr, i) => {
+                    if(tStr.startsWith(today)) {
+                        const hr = tStr.split('T')[1]; 
+                        const hrInt = parseInt(hr.split(':')[0]);
+                        // Filter working hours (07:00 to 18:00)
+                        if (hrInt >= 7 && hrInt <= 18) {
+                            if(wData.hourly.weathercode[i] >= 51) { 
+                                if(!curBlock) curBlock = { f: hr, t: hr, r: "Auto-detected Rain (Satellite)" };
+                                else curBlock.t = hr;
+                            } else {
+                                if(curBlock) {
+                                    let toHr = parseInt(curBlock.t.split(':')[0]) + 1;
+                                    curBlock.t = (toHr < 10 ? '0' : '') + toHr + ':00';
+                                    rainBlocks.push(curBlock); curBlock = null;
+                                }
+                            }
+                        }
+                    }
+                });
+                if(curBlock) { let toHr = parseInt(curBlock.t.split(':')[0]) + 1; curBlock.t = (toHr < 10 ? '0' : '') + toHr + ':00'; rainBlocks.push(curBlock); }
+
+                if(rainBlocks.length > 0) {
+                    rainBlocks.forEach(b => dData.delays.push(b));
+                    const tb = document.getElementById('tb-delays'); tb.innerHTML='';
+                    dData.delays.forEach(it => {
+                        let tr = document.createElement('tr');
+                        ['f','t','r'].forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText = it[k]; tr.appendChild(td); });
+                        tb.appendChild(tr);
+                    });
+                    alert(`සාර්ථකයි! අද දින වර්ෂාව නිසා වැඩ නැවතුණු වේලාවන් ${rainBlocks.length} ක් Auto-detect විය.`);
+                } else {
+                    alert("අද දින වැඩ කරන වේලාවන් තුළ වර්ෂාවක් වාර්තා වී නොමැත.");
+                }
+            } catch (e) { alert("Error: " + e.message); }
+            btn.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> Auto Sync Rain via Satellite';
+        };
+
         window.submitDPR = async (e) => {
             e.preventDefault(); document.getElementById('btnSubmit').innerText = "Submitting...";
             try {
                 await addDoc(collection(db, "daily_reports"), {
                     date: document.getElementById('date').value, docNo: document.getElementById('docNo').value, siteId: document.getElementById('siteId').value, weather: document.getElementById('weather').value,
-                    data: dData, preparedBy: document.getElementById('prepBy').value,
-                    status: "Pending Approval", // New Status Feature
-                    timestamp: new Date()
+                    data: dData, preparedBy: document.getElementById('prepBy').value, status: "Pending Approval", timestamp: new Date()
                 });
                 alert("Sent for Admin Approval!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]};
                 ['tb-delays','tb-measures','tb-sups','tb-subs','tb-visits','tb-workers'].forEach(id=>document.getElementById(id).innerHTML='');
