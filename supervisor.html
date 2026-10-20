@@ -50,7 +50,7 @@
                 <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Add Records</h3>
                 
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <button type="button" onclick="openM('modalWorker')" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Labour</button>
+                    <button type="button" onclick="openWorkerModal()" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Labour</button>
                     <button type="button" onclick="openM('modalDelay')" class="bg-white border-2 border-orange-100 text-orange-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-orange-50"><i class="fa-solid fa-cloud-rain text-2xl"></i> Add Delay</button>
                     <button type="button" onclick="openM('modalMeasure')" class="bg-white border-2 border-teal-100 text-teal-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-teal-50"><i class="fa-solid fa-ruler-combined text-2xl"></i> Measurement</button>
                     <button type="button" onclick="openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50 text-center"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
@@ -89,7 +89,7 @@
 
     <!-- MODALS -->
     
-    <!-- Worker Modal (UPDATED WITH TIME AND REMARK) -->
+    <!-- Worker Modal (UPDATED WITH DROPDOWN AND CONDITIONAL SITE SELECTOR) -->
     <div id="modalWorker" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-blue-800">Add Labour</h3>
         <div class="space-y-3">
             <input type="text" id="wName" class="input-mobile" placeholder="Labour Name">
@@ -101,13 +101,26 @@
             
             <div class="border-t pt-3 mt-2">
                 <label class="text-xs font-bold text-red-500 uppercase ml-1">If Left Early / Transferred (Optional)</label>
-                <div class="flex gap-2 mt-1">
-                    <input type="time" id="wLeaveTime" class="input-mobile" title="Leave Time">
-                    <input type="text" id="wRem" class="input-mobile flex-1" placeholder="Note (e.g. Transferred to Kandy site)">
+                
+                <!-- NEW REASON DROPDOWN -->
+                <select id="wReasonType" class="input-mobile mt-1 font-bold text-gray-700" onchange="toggleTransferSite()">
+                    <option value="None">None (Worked Full Day)</option>
+                    <option value="Left Early">Left Early</option>
+                    <option value="Transferred">Transferred to another Site</option>
+                </select>
+
+                <div class="flex gap-2 mt-2">
+                    <input type="time" id="wLeaveTime" class="input-mobile" title="Time">
+                    
+                    <!-- DYNAMIC FIELD: EITHER TEXT REMARK OR SITE SELECTOR -->
+                    <input type="text" id="wRemText" class="input-mobile flex-1" placeholder="Note (e.g. Sick)">
+                    <select id="wRemSite" class="input-mobile flex-1 hidden font-bold text-blue-800 bg-blue-50">
+                        <!-- Auto filled via JS -->
+                    </select>
                 </div>
             </div>
 
-            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('workers',['wName','wType','wOT','wAdv','wLeaveTime','wRem'],['n','t','o','a','lt','rem'], 'modalWorker')" class="btn-mobile bg-blue-600 text-white">Save</button></div>
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="saveWorkerData()" class="btn-mobile bg-blue-600 text-white">Save</button></div>
         </div>
     </div></div>
 
@@ -129,7 +142,7 @@
         </div>
     </div></div>
 
-    <!-- Material/Sub Modal (UPDATED WITH OPTIONAL PRICE) -->
+    <!-- Material/Sub Modal -->
     <div id="modalSupSub" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-green-800">Add Delivery / Sub-Contractor</h3>
         <div class="space-y-3">
             <select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name'; document.getElementById('ssProv').placeholder = this.value==='sup'?'Supplier Name':'Team / Person Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select>
@@ -170,6 +183,7 @@
         window.closeM = (id) => document.getElementById(id).style.display = 'none';
 
         let mySites = [];
+        let allCompanySites = []; // To store all sites for the transfer dropdown
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
         document.getElementById('date').value = new Date().toISOString().split('T')[0];
 
@@ -177,13 +191,91 @@
             if(!user) return window.location.href = "index.html";
             const uName = user.email.split('@')[0];
             document.getElementById('prepBy').value = uName; document.getElementById('supInfo').innerText = "Hi, " + uName;
+            
+            // Get user's assigned sites
             const uDoc = await getDoc(doc(db, "users", user.uid));
             if(uDoc.exists() && uDoc.data().assignedSites) {
                 mySites = uDoc.data().assignedSites;
                 const drop = document.getElementById('siteId'); drop.innerHTML='<option value="">Select Site...</option>';
                 mySites.forEach(s => { let o=document.createElement('option'); o.value=s; o.innerText=s; drop.appendChild(o); });
             }
+
+            // Fetch ALL sites for the transfer dropdown
+            const sitesSnap = await getDocs(collection(db, "sites"));
+            sitesSnap.forEach(d => { if(d.data().status === 'Ongoing') allCompanySites.push(d.data().name); });
         });
+
+        // -------------------------------------------------------------
+        // NEW: WORKER MODAL LOGIC (CONDITIONAL DROPDOWN)
+        // -------------------------------------------------------------
+        window.openWorkerModal = () => {
+            document.getElementById('wReasonType').value = "None";
+            window.toggleTransferSite(); // Reset view
+            window.openM('modalWorker');
+        };
+
+        window.toggleTransferSite = () => {
+            const reason = document.getElementById('wReasonType').value;
+            const textInput = document.getElementById('wRemText');
+            const siteSelect = document.getElementById('wRemSite');
+            const currentSite = document.getElementById('siteId').value;
+
+            if (reason === 'Transferred') {
+                textInput.classList.add('hidden');
+                siteSelect.classList.remove('hidden');
+                
+                // Populate transfer sites excluding the current site
+                siteSelect.innerHTML = '<option value="">Transfer To...</option>';
+                allCompanySites.forEach(s => {
+                    if(s !== currentSite) {
+                        let o=document.createElement('option'); o.value=s; o.innerText=s; siteSelect.appendChild(o);
+                    }
+                });
+            } else {
+                siteSelect.classList.add('hidden');
+                textInput.classList.remove('hidden');
+                textInput.placeholder = reason === 'Left Early' ? 'Note (e.g. Sick / Personal reason)' : 'Remarks';
+            }
+        };
+
+        window.saveWorkerData = () => {
+            const n = document.getElementById('wName').value;
+            if(!n) return alert("Worker Name is required!");
+            
+            const reasonType = document.getElementById('wReasonType').value;
+            let finalRemark = "";
+
+            if(reasonType === "Left Early") {
+                const note = document.getElementById('wRemText').value;
+                finalRemark = note ? `Left Early - ${note}` : `Left Early`;
+            } 
+            else if (reasonType === "Transferred") {
+                const tSite = document.getElementById('wRemSite').value;
+                if(!tSite) return alert("Please select the site they were transferred to.");
+                finalRemark = `Transferred to ${tSite}`;
+            } 
+            else {
+                // If None, just take whatever is in the text box (if any) or leave blank
+                finalRemark = document.getElementById('wRemText').value || "-";
+            }
+
+            // Push to data array manually to handle the custom logic
+            dData.workers.push({
+                n: n,
+                t: document.getElementById('wType').value || '-',
+                o: document.getElementById('wOT').value || '-',
+                a: document.getElementById('wAdv').value || '-',
+                lt: document.getElementById('wLeaveTime').value || '-',
+                rem: finalRemark
+            });
+
+            // Clean fields
+            ['wName','wOT','wAdv','wLeaveTime','wRemText'].forEach(id => document.getElementById(id).value = '');
+            
+            renderMobileLists();
+            window.closeM('modalWorker');
+        };
+        // -------------------------------------------------------------
 
         const renderMobileLists = () => {
             const rL = (arr, id, icon, titleF, subF) => {
@@ -192,9 +284,14 @@
                     con.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${arr.length} Record(s) Added</h4>`;
                     arr.forEach((item, idx) => {
                         let subText = item[subF] || '';
-                        // Special display for workers if they left early
-                        if(id === 'list-workers' && item['lt'] && item['lt'] !== '-') { subText += ` <span class="text-red-500 ml-2"><i class="fa-solid fa-person-walking-arrow-right"></i> Left at ${item['lt']} (${item['rem']})</span>`; }
-                        // Special display for sups/subs if price exists
+                        
+                        // Handle Workers Subtext
+                        if(id === 'list-workers') {
+                            if(item.lt && item.lt !== '-') subText += ` <span class="text-red-500 ml-2 font-bold"><i class="fa-regular fa-clock"></i> ${item.lt}</span>`;
+                            if(item.rem && item.rem !== '-') subText += ` <span class="text-red-600 block mt-1"><i class="fa-solid fa-arrow-right-from-bracket"></i> ${item.rem}</span>`;
+                        }
+                        
+                        // Handle Sups/Subs Subtext
                         if(id === 'list-supsubs' && item['p'] && item['p'] !== '-') { subText += ` | Rs.${item['p']}`; }
 
                         let div = document.createElement('div'); div.className = "list-card shadow-sm";
@@ -207,7 +304,6 @@
             rL(dData.delays, 'list-delays', 'fa-cloud-rain', 'r', 'f');
             rL(dData.measures, 'list-measures', 'fa-ruler-combined', 'd', 'u');
             
-            // Combine Sups and Subs for mobile view nicely
             const conSupSub = document.getElementById('list-supsubs'); conSupSub.innerHTML='';
             let ssCount = dData.sups.length + dData.subs.length;
             if(ssCount > 0) {
