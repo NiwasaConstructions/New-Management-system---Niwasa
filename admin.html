@@ -22,7 +22,7 @@
         <div class="space-x-2 flex flex-wrap">
             <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="nav-btn text-blue-300 font-bold px-2 py-1">Dashboard</button>
             <button onclick="window.switchTab('entry')" id="nav-entry" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Data Entry</button>
-            <button onclick="window.switchTab('reports')" id="nav-reports" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Approve Reports</button>
+            <button onclick="window.switchTab('reports')" id="nav-reports" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Reports</button>
             <button onclick="window.switchTab('sites')" id="nav-sites" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Sites</button>
             <button onclick="window.switchTab('users')" id="nav-users" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Users</button>
             <button onclick="window.logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-2">Logout</button>
@@ -44,11 +44,13 @@
             </div>
         </div>
 
-        <!-- 2. DATA ENTRY -->
+        <!-- 2. DATA ENTRY / EDIT MODE -->
         <div id="tab-entry" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Submit Daily Progress Report (Admin)</h2>
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Submit / Edit Report</h2>
             <div class="bg-white p-6 rounded-lg shadow border-t-4 border-blue-600">
                 <form id="dprForm" onsubmit="window.submitAdminDPR(event)" class="space-y-6">
+                    <input type="hidden" id="editDocId"> <!-- Hidden ID for Edit Mode -->
+                    
                     <div class="bg-gray-50 p-4 rounded border">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div><label class="font-semibold text-sm">Date</label><input type="date" id="eDate" class="w-full border p-2 rounded" required></div>
@@ -86,7 +88,7 @@
                     <div class="bg-purple-50 p-4 rounded border border-purple-200">
                         <h3 class="font-bold text-purple-800 mb-2">Visitors & Notes</h3>
                         <div class="flex gap-2 mb-2">
-                            <select id="vName" class="border p-2 rounded w-1/4 font-bold text-purple-900"><option value="">Select...</option><option value="Engineer">Engineer</option><option value="Architect">Architect</option><option value="Boss">Boss</option><option value="QS">QS</option><option value="Client">Client</option><option value="Client's Party">Client's Party</option></select>
+                            <select id="vName" class="border p-2 rounded w-1/4 font-bold text-purple-900"><option value="">Select...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select>
                             <input type="text" id="vNote" placeholder="Special Note" class="border p-2 rounded flex-1"><input type="time" id="vTime" class="border p-2 rounded">
                             <button type="button" onclick="window.addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
                         </div>
@@ -100,14 +102,14 @@
                             <select id="wType" class="border p-2 rounded"><option>SK</option><option>USK</option></select>
                             <input type="text" id="wOT" placeholder="OT Hrs" class="border p-2 rounded w-20">
                             <input type="number" id="wAdv" placeholder="Adv Rs" class="border p-2 rounded w-24">
-                            <input type="text" id="wRem" placeholder="Remarks (Transfers/Leaves)" class="border p-2 rounded flex-1">
+                            <input type="text" id="wRem" placeholder="Remarks" class="border p-2 rounded flex-1">
                             <button type="button" onclick="window.addD('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'])" class="bg-blue-600 text-white font-bold rounded px-4">Add</button>
                         </div>
                         <table class="w-full text-sm bg-white border"><tbody id="tb-workers"></tbody></table>
                     </div>
 
                     <input type="hidden" id="adminName">
-                    <button type="submit" id="btnSubmitDPR" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg text-xl hover:bg-blue-800">Submit Approved Report</button>
+                    <button type="submit" id="btnSubmitDPR" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg text-xl hover:bg-blue-800">Save Approved Report</button>
                 </form>
             </div>
         </div>
@@ -127,7 +129,7 @@
                         <input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded font-bold text-lg" required>
                         <div class="bg-blue-50 p-3 rounded border border-blue-200">
                             <label class="text-xs font-bold text-blue-800 mb-1 block">Google Maps Link</label>
-                            <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" placeholder="Paste map link here..." class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
+                            <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" placeholder="Paste full map link here..." class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
                             <input type="text" id="sLoc" placeholder="City or Extracted GPS" class="w-full border p-2 rounded font-bold text-gray-700 bg-white" required>
                         </div>
                         <select id="sStat" class="w-full border p-2 rounded font-bold"><option>Ongoing</option><option>Completed</option></select>
@@ -145,7 +147,13 @@
                 <div class="bg-white p-6 rounded shadow h-fit">
                     <form onsubmit="window.addUser(event)" class="space-y-4">
                         <input type="email" id="uEmail" placeholder="Email" class="w-full border p-2 rounded" required>
-                        <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded" required>
+                        
+                        <!-- PASSWORD VIEW ADDED HERE -->
+                        <div class="relative">
+                            <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded pr-10" required>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500" onclick="window.togglePass('uPass', 'eyeIcon2')"><i id="eyeIcon2" class="fa-solid fa-eye"></i></div>
+                        </div>
+
                         <select id="uRole" class="w-full border p-2 rounded" required><option value="">Role...</option><option value="supervisor">Supervisor</option><option value="customer">Customer</option></select>
                         <div id="cbSites" class="border p-2 bg-gray-50 h-32 overflow-y-auto"></div>
                         <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Create User</button>
@@ -187,11 +195,9 @@
         const config = { apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" };
         const app = !getApps().length ? initializeApp(config) : getApp();
         const auth = getAuth(app); const db = getFirestore(app);
-        
-        // Anti-crash safety for secondary app creation
         const authSecondary = getAuth(getApps().find(a => a.name === "Secondary") || initializeApp(config, "Secondary"));
 
-        // Global functions mapped securely
+        // Global functions
         window.switchTab = (tab) => { 
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); 
             document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('text-blue-300'));
@@ -204,29 +210,49 @@
         };
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
 
+        // Password View Logic
+        window.togglePass = (id, iconId) => {
+            const el = document.getElementById(id); const icon = document.getElementById(iconId);
+            if(el.type === 'password') { el.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } 
+            else { el.type = 'password'; icon.classList.add('fa-eye'); icon.classList.remove('fa-eye-slash'); }
+        };
+
         auth.onAuthStateChanged(user => { if(!user) return window.location.href = "index.html"; const n = user.email.split('@')[0]; document.getElementById('adminEmail').value = n; document.getElementById('adminName').value = n; });
 
-        // 1. DATA ENTRY
+        // 1. DATA ENTRY & EDIT MODE
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
+        
+        window.renderAllTbs = () => {
+            const rTb = (arr, id, keys) => {
+                const tb = document.getElementById(id); tb.innerHTML='';
+                arr.forEach((item, idx) => {
+                    let tr = document.createElement('tr');
+                    keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText = item[k]||'-'; tr.appendChild(td); });
+                    let delTd = document.createElement('td'); delTd.className="border p-1 text-center"; delTd.innerHTML = `<button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-500 font-bold"><i class="fa-solid fa-xmark"></i></button>`;
+                    tr.appendChild(delTd); tb.appendChild(tr);
+                });
+            };
+            rTb(dData.delays, 'tb-delays', ['f','t','r']); rTb(dData.measures, 'tb-measures', ['d','u']); rTb(dData.sups, 'tb-sups', ['m','q','n']); rTb(dData.subs, 'tb-subs', ['t','q','n']); rTb(dData.visits, 'tb-visits', ['n','no','t']); rTb(dData.workers, 'tb-workers', ['n','t','o','a','rem']);
+        };
+
         window.addD = (arrName, inIds, keys) => {
             if(!document.getElementById(inIds[0]).value) return; 
             let obj = {}; inIds.forEach((id, i) => { obj[keys[i]] = document.getElementById(id).value || '-'; document.getElementById(id).value = ''; });
-            dData[arrName].push(obj);
-            const tb = document.getElementById('tb-'+arrName); tb.innerHTML='';
-            dData[arrName].forEach(it => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText = it[k]; tr.appendChild(td); }); tb.appendChild(tr); });
+            dData[arrName].push(obj); window.renderAllTbs();
         };
+        window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); window.renderAllTbs(); };
 
         window.submitAdminDPR = async (e) => {
             e.preventDefault(); document.getElementById('btnSubmitDPR').innerText="Submitting...";
             const siteVal = document.getElementById('eSite').value;
+            const curId = document.getElementById('editDocId').value;
+            const payload = { date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, siteId: siteVal, weather: document.getElementById('eWeather').value, data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: "Approved", approvedBy: document.getElementById('adminName').value, timestamp: new Date() };
             try {
-                await addDoc(collection(db, "daily_reports"), {
-                    date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, siteId: siteVal, weather: document.getElementById('eWeather').value,
-                    data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: "Approved", approvedBy: document.getElementById('adminName').value, timestamp: new Date()
-                });
-                alert("Report Saved & Approved!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]}; ['tb-delays','tb-measures','tb-sups','tb-subs','tb-visits','tb-workers'].forEach(id=>document.getElementById(id).innerHTML='');
+                if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); document.getElementById('editDocId').value=""; } 
+                else { await addDoc(collection(db, "daily_reports"), payload); }
+                alert("Report Saved & Approved!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]}; window.renderAllTbs(); window.switchTab('reports');
             } catch(er) { alert(er.message); }
-            document.getElementById('btnSubmitDPR').innerText="Submit Approved Report";
+            document.getElementById('btnSubmitDPR').innerText="Save Approved Report";
         };
 
         window.extractGPS = () => { const link = document.getElementById('sLocLink').value; const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/); if(match) { document.getElementById('sLoc').value = match[1] + "," + match[2]; alert("GPS Extracted!"); } else { alert("Coordinates not found in link."); } };
@@ -253,9 +279,6 @@
         window.openEditU = (id, curSites) => { document.getElementById('muId').value = id; const arr = curSites.split(', '); const cbCon = document.getElementById('muCheckboxes'); cbCon.innerHTML=''; globalSites.forEach(s => { if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='block'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="mucb mr-2" ${arr.includes(s.name)?'checked':''}>${s.name}`; cbCon.appendChild(lbl); } }); document.getElementById('modalEditUser').style.display='block'; };
         window.saveUserSites = async () => { await updateDoc(doc(db, "users", document.getElementById('muId').value), {assignedSites: Array.from(document.querySelectorAll('.mucb:checked')).map(c=>c.value)}); document.getElementById('modalEditUser').style.display='none'; window.loadUsers(); };
 
-        // ===============================================
-        // REPORTS MANAGEMENT - 100% FIXED BY USING UNIQUE IDs
-        // ===============================================
         let allReports = [];
         window.loadReports = async () => {
             const snap = await getDocs(query(collection(db, "daily_reports"), orderBy("timestamp", "desc")));
@@ -265,10 +288,9 @@
                 if(r.status === "Draft") return; 
                 let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-800 px-2 rounded">Approved</span>` : `<span class="bg-yellow-100 text-yellow-800 px-2 rounded font-bold animate-pulse">Pending</span>`;
                 
-                // Using exact IDs now instead of array indexes to guarantee no undefined errors
-                let acts = `<button onclick="window.viewRep('${r.id}')" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i> View</button>`;
-                acts += `<button onclick="window.exportRep('${r.id}')" class="bg-gray-600 text-white px-2 rounded mr-1"><i class="fa-solid fa-file-excel"></i> Excel</button>`;
-                
+                let acts = `<button onclick="window.viewRep('${r.id}')" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i></button>`;
+                acts += `<button onclick="window.adminEditRep('${r.id}')" class="bg-yellow-500 text-white px-2 rounded hover:bg-yellow-600 mr-1" title="Edit Data"><i class="fa-solid fa-pen"></i></button>`;
+                acts += `<button onclick="window.exportRep('${r.id}')" class="bg-gray-600 text-white px-2 rounded mr-1">Excel</button>`;
                 if(r.status !== "Approved") acts += `<button onclick="window.approveRep('${r.id}')" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
                 acts += `<button onclick="window.delRep('${r.id}')" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
                 
@@ -276,9 +298,15 @@
             });
         };
 
+        window.adminEditRep = (id) => {
+            const r = allReports.find(x => x.id === id); if(!r) return;
+            document.getElementById('editDocId').value = id; document.getElementById('eDate').value = r.date; document.getElementById('eDocNo').value = r.docNo || ''; document.getElementById('eSite').value = r.siteId; document.getElementById('eWeather').value = r.weather || 'Sunny';
+            dData = r.data || { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
+            window.renderAllTbs(); window.switchTab('entry');
+        };
+
         window.viewRep = (id) => {
-            const r = allReports.find(x => x.id === id);
-            if(!r) return alert("Report data error!");
+            const r = allReports.find(x => x.id === id); if(!r) return;
             document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + (r.siteId || 'Unknown'); document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
             const d = r.data || {};
             const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
@@ -288,10 +316,7 @@
 
         window.exportRep = async (id) => {
             try {
-                const r = allReports.find(x => x.id === id);
-                if(!r) return alert("Report data error!");
-                const siteNameForFile = r.siteId || 'Unknown_Site';
-                
+                const r = allReports.find(x => x.id === id); if(!r) return; const siteNameForFile = r.siteId || 'Unknown_Site';
                 const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
                 const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10};
                 ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
@@ -301,10 +326,7 @@
                 const d=r.data||{};
                 addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
                 ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15}];
-                
-                const buf = await wb.xlsx.writeBuffer(); 
-                const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-                saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`);
+                const buf = await wb.xlsx.writeBuffer(); const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`);
             } catch(err) { alert("Export Error: " + err.message); }
         };
 
@@ -326,7 +348,7 @@
                     window.charts.d = new Chart(document.getElementById('delayChart'), {type:'bar', data:{labels:Object.keys(dHrs), datasets:[{label:'Delay Hrs', data:Object.values(dHrs), backgroundColor:'#3b82f6'}]}});
                     window.charts.l = new Chart(document.getElementById('labourChart'), {type:'doughnut', data:{labels:['SK','USK'], datasets:[{data:[sk,usk], backgroundColor:['#10b981','#f59e0b']}]}});
                 }
-            } catch(e) { console.log(e); }
+            } catch(e) {}
         };
 
         window.onload = async () => { await window.loadSites(); window.loadUsers(); window.loadReports(); window.calculateAnalytics(); };
