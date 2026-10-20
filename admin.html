@@ -10,182 +10,234 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style> 
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .tab-content{display:none;} .tab-content.active{display:block;} 
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 900px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .admin-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #f3f4f6; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #fff; margin: 3% auto; padding: 25px; border-radius: 16px; width: 95%; max-width: 1000px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .rep-card { transition: transform 0.2s; } .rep-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-slate-50 flex flex-col h-screen">
 
-    <nav class="bg-blue-900 text-white p-4 shadow-lg flex justify-between items-center flex-wrap gap-3">
-        <div><h1 class="text-2xl font-bold"><i class="fa-solid fa-shield mr-2"></i>Niwasa Admin</h1></div>
-        <div class="space-x-2 flex flex-wrap">
-            <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="nav-btn text-blue-300 font-bold px-2 py-1">Dashboard</button>
-            <button onclick="window.switchTab('entry')" id="nav-entry" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Data Entry</button>
-            <button onclick="window.switchTab('reports')" id="nav-reports" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Reports</button>
-            <button onclick="window.switchTab('sites')" id="nav-sites" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Sites</button>
-            <button onclick="window.switchTab('users')" id="nav-users" class="nav-btn hover:text-blue-300 font-bold px-2 py-1">Manage Users</button>
-            <button onclick="window.logout()" class="bg-red-600 px-4 py-1 rounded hover:bg-red-700 font-bold ml-2">Logout</button>
+    <nav class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
+        <div class="flex items-center gap-3"><i class="fa-solid fa-building-shield text-3xl text-blue-300"></i><h1 class="text-2xl font-black tracking-tight">Niwasa <span class="font-normal opacity-80">Admin</span></h1></div>
+        <div class="flex items-center gap-4">
+            <span class="text-sm font-bold text-blue-200 hidden md:inline" id="adminHeaderName">Loading...</span>
+            <button onclick="window.logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-bold text-sm shadow transition"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </nav>
 
-    <div class="p-6 max-w-7xl mx-auto">
-        <!-- 1. DASHBOARD -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="flex justify-between items-center mb-6"><h2 class="text-3xl font-extrabold text-gray-800">Company Overview</h2><button onclick="window.calculateAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded shadow"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500"><h3 class="text-gray-500 font-bold text-sm">Active Sites</h3><p class="text-4xl font-black text-blue-900 mt-2" id="statSites">0</p></div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500"><h3 class="text-gray-500 font-bold text-sm">Total Labours Today</h3><p class="text-4xl font-black text-green-700 mt-2" id="statLabours">0</p></div>
-                <div class="bg-white p-6 rounded-xl shadow border-l-4 border-red-500"><h3 class="text-gray-500 font-bold text-sm">Advances Today (Rs)</h3><p class="text-4xl font-black text-red-600 mt-2" id="statAdvances">0</p></div>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow"><h3 class="font-bold border-b pb-2 mb-4">Weather Delays (Hrs)</h3><canvas id="delayChart"></canvas></div>
-                <div class="bg-white p-6 rounded-xl shadow"><h3 class="font-bold border-b pb-2 mb-4">Labour Distribution</h3><canvas id="labourChart"></canvas></div>
-            </div>
+    <!-- Main Content Area with Sidebar Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <div class="w-64 bg-white border-r shadow-sm hidden md:flex flex-col p-4 gap-2 z-0">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-2 mt-4">Menu</p>
+            <button onclick="window.switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-3"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</button>
+            <button onclick="window.switchTab('reports')" id="nav-reports" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-3"><i class="fa-solid fa-file-signature w-5"></i> Manage Reports</button>
+            <button onclick="window.switchTab('entry')" id="nav-entry" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-3"><i class="fa-solid fa-pen-to-square w-5"></i> Admin Data Entry</button>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 ml-2 mt-6">Settings</p>
+            <button onclick="window.switchTab('sites')" id="nav-sites" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-3"><i class="fa-solid fa-map-location-dot w-5"></i> Manage Sites</button>
+            <button onclick="window.switchTab('users')" id="nav-users" class="nav-btn w-full text-left px-4 py-3 rounded-xl font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-3"><i class="fa-solid fa-users-gear w-5"></i> Manage Users</button>
         </div>
 
-        <!-- 2. DATA ENTRY / EDIT MODE -->
-        <div id="tab-entry" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Submit / Edit Report</h2>
-            <div class="bg-white p-6 rounded-lg shadow border-t-4 border-blue-600">
-                <form id="dprForm" onsubmit="window.submitAdminDPR(event)" class="space-y-6">
-                    <input type="hidden" id="editDocId"> <!-- Hidden ID for Edit Mode -->
-                    
-                    <div class="bg-gray-50 p-4 rounded border">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            <div><label class="font-semibold text-sm">Date</label><input type="date" id="eDate" class="w-full border p-2 rounded" required></div>
-                            <div><label class="font-semibold text-sm">DOC No</label><input type="text" id="eDocNo" class="w-full border p-2 rounded"></div>
-                            <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="eSite" class="w-full border p-2 rounded bg-yellow-100 font-bold" required><option value="">Select...</option></select></div>
-                            <div><label class="font-semibold text-sm">Weather</label><select id="eWeather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                        <h3 class="font-bold text-orange-800 mb-2">Weather Delays</h3>
-                        <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded"><input type="time" id="dTo" class="border p-2 rounded"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded flex-1"><button type="button" onclick="window.addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded px-4">Add</button></div>
-                        <table class="w-full text-sm bg-white border"><tbody id="tb-delays"></tbody></table>
-                    </div>
-
-                    <div class="bg-teal-50 p-4 rounded border border-teal-200">
-                        <h3 class="font-bold text-teal-800 mb-2">Work Measurements</h3>
-                        <div class="flex gap-2 mb-2"><input type="text" id="mDesc" placeholder="Work Desc" class="border p-2 rounded flex-1"><input type="text" id="mUnit" placeholder="Unit/Qty" class="border p-2 rounded"><button type="button" onclick="window.addD('measures',['mDesc','mUnit'],['d','u'])" class="bg-teal-600 text-white font-bold rounded px-4">Add</button></div>
-                        <table class="w-full text-sm bg-white border"><tbody id="tb-measures"></tbody></table>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-green-50 p-4 rounded border border-green-200">
-                            <h3 class="font-bold text-green-800 mb-2">Suppliers</h3>
-                            <div class="flex gap-1 mb-2"><input type="text" id="sMat" placeholder="Material" class="border p-1 rounded flex-1"><input type="text" id="sQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="sName" placeholder="Supplier" class="border p-1 rounded"><button type="button" onclick="window.addD('sups',['sMat','sQty','sName'],['m','q','n'])" class="bg-green-600 text-white font-bold rounded px-2">Add</button></div>
-                            <table class="w-full text-xs bg-white border"><tbody id="tb-sups"></tbody></table>
-                        </div>
-                        <div class="bg-lime-50 p-4 rounded border border-lime-200">
-                            <h3 class="font-bold text-lime-800 mb-2">Sub-Contractors</h3>
-                            <div class="flex gap-1 mb-2"><input type="text" id="subTask" placeholder="Task" class="border p-1 rounded flex-1"><input type="text" id="subQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="subName" placeholder="Name" class="border p-1 rounded"><button type="button" onclick="window.addD('subs',['subTask','subQty','subName'],['t','q','n'])" class="bg-lime-600 text-white font-bold rounded px-2">Add</button></div>
-                            <table class="w-full text-xs bg-white border"><tbody id="tb-subs"></tbody></table>
-                        </div>
-                    </div>
-
-                    <div class="bg-purple-50 p-4 rounded border border-purple-200">
-                        <h3 class="font-bold text-purple-800 mb-2">Visitors & Notes</h3>
-                        <div class="flex gap-2 mb-2">
-                            <select id="vName" class="border p-2 rounded w-1/4 font-bold text-purple-900"><option value="">Select...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select>
-                            <input type="text" id="vNote" placeholder="Special Note" class="border p-2 rounded flex-1"><input type="time" id="vTime" class="border p-2 rounded">
-                            <button type="button" onclick="window.addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
-                        </div>
-                        <table class="w-full text-sm bg-white border"><tbody id="tb-visits"></tbody></table>
-                    </div>
-
-                    <div class="bg-blue-50 p-4 rounded border border-blue-200">
-                        <h3 class="font-bold text-blue-800 mb-2">Labour & Advances</h3>
-                        <div class="flex flex-wrap gap-2 mb-2">
-                            <input type="text" id="wName" placeholder="Name" class="border p-2 rounded w-1/4">
-                            <select id="wType" class="border p-2 rounded"><option>SK</option><option>USK</option></select>
-                            <input type="text" id="wOT" placeholder="OT Hrs" class="border p-2 rounded w-20">
-                            <input type="number" id="wAdv" placeholder="Adv Rs" class="border p-2 rounded w-24">
-                            <input type="text" id="wRem" placeholder="Remarks" class="border p-2 rounded flex-1">
-                            <button type="button" onclick="window.addD('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'])" class="bg-blue-600 text-white font-bold rounded px-4">Add</button>
-                        </div>
-                        <table class="w-full text-sm bg-white border"><tbody id="tb-workers"></tbody></table>
-                    </div>
-
-                    <input type="hidden" id="adminName">
-                    <button type="submit" id="btnSubmitDPR" class="w-full bg-blue-900 text-white font-bold py-4 rounded-lg text-xl hover:bg-blue-800">Save Approved Report</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- 3. REPORTS -->
-        <div id="tab-reports" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4">Pending & Approved Reports</h2>
-            <table class="w-full text-left border bg-white shadow"><thead class="bg-gray-200"><tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border">Status</th><th class="p-3 border text-center">Action</th></tr></thead><tbody id="tbReportsList"></tbody></table>
-        </div>
-
-        <!-- 4. SITES -->
-        <div id="tab-sites" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4">Manage Sites</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded shadow h-fit">
-                    <form onsubmit="window.addSite(event)" class="space-y-4">
-                        <input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded font-bold text-lg" required>
-                        <div class="bg-blue-50 p-3 rounded border border-blue-200">
-                            <label class="text-xs font-bold text-blue-800 mb-1 block">Google Maps Link</label>
-                            <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" placeholder="Paste full map link here..." class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
-                            <input type="text" id="sLoc" placeholder="City or Extracted GPS" class="w-full border p-2 rounded font-bold text-gray-700 bg-white" required>
-                        </div>
-                        <select id="sStat" class="w-full border p-2 rounded font-bold"><option>Ongoing</option><option>Completed</option></select>
-                        <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded text-lg">Add Site</button>
-                    </form>
+        <!-- Scrollable Main Content -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-10">
+            
+            <!-- 1. DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-black text-gray-800">Overview</h2><button onclick="window.calculateAnalytics()" class="bg-blue-100 text-blue-700 font-bold px-4 py-2 rounded-lg hover:bg-blue-200"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="admin-card border-l-4 border-blue-500"><div class="flex justify-between items-start"><div><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-4xl font-black text-blue-900 mt-2" id="statSites">0</p></div><i class="fa-solid fa-building text-3xl text-blue-100"></i></div></div>
+                    <div class="admin-card border-l-4 border-green-500"><div class="flex justify-between items-start"><div><h3 class="text-gray-500 font-bold text-sm uppercase">Total Labours Today</h3><p class="text-4xl font-black text-green-700 mt-2" id="statLabours">0</p></div><i class="fa-solid fa-helmet-safety text-3xl text-green-100"></i></div></div>
+                    <div class="admin-card border-l-4 border-red-500"><div class="flex justify-between items-start"><div><h3 class="text-gray-500 font-bold text-sm uppercase">Advances Today (Rs)</h3><p class="text-4xl font-black text-red-600 mt-2" id="statAdvances">0</p></div><i class="fa-solid fa-money-bill-wave text-3xl text-red-100"></i></div></div>
                 </div>
-                <div class="md:col-span-2 bg-white p-6 rounded shadow"><table class="w-full border text-sm text-left"><thead class="bg-gray-100"><tr><th class="p-2 border">Site</th><th class="p-2 border">Location</th><th class="p-2 border">Status</th><th class="p-2 border">Action</th></tr></thead><tbody id="sitesTable"></tbody></table></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="admin-card"><h3 class="font-bold border-b pb-3 mb-4 text-gray-700">Weather Delays (Hrs)</h3><canvas id="delayChart"></canvas></div>
+                    <div class="admin-card"><h3 class="font-bold border-b pb-3 mb-4 text-gray-700">Labour Distribution</h3><div class="max-w-xs mx-auto"><canvas id="labourChart"></canvas></div></div>
+                </div>
             </div>
-        </div>
 
-        <!-- 5. USERS -->
-        <div id="tab-users" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4">Manage Users</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded shadow h-fit">
-                    <form onsubmit="window.addUser(event)" class="space-y-4">
-                        <input type="email" id="uEmail" placeholder="Email" class="w-full border p-2 rounded" required>
+            <!-- 2. MANAGE REPORTS (CARD BASED UI) -->
+            <div id="tab-reports" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-3xl font-black mb-8 text-gray-800">Pending & Approved Reports</h2>
+                <div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards will be injected here -->
+                </div>
+            </div>
+
+            <!-- 3. DATA ENTRY / EDIT MODE (Admin) -->
+            <div id="tab-entry" class="tab-content max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-black text-gray-800">Submit / Edit Report</h2>
+                    <span id="adminFormStatus" class="bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-sm">New Record</span>
+                </div>
+                <div class="admin-card !p-8">
+                    <form id="dprForm" onsubmit="window.submitAdminDPR(event)" class="space-y-8">
+                        <input type="hidden" id="editDocId">
                         
-                        <!-- PASSWORD VIEW ADDED HERE -->
-                        <div class="relative">
-                            <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded pr-10" required>
-                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500" onclick="window.togglePass('uPass', 'eyeIcon2')"><i id="eyeIcon2" class="fa-solid fa-eye"></i></div>
+                        <!-- General -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div><label class="font-bold text-sm text-gray-600">Date</label><input type="date" id="eDate" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white" required></div>
+                            <div><label class="font-bold text-sm text-gray-600">DOC No</label><input type="text" id="eDocNo" class="w-full border p-3 rounded-lg bg-gray-50 focus:bg-white"></div>
+                            <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="eSite" class="w-full border p-3 rounded-lg bg-blue-50 font-bold text-blue-900" required><option value="">Select...</option></select></div>
+                            <div><label class="font-bold text-sm text-gray-600">Weather</label><select id="eWeather" class="w-full border p-3 rounded-lg bg-orange-50 font-bold text-orange-900"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                         </div>
 
-                        <select id="uRole" class="w-full border p-2 rounded" required><option value="">Role...</option><option value="supervisor">Supervisor</option><option value="customer">Customer</option></select>
-                        <div id="cbSites" class="border p-2 bg-gray-50 h-32 overflow-y-auto"></div>
-                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded">Create User</button>
+                        <hr>
+
+                        <!-- Delays & Measures -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-orange-800 mb-2"><i class="fa-solid fa-cloud-rain mr-2"></i>Weather Delays</h3>
+                                <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded-lg w-24"><input type="time" id="dTo" class="border p-2 rounded-lg w-24"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded-lg flex-1"><button type="button" onclick="window.addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded-lg px-3">Add</button></div>
+                                <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-delays"></tbody></table>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-teal-800 mb-2"><i class="fa-solid fa-ruler-combined mr-2"></i>Work Measurements</h3>
+                                <div class="flex gap-2 mb-2"><input type="text" id="mDesc" placeholder="Work Desc" class="border p-2 rounded-lg flex-1"><input type="text" id="mUnit" placeholder="Unit/Qty" class="border p-2 rounded-lg w-1/3"><button type="button" onclick="window.addD('measures',['mDesc','mUnit'],['d','u'])" class="bg-teal-600 text-white font-bold rounded-lg px-3">Add</button></div>
+                                <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-measures"></tbody></table>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Suppliers & Sub-Contractors -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-bold text-green-800 mb-2"><i class="fa-solid fa-box mr-2"></i>Suppliers</h3>
+                                <div class="flex flex-wrap gap-2 mb-2"><input type="text" id="sMat" placeholder="Material" class="border p-2 rounded-lg flex-1"><input type="text" id="sQty" placeholder="Qty" class="border p-2 rounded-lg w-20"><input type="text" id="sName" placeholder="Supplier" class="border p-2 rounded-lg flex-1"><input type="number" id="sPrice" placeholder="Price (Opt)" class="border p-2 rounded-lg w-24"><button type="button" onclick="window.addD('sups',['sMat','sQty','sName','sPrice'],['m','q','n','p'])" class="bg-green-600 text-white font-bold rounded-lg px-3 w-full mt-1">Add</button></div>
+                                <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-sups"></tbody></table>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lime-800 mb-2"><i class="fa-solid fa-users-gear mr-2"></i>Sub-Contractors</h3>
+                                <div class="flex flex-wrap gap-2 mb-2"><input type="text" id="subTask" placeholder="Task" class="border p-2 rounded-lg flex-1"><input type="text" id="subQty" placeholder="Qty" class="border p-2 rounded-lg w-20"><input type="text" id="subName" placeholder="Name" class="border p-2 rounded-lg flex-1"><input type="number" id="subPrice" placeholder="Price (Opt)" class="border p-2 rounded-lg w-24"><button type="button" onclick="window.addD('subs',['subTask','subQty','subName','subPrice'],['t','q','n','p'])" class="bg-lime-600 text-white font-bold rounded-lg px-3 w-full mt-1">Add</button></div>
+                                <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-subs"></tbody></table>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Visitors & Notes -->
+                        <div>
+                            <h3 class="font-bold text-purple-800 mb-2"><i class="fa-solid fa-user-tie mr-2"></i>Visitors & Notes</h3>
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                <select id="vName" class="border p-2 rounded-lg font-bold text-purple-900 bg-purple-50"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select>
+                                <input type="time" id="vTime" class="border p-2 rounded-lg">
+                                <input type="text" id="vNote" placeholder="Special Note / Instruction" class="border p-2 rounded-lg flex-1">
+                                <button type="button" onclick="window.addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded-lg px-4">Add</button>
+                            </div>
+                            <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-visits"></tbody></table>
+                        </div>
+
+                        <hr>
+
+                        <!-- Labour -->
+                        <div>
+                            <h3 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-helmet-safety mr-2"></i>Labour & Advances</h3>
+                            <div class="flex flex-wrap gap-2 mb-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <input type="text" id="wName" placeholder="Name" class="border p-2 rounded-lg w-1/4">
+                                <select id="wType" class="border p-2 rounded-lg"><option>SK</option><option>USK</option></select>
+                                <input type="number" id="wOT" placeholder="OT Hrs" class="border p-2 rounded-lg w-20">
+                                <input type="number" id="wAdv" placeholder="Adv Rs" class="border p-2 rounded-lg w-24">
+                                <input type="time" id="wLeaveTime" class="border p-2 rounded-lg text-red-500 font-bold" title="Left Early Time">
+                                <input type="text" id="wRem" placeholder="Remarks (Leave/Transfer)" class="border p-2 rounded-lg flex-1 border-red-300">
+                                <button type="button" onclick="window.addD('workers',['wName','wType','wOT','wAdv','wLeaveTime','wRem'],['n','t','o','a','lt','rem'])" class="bg-blue-600 text-white font-bold rounded-lg px-4">Add Worker</button>
+                            </div>
+                            <table class="w-full text-sm bg-gray-50 rounded-lg overflow-hidden"><tbody id="tb-workers"></tbody></table>
+                        </div>
+
+                        <input type="hidden" id="adminName">
+                        <button type="submit" id="btnSubmitDPR" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl text-xl shadow-lg hover:bg-blue-700 transition">Save & Approve Report</button>
                     </form>
                 </div>
-                <div class="lg:col-span-2 bg-white p-6 rounded shadow"><table class="w-full border text-sm text-left"><thead class="bg-gray-100"><tr><th class="p-2 border">Email</th><th class="p-2 border">Role</th><th class="p-2 border">Sites</th><th class="p-2 border">Action</th></tr></thead><tbody id="usersTable"></tbody></table></div>
             </div>
-        </div>
-    </div>
+
+            <!-- 4. MANAGE SITES -->
+            <div id="tab-sites" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-3xl font-black mb-8 text-gray-800">Manage Sites</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="admin-card h-fit">
+                        <h3 class="font-bold border-b pb-2 mb-4">Add New Site</h3>
+                        <form onsubmit="window.addSite(event)" class="space-y-4">
+                            <input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded-lg font-bold" required>
+                            <input type="text" id="sLoc" placeholder="Location / Address" class="w-full border p-2 rounded-lg" required>
+                            <select id="sStat" class="w-full border p-2 rounded-lg font-bold bg-gray-50"><option>Ongoing</option><option>Completed</option></select>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition">Add Site</button>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 admin-card"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Site</th><th class="p-3">Location</th><th class="p-3">Status</th><th class="p-3 text-right">Action</th></tr></thead><tbody id="sitesTable"></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- 5. MANAGE USERS -->
+            <div id="tab-users" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-3xl font-black mb-8 text-gray-800">Manage Users</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="admin-card h-fit">
+                        <h3 class="font-bold border-b pb-2 mb-4">Create User</h3>
+                        <form onsubmit="window.addUser(event)" class="space-y-4">
+                            <input type="email" id="uEmail" placeholder="Email Address" class="w-full border p-2 rounded-lg" required>
+                            
+                            <div class="relative">
+                                <input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded-lg pr-10" required>
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400" onclick="window.togglePass('uPass', 'eyeIconUser')"><i id="eyeIconUser" class="fa-solid fa-eye"></i></div>
+                            </div>
+
+                            <select id="uRole" class="w-full border p-2 rounded-lg bg-gray-50" required><option value="">Select Role...</option><option value="supervisor">Supervisor</option><option value="customer">Customer</option></select>
+                            
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Assign Sites</label>
+                                <div id="cbSites" class="border p-3 bg-gray-50 rounded-lg h-32 overflow-y-auto space-y-2"></div>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition">Create User</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Email</th><th class="p-3">Role</th><th class="p-3">Assigned Sites</th><th class="p-3 text-right">Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div>
+                </div>
+            </div>
+
+        </div> <!-- End Main Content -->
+    </div> <!-- End Layout -->
 
     <!-- VIEW REPORT MODAL -->
     <div id="modalView" class="modal">
         <div class="modal-content">
-            <div class="flex justify-between items-center border-b pb-2 mb-4"><h2 class="text-2xl font-black text-blue-900">DPR DETAILS</h2><button onclick="document.getElementById('modalView').style.display='none'" class="text-red-600 font-bold text-2xl">&times;</button></div>
-            <div class="flex justify-between mb-4 font-bold text-sm"><span id="mvDate"></span><span id="mvSite" class="text-blue-800"></span><span id="mvWeather" class="bg-gray-200 px-2 rounded"></span></div>
-            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-                <div class="bg-orange-50 p-2 rounded border"><h4 class="font-bold">Delays</h4><table class="w-full text-sm bg-white"><tbody id="mvDelays"></tbody></table></div>
-                <div class="bg-teal-50 p-2 rounded border"><h4 class="font-bold">Measurements</h4><table class="w-full text-sm bg-white"><tbody id="mvMeasures"></tbody></table></div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="bg-green-50 p-2 rounded border"><h4 class="font-bold text-xs">Suppliers</h4><table class="w-full text-xs bg-white"><tbody id="mvSups"></tbody></table></div>
-                    <div class="bg-lime-50 p-2 rounded border"><h4 class="font-bold text-xs">Sub-Contractors</h4><table class="w-full text-xs bg-white"><tbody id="mvSubs"></tbody></table></div>
+            <div class="flex justify-between items-center border-b pb-4 mb-4"><h2 class="text-2xl font-black text-gray-800"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>DPR Details</h2><button onclick="document.getElementById('modalView').style.display='none'" class="text-gray-400 hover:text-red-500 transition text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div>
+            <div class="flex flex-wrap justify-between bg-gray-50 p-4 rounded-xl mb-4 font-bold text-gray-700 text-sm border"><span id="mvDate"></span><span id="mvSite" class="text-blue-700"></span><span id="mvWeather"></span></div>
+            
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <div class="border rounded-xl overflow-hidden"><div class="bg-orange-50 font-bold p-3 text-orange-800 border-b"><i class="fa-solid fa-cloud-rain w-5 text-center mr-1"></i> Delays</div><table class="w-full text-sm"><tbody id="mvDelays" class="divide-y"></tbody></table></div>
+                <div class="border rounded-xl overflow-hidden"><div class="bg-teal-50 font-bold p-3 text-teal-800 border-b"><i class="fa-solid fa-ruler-combined w-5 text-center mr-1"></i> Measurements</div><table class="w-full text-sm"><tbody id="mvMeasures" class="divide-y"></tbody></table></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border rounded-xl overflow-hidden"><div class="bg-green-50 font-bold p-3 text-green-800 border-b text-xs"><i class="fa-solid fa-box mr-1"></i> Suppliers</div><table class="w-full text-xs"><tbody id="mvSups" class="divide-y"></tbody></table></div>
+                    <div class="border rounded-xl overflow-hidden"><div class="bg-lime-50 font-bold p-3 text-lime-800 border-b text-xs"><i class="fa-solid fa-users-gear mr-1"></i> Sub-Contractors</div><table class="w-full text-xs"><tbody id="mvSubs" class="divide-y"></tbody></table></div>
                 </div>
-                <div class="bg-purple-50 p-2 rounded border"><h4 class="font-bold">Visitors & Notes</h4><table class="w-full text-sm bg-white"><tbody id="mvVisits"></tbody></table></div>
-                <div class="bg-blue-50 p-2 rounded border"><h4 class="font-bold">Workers & Advances</h4><table class="w-full text-sm bg-white border"><thead class="bg-gray-100"><tr><th class="border p-1">Name</th><th class="border p-1">Type</th><th class="border p-1">OT</th><th class="border p-1">Adv</th><th class="border p-1 text-red-700">Remarks</th></tr></thead><tbody id="mvWorkers"></tbody></table></div>
+                
+                <div class="border rounded-xl overflow-hidden"><div class="bg-purple-50 font-bold p-3 text-purple-800 border-b"><i class="fa-solid fa-user-tie w-5 text-center mr-1"></i> Visitors & Notes</div><table class="w-full text-sm"><tbody id="mvVisits" class="divide-y"></tbody></table></div>
+                
+                <!-- Updated View Modal for Workers to include Leave Time and Price -->
+                <div class="border rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-blue-50 font-bold p-3 text-blue-800 border-b"><i class="fa-solid fa-helmet-safety w-5 text-center mr-1"></i> Workers & Advances</div>
+                    <table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="p-2 border-b">Name</th><th class="p-2 border-b">Type</th><th class="p-2 border-b">OT</th><th class="p-2 border-b">Adv</th><th class="p-2 border-b text-red-500">Left</th><th class="p-2 border-b text-red-500">Remarks</th></tr></thead><tbody id="mvWorkers" class="divide-y"></tbody></table>
+                </div>
             </div>
-            <div class="mt-4 pt-3 border-t text-right text-sm"><p class="font-bold text-gray-600">Prepared By: <span id="mvPreparedBy" class="text-blue-900"></span></p><p class="font-bold text-green-700" id="mvApprovedBy"></p></div>
+            
+            <div class="mt-6 pt-4 border-t flex justify-between items-center text-sm bg-gray-50 p-4 rounded-xl">
+                <p class="font-bold text-gray-500">Prepared: <span id="mvPreparedBy" class="text-blue-900"></span></p>
+                <p class="font-black text-green-600" id="mvApprovedBy"></p>
+            </div>
         </div>
     </div>
     
-    <div id="modalEditUser" class="modal"><div class="modal-content" style="max-width: 500px;"><div class="flex justify-between items-center border-b pb-2 mb-4"><h3 class="font-bold text-xl">Edit Sites</h3><button onclick="document.getElementById('modalEditUser').style.display='none'" class="text-red-600 font-bold text-2xl">&times;</button></div><input type="hidden" id="muId"><div id="muCheckboxes" class="border p-2 bg-gray-50 h-40 overflow-y-auto mb-4"></div><button onclick="window.saveUserSites()" class="w-full bg-green-600 text-white font-bold py-2 rounded">Save</button></div></div>
+    <!-- Edit User Modal -->
+    <div id="modalEditUser" class="modal"><div class="modal-content" style="max-width: 400px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-gray-800">Edit Assigned Sites</h3><button onclick="document.getElementById('modalEditUser').style.display='none'" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><input type="hidden" id="muId"><div id="muCheckboxes" class="border border-gray-200 p-3 bg-gray-50 h-48 overflow-y-auto mb-4 rounded-xl space-y-2"></div><button onclick="window.saveUserSites()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow transition">Save Changes</button></div></div>
     
     <input type="hidden" id="adminEmail">
+
+    <style> /* Scrollbar styling for a cleaner look */ .custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; } </style>
 
     <script type="module">
         import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -197,12 +249,14 @@
         const auth = getAuth(app); const db = getFirestore(app);
         const authSecondary = getAuth(getApps().find(a => a.name === "Secondary") || initializeApp(config, "Secondary"));
 
-        // Global functions
+        // Navigation
         window.switchTab = (tab) => { 
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); 
-            document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('text-blue-300'));
+            document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('bg-blue-50'); e.classList.remove('text-blue-700');});
             document.getElementById('tab-'+tab).classList.add('active'); 
-            document.getElementById('nav-'+tab).classList.add('text-blue-300');
+            const navBtn = document.getElementById('nav-'+tab);
+            if(navBtn) { navBtn.classList.add('bg-blue-50'); navBtn.classList.add('text-blue-700'); }
+            
             if(tab === 'dashboard') window.calculateAnalytics(); 
             if(tab === 'reports') window.loadReports(); 
             if(tab === 'sites') window.loadSites(); 
@@ -217,22 +271,28 @@
             else { el.type = 'password'; icon.classList.add('fa-eye'); icon.classList.remove('fa-eye-slash'); }
         };
 
-        auth.onAuthStateChanged(user => { if(!user) return window.location.href = "index.html"; const n = user.email.split('@')[0]; document.getElementById('adminEmail').value = n; document.getElementById('adminName').value = n; });
+        auth.onAuthStateChanged(user => { 
+            if(!user) return window.location.href = "index.html"; 
+            const n = user.email.split('@')[0]; 
+            document.getElementById('adminEmail').value = n; 
+            document.getElementById('adminName').value = n; 
+            document.getElementById('adminHeaderName').innerText = n + " (Admin)";
+        });
 
-        // 1. DATA ENTRY & EDIT MODE
+        // 1. DATA ENTRY & EDIT
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
         
         window.renderAllTbs = () => {
             const rTb = (arr, id, keys) => {
                 const tb = document.getElementById(id); tb.innerHTML='';
                 arr.forEach((item, idx) => {
-                    let tr = document.createElement('tr');
-                    keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText = item[k]||'-'; tr.appendChild(td); });
-                    let delTd = document.createElement('td'); delTd.className="border p-1 text-center"; delTd.innerHTML = `<button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-500 font-bold"><i class="fa-solid fa-xmark"></i></button>`;
+                    let tr = document.createElement('tr'); tr.className = "hover:bg-gray-100 transition";
+                    keys.forEach(k => { let td = document.createElement('td'); td.className="border p-2"; td.innerText = item[k]||'-'; tr.appendChild(td); });
+                    let delTd = document.createElement('td'); delTd.className="border p-2 text-center"; delTd.innerHTML = `<button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-400 hover:text-red-600 font-bold"><i class="fa-solid fa-trash"></i></button>`;
                     tr.appendChild(delTd); tb.appendChild(tr);
                 });
             };
-            rTb(dData.delays, 'tb-delays', ['f','t','r']); rTb(dData.measures, 'tb-measures', ['d','u']); rTb(dData.sups, 'tb-sups', ['m','q','n']); rTb(dData.subs, 'tb-subs', ['t','q','n']); rTb(dData.visits, 'tb-visits', ['n','no','t']); rTb(dData.workers, 'tb-workers', ['n','t','o','a','rem']);
+            rTb(dData.delays, 'tb-delays', ['f','t','r']); rTb(dData.measures, 'tb-measures', ['d','u']); rTb(dData.sups, 'tb-sups', ['m','q','n','p']); rTb(dData.subs, 'tb-subs', ['t','q','n','p']); rTb(dData.visits, 'tb-visits', ['n','no','t']); rTb(dData.workers, 'tb-workers', ['n','t','o','a','lt','rem']);
         };
 
         window.addD = (arrName, inIds, keys) => {
@@ -243,64 +303,97 @@
         window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); window.renderAllTbs(); };
 
         window.submitAdminDPR = async (e) => {
-            e.preventDefault(); document.getElementById('btnSubmitDPR').innerText="Submitting...";
+            e.preventDefault(); document.getElementById('btnSubmitDPR').innerText="Saving...";
             const siteVal = document.getElementById('eSite').value;
             const curId = document.getElementById('editDocId').value;
             const payload = { date: document.getElementById('eDate').value, docNo: document.getElementById('eDocNo').value, siteId: siteVal, weather: document.getElementById('eWeather').value, data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: "Approved", approvedBy: document.getElementById('adminName').value, timestamp: new Date() };
             try {
-                if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); document.getElementById('editDocId').value=""; } 
+                if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); document.getElementById('editDocId').value=""; document.getElementById('adminFormStatus').innerText = "New Record"; document.getElementById('adminFormStatus').className = "bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-sm"; } 
                 else { await addDoc(collection(db, "daily_reports"), payload); }
                 alert("Report Saved & Approved!"); e.target.reset(); dData={delays:[],measures:[],sups:[],subs:[],visits:[],workers:[]}; window.renderAllTbs(); window.switchTab('reports');
             } catch(er) { alert(er.message); }
-            document.getElementById('btnSubmitDPR').innerText="Save Approved Report";
+            document.getElementById('btnSubmitDPR').innerText="Save & Approve Report";
         };
 
-        window.extractGPS = () => { const link = document.getElementById('sLocLink').value; const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/); if(match) { document.getElementById('sLoc').value = match[1] + "," + match[2]; alert("GPS Extracted!"); } else { alert("Coordinates not found in link."); } };
-
+        // 2. SITES
         let globalSites = [];
         window.loadSites = async () => {
             const snap = await getDocs(collection(db, "sites")); globalSites = []; const tb = document.getElementById('sitesTable'); const cb = document.getElementById('cbSites'); const eDrop = document.getElementById('eSite');
-            tb.innerHTML=''; cb.innerHTML=''; eDrop.innerHTML='<option value="">Select...</option>';
+            tb.innerHTML=''; cb.innerHTML=''; eDrop.innerHTML='<option value="">Select Site...</option>';
             snap.forEach(d => {
                 const s = d.data(); globalSites.push({id:d.id, name:s.name, status:s.status});
-                let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border font-bold">${s.name}</td><td class="p-2 border text-xs">${s.location}</td><td class="p-2 border">${s.status}</td><td class="p-2 border"><button onclick="window.toggleSite('${d.id}','${s.status}')" class="bg-gray-800 text-white px-2 rounded">Toggle</button></td>`; tb.appendChild(tr);
-                if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='block'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="scb mr-2">${s.name}`; cb.appendChild(lbl); let opt=document.createElement('option'); opt.value=s.name; opt.innerText=s.name; eDrop.appendChild(opt); }
+                let badge = s.status === 'Ongoing' ? `<span class="bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded text-xs">Ongoing</span>` : `<span class="bg-gray-200 text-gray-600 font-bold px-2 py-1 rounded text-xs">Completed</span>`;
+                let tr=document.createElement('tr'); tr.className="border-b hover:bg-gray-50"; tr.innerHTML=`<td class="p-3 font-bold text-gray-800">${s.name}</td><td class="p-3 text-gray-500">${s.location}</td><td class="p-3">${badge}</td><td class="p-3 text-right"><button onclick="window.toggleSite('${d.id}','${s.status}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-bold transition">Toggle</button></td>`; tb.appendChild(tr);
+                if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="scb w-4 h-4 text-blue-600 rounded"><span class="font-semibold text-gray-700">${s.name}</span>`; cb.appendChild(lbl); let opt=document.createElement('option'); opt.value=s.name; opt.innerText=s.name; eDrop.appendChild(opt); }
             });
         };
-        window.addSite = async (e) => { e.preventDefault(); await addDoc(collection(db, "sites"), {name:document.getElementById('sName').value, location:document.getElementById('sLoc').value, status:document.getElementById('sStat').value}); e.target.reset(); document.getElementById('sLocLink').value=''; window.loadSites(); };
+        window.addSite = async (e) => { e.preventDefault(); await addDoc(collection(db, "sites"), {name:document.getElementById('sName').value, location:document.getElementById('sLoc').value, status:document.getElementById('sStat').value}); e.target.reset(); window.loadSites(); };
         window.toggleSite = async (id, cur) => { await updateDoc(doc(db, "sites", id), {status: cur==='Ongoing'?'Completed':'Ongoing'}); window.loadSites(); };
 
+        // 3. USERS
         window.loadUsers = async () => {
             const snap = await getDocs(collection(db, "users")); const tb = document.getElementById('usersTable'); tb.innerHTML='';
-            snap.forEach(d => { const u = d.data(); const sites = (u.assignedSites||[]).join(', '); const acts = u.role==='admin'?'-':`<button onclick="window.openEditU('${d.id}','${sites}')" class="bg-yellow-500 text-white px-2 rounded mr-1">Edit</button><button onclick="window.delU('${d.id}')" class="bg-red-500 text-white px-2 rounded">Del</button>`; let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-2 border">${u.email}</td><td class="p-2 border">${u.role}</td><td class="p-2 border">${sites}</td><td class="p-2 border">${acts}</td>`; tb.appendChild(tr); });
+            snap.forEach(d => { const u = d.data(); const sites = (u.assignedSites||[]).join(', '); const acts = u.role==='admin'?'-':`<button onclick="window.openEditU('${d.id}','${sites}')" class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded font-bold text-xs mr-2 hover:bg-yellow-200 transition">Edit Sites</button><button onclick="window.delU('${d.id}')" class="text-red-400 hover:text-red-600 transition"><i class="fa-solid fa-trash"></i></button>`; let tr=document.createElement('tr'); tr.className="border-b hover:bg-gray-50"; tr.innerHTML=`<td class="p-3 font-bold text-gray-700">${u.email}</td><td class="p-3"><span class="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs font-bold uppercase">${u.role}</span></td><td class="p-3 text-xs text-gray-500">${sites}</td><td class="p-3 text-right">${acts}</td>`; tb.appendChild(tr); });
         };
         window.addUser = async (e) => { e.preventDefault(); const sel = Array.from(document.querySelectorAll('.scb:checked')).map(c=>c.value); try { const cred = await createUserWithEmailAndPassword(authSecondary, document.getElementById('uEmail').value, document.getElementById('uPass').value); await setDoc(doc(db, "users", cred.user.uid), { email: document.getElementById('uEmail').value, role: document.getElementById('uRole').value, assignedSites: sel }); await signOut(authSecondary); e.target.reset(); window.loadUsers(); } catch(err) { alert(err.message); } };
         window.delU = async (id) => { if(confirm('Delete User?')) { await deleteDoc(doc(db, "users", id)); window.loadUsers(); } };
-        window.openEditU = (id, curSites) => { document.getElementById('muId').value = id; const arr = curSites.split(', '); const cbCon = document.getElementById('muCheckboxes'); cbCon.innerHTML=''; globalSites.forEach(s => { if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='block'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="mucb mr-2" ${arr.includes(s.name)?'checked':''}>${s.name}`; cbCon.appendChild(lbl); } }); document.getElementById('modalEditUser').style.display='block'; };
+        window.openEditU = (id, curSites) => { document.getElementById('muId').value = id; const arr = curSites.split(', '); const cbCon = document.getElementById('muCheckboxes'); cbCon.innerHTML=''; globalSites.forEach(s => { if(s.status==='Ongoing') { let lbl=document.createElement('label'); lbl.className='flex items-center gap-2 p-2 hover:bg-gray-200 rounded cursor-pointer'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="mucb w-4 h-4 text-blue-600 rounded" ${arr.includes(s.name)?'checked':''}><span class="font-bold text-gray-700">${s.name}</span>`; cbCon.appendChild(lbl); } }); document.getElementById('modalEditUser').style.display='block'; };
         window.saveUserSites = async () => { await updateDoc(doc(db, "users", document.getElementById('muId').value), {assignedSites: Array.from(document.querySelectorAll('.mucb:checked')).map(c=>c.value)}); document.getElementById('modalEditUser').style.display='none'; window.loadUsers(); };
 
+        // 4. REPORTS (CARD LAYOUT FOR ADMIN)
         let allReports = [];
         window.loadReports = async () => {
             const snap = await getDocs(query(collection(db, "daily_reports"), orderBy("timestamp", "desc")));
-            const tb = document.getElementById('tbReportsList'); tb.innerHTML=''; allReports=[];
+            const grid = document.getElementById('reportsGrid'); grid.innerHTML=''; allReports=[];
             snap.forEach((d) => {
                 const r = d.data(); r.id = d.id; allReports.push(r);
                 if(r.status === "Draft") return; 
-                let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-800 px-2 rounded">Approved</span>` : `<span class="bg-yellow-100 text-yellow-800 px-2 rounded font-bold animate-pulse">Pending</span>`;
                 
-                let acts = `<button onclick="window.viewRep('${r.id}')" class="bg-blue-500 text-white px-2 rounded hover:bg-blue-600 mr-1"><i class="fa-solid fa-eye"></i></button>`;
-                acts += `<button onclick="window.adminEditRep('${r.id}')" class="bg-yellow-500 text-white px-2 rounded hover:bg-yellow-600 mr-1" title="Edit Data"><i class="fa-solid fa-pen"></i></button>`;
-                acts += `<button onclick="window.exportRep('${r.id}')" class="bg-gray-600 text-white px-2 rounded mr-1">Excel</button>`;
-                if(r.status !== "Approved") acts += `<button onclick="window.approveRep('${r.id}')" class="bg-green-600 text-white px-2 rounded hover:bg-green-700 font-bold mr-1">Approve</button>`;
-                acts += `<button onclick="window.delRep('${r.id}')" class="bg-red-500 text-white px-2 rounded hover:bg-red-600">Del</button>`;
+                let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black uppercase"><i class="fa-solid fa-check mr-1"></i>Approved</span>` : `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-black uppercase animate-pulse"><i class="fa-solid fa-clock mr-1"></i>Pending</span>`;
                 
-                let tr = document.createElement('tr'); tr.innerHTML = `<td class="p-3 border">${r.date}</td><td class="p-3 border font-bold">${r.siteId || 'Unknown'}</td><td class="p-3 border">${badge}</td><td class="p-3 border text-center">${acts}</td>`; tb.appendChild(tr);
+                // Constructing the Card
+                let card = document.createElement('div');
+                card.className = "rep-card bg-white rounded-2xl p-5 border border-gray-100 relative shadow-sm";
+                
+                let acts = `<div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">`;
+                acts += `<div class="flex gap-2">`;
+                acts += `<button onclick="window.viewRep('${r.id}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition flex justify-center items-center" title="View"><i class="fa-solid fa-eye"></i></button>`;
+                acts += `<button onclick="window.adminEditRep('${r.id}')" class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white transition flex justify-center items-center" title="Edit"><i class="fa-solid fa-pen"></i></button>`;
+                acts += `<button onclick="window.exportRep('${r.id}')" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition flex justify-center items-center" title="Excel Export"><i class="fa-solid fa-file-excel"></i></button>`;
+                acts += `</div>`;
+                
+                let rightActs = `<div class="flex gap-2">`;
+                if(r.status !== "Approved") rightActs += `<button onclick="window.approveRep('${r.id}')" class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold text-sm shadow-md hover:bg-green-600 transition">Approve</button>`;
+                rightActs += `<button onclick="window.delRep('${r.id}')" class="w-10 h-10 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex justify-center items-center"><i class="fa-solid fa-trash"></i></button>`;
+                rightActs += `</div>`;
+                
+                acts += rightActs + `</div>`;
+
+                let infoStr = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-black text-xl text-gray-800">${r.date}</h3>
+                        ${badge}
+                    </div>
+                    <p class="text-blue-700 font-bold text-sm mb-1"><i class="fa-solid fa-location-dot mr-1"></i>${r.siteId || 'Unknown Site'}</p>
+                    <p class="text-gray-400 text-xs font-semibold mb-4">Prep: ${r.preparedBy || 'System'}</p>
+                `;
+                
+                card.innerHTML = infoStr + acts;
+                grid.appendChild(card);
             });
         };
 
         window.adminEditRep = (id) => {
             const r = allReports.find(x => x.id === id); if(!r) return;
-            document.getElementById('editDocId').value = id; document.getElementById('eDate').value = r.date; document.getElementById('eDocNo').value = r.docNo || ''; document.getElementById('eSite').value = r.siteId; document.getElementById('eWeather').value = r.weather || 'Sunny';
+            document.getElementById('editDocId').value = id; 
+            document.getElementById('eDate').value = r.date; 
+            document.getElementById('eDocNo').value = r.docNo || ''; 
+            document.getElementById('eSite').value = r.siteId; 
+            document.getElementById('eWeather').value = r.weather || 'Sunny';
+            
+            document.getElementById('adminFormStatus').innerText = "Editing Record";
+            document.getElementById('adminFormStatus').className = "bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm animate-pulse";
+            
             dData = r.data || { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
             window.renderAllTbs(); window.switchTab('entry');
         };
@@ -309,8 +402,9 @@
             const r = allReports.find(x => x.id === id); if(!r) return;
             document.getElementById('mvDate').innerText = "Date: " + r.date; document.getElementById('mvSite').innerText = "Site: " + (r.siteId || 'Unknown'); document.getElementById('mvWeather').innerText = "Weather: " + (r.weather || 'N/A'); document.getElementById('mvPreparedBy').innerText = r.preparedBy || 'Unknown'; document.getElementById('mvApprovedBy').innerText = r.approvedBy ? `Approved By: ${r.approvedBy}` : '';
             const d = r.data || {};
-            const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-1 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
-            rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'rem']);
+            const rMV = (arr, tid, keys) => { const t = document.getElementById(tid); t.innerHTML=''; if(!arr || arr.length===0) { t.innerHTML='<tr><td class="p-2 text-gray-500 italic">No records.</td></tr>'; return; } arr.forEach(item => { let tr = document.createElement('tr'); keys.forEach(k => { let td = document.createElement('td'); td.className="border-b p-2"; td.innerText=item[k]||'-'; tr.appendChild(td); }); t.appendChild(tr); }); };
+            rMV(d.delays, 'mvDelays', ['f', 't', 'r']); rMV(d.measures, 'mvMeasures', ['d', 'u']); rMV(d.sups, 'mvSups', ['m', 'q', 'n', 'p']); rMV(d.subs, 'mvSubs', ['t', 'q', 'n', 'p']); rMV(d.visits, 'mvVisits', ['n', 'no', 't']); 
+            rMV(d.workers, 'mvWorkers', ['n', 't', 'o', 'a', 'lt', 'rem']);
             document.getElementById('modalView').style.display='block';
         };
 
@@ -319,14 +413,22 @@
                 const r = allReports.find(x => x.id === id); if(!r) return; const siteNameForFile = r.siteId || 'Unknown_Site';
                 const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR');
                 const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10};
-                ws.mergeCells('A1:I2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
+                ws.mergeCells('A1:J2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'};
                 ws.getCell('A4').value="Date: "+r.date; ws.getCell('D4').value="Weather: "+r.weather; ws.getCell('G4').value="Status: "+r.status;
                 let row = 6;
-                const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:I${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; };
+                const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:J${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; };
                 const d=r.data||{};
-                addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier"],d.sups,['m','q','n']); addS("Sub-Contractors",["Task","Qty","Name"],d.subs,['t','q','n']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","OT","Adv", "Remarks"],d.workers,['n','t','o','a','rem']);
-                ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15}];
-                const buf = await wb.xlsx.writeBuffer(); const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`);
+                addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); 
+                addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); 
+                addS("Suppliers",["Material","Qty","Supplier","Price(Rs)"],d.sups,['m','q','n','p']); 
+                addS("Sub-Contractors",["Task","Qty","Name","Price(Rs)"],d.subs,['t','q','n','p']); 
+                addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); 
+                addS("Workers & Advances",["Name","Type","OT","Adv", "Left Early", "Remarks"],d.workers,['n','t','o','a','lt','rem']);
+                ws.columns=[{width:15},{width:15},{width:20},{width:20},{width:15},{width:15},{width:15},{width:15},{width:15},{width:15}];
+                
+                const buf = await wb.xlsx.writeBuffer(); 
+                const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`);
             } catch(err) { alert("Export Error: " + err.message); }
         };
 
@@ -339,16 +441,16 @@
                 let tLab=0, tAdv=0, dHrs={}, sk=0, usk=0;
                 rSnap.forEach(d => {
                     const r = d.data();
-                    if(r.date===today && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{if(w.a)tAdv+=parseFloat(w.a); if(w.t==='SK')sk++; if(w.t==='USK')usk++;}); }
+                    if(r.date===today && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{if(w.a && w.a!=='-')tAdv+=parseFloat(w.a); if(w.t==='SK')sk++; if(w.t==='USK')usk++;}); }
                     if(r.siteId && r.data && r.data.delays) { if(!dHrs[r.siteId])dHrs[r.siteId]=0; r.data.delays.forEach(dy=>{if(dy.f&&dy.t){let h=(new Date(`1970-01-01T${dy.t}:00`)-new Date(`1970-01-01T${dy.f}:00`))/3600000; if(h>0)dHrs[r.siteId]+=h;}}); }
                 });
-                document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tAdv;
+                document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tAdv.toLocaleString('en-US', {minimumFractionDigits:2});
                 if(typeof Chart !== 'undefined') {
                     if(window.charts?.d) window.charts.d.destroy(); if(window.charts?.l) window.charts.l.destroy(); window.charts={};
-                    window.charts.d = new Chart(document.getElementById('delayChart'), {type:'bar', data:{labels:Object.keys(dHrs), datasets:[{label:'Delay Hrs', data:Object.values(dHrs), backgroundColor:'#3b82f6'}]}});
-                    window.charts.l = new Chart(document.getElementById('labourChart'), {type:'doughnut', data:{labels:['SK','USK'], datasets:[{data:[sk,usk], backgroundColor:['#10b981','#f59e0b']}]}});
+                    window.charts.d = new Chart(document.getElementById('delayChart'), {type:'bar', data:{labels:Object.keys(dHrs), datasets:[{label:'Delay Hrs', data:Object.values(dHrs), backgroundColor:'#3b82f6', borderRadius:5}]}});
+                    window.charts.l = new Chart(document.getElementById('labourChart'), {type:'doughnut', data:{labels:['SK','USK'], datasets:[{data:[sk,usk], backgroundColor:['#10b981','#f59e0b'], borderWidth:0}]}});
                 }
-            } catch(e) {}
+            } catch(e) { console.log(e); }
         };
 
         window.onload = async () => { await window.loadSites(); window.loadUsers(); window.loadReports(); window.calculateAnalytics(); };
