@@ -2,114 +2,152 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supervisor Portal - Niwasa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Supervisor App - Niwasa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .tab-content { display: none; } .tab-content.active { display: block; }
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 25px; border-radius: 12px; width: 95%; max-width: 900px; }
+        .app-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .input-mobile { width: 100%; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; font-size: 16px; background-color: #f9fafb; outline: none; transition: border-color 0.2s; }
+        .input-mobile:focus { border-color: #3b82f6; background-color: #fff; }
+        .btn-mobile { width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+        .btn-mobile:active { opacity: 0.7; }
+        .list-card { background: #f3f4f6; border-radius: 10px; padding: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 25px; border-radius: 20px; width: 92%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
-<body class="bg-gray-100 p-4">
+<body class="bg-slate-50 pb-20">
 
-    <div class="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md mb-10 border-t-4 border-blue-600">
-        <div class="flex flex-col md:flex-row justify-between items-center border-b pb-4 mb-6 gap-4">
-            <div><h1 class="text-3xl font-extrabold text-gray-800">Daily Progress Report (DPR)</h1><p class="text-blue-600 font-bold" id="supInfo">Loading...</p></div>
-            <div class="space-x-2 flex">
-                <button onclick="switchTab('entry')" class="bg-blue-600 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-pen"></i> Manage Data</button>
-                <button onclick="switchTab('history')" class="bg-gray-800 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-clock-rotate-left"></i> History & Edit</button>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded font-bold"><i class="fa-solid fa-power-off"></i></button>
-            </div>
-        </div>
-        
+    <!-- Mobile Top Bar -->
+    <div class="bg-blue-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <div><h1 class="text-xl font-bold">Niwasa DPR</h1><p class="text-blue-200 text-xs" id="supInfo">Loading...</p></div>
+        <button onclick="logout()" class="text-red-300 hover:text-red-100 text-2xl"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+
+    <div class="p-4 max-w-lg mx-auto">
+        <!-- ENTRY TAB -->
         <div id="tab-entry" class="tab-content active">
+            
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">Data Entry <span id="statusBadge" class="ml-2 text-sm bg-gray-200 text-gray-800 px-2 rounded">New</span></h2>
-                <button onclick="checkDraft()" class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-bold shadow"><i class="fa-solid fa-rotate"></i> Load Today's Draft</button>
+                <span id="statusBadge" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">New</span>
+                <button onclick="checkDraft()" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i> Check Draft</button>
             </div>
             
-            <form id="dprForm" class="space-y-6">
+            <form id="dprForm">
                 <input type="hidden" id="currentDocId" value="">
                 
-                <div class="bg-gray-50 p-4 rounded border">
-                    <h3 class="font-bold text-gray-800 mb-3 border-b pb-2">1. General Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div><label class="font-semibold text-sm">Date</label><input type="date" id="date" class="w-full border p-2 rounded" required onchange="checkDraft()"></div>
-                        <div><label class="font-semibold text-sm">DOC No</label><input type="text" id="docNo" class="w-full border p-2 rounded"></div>
-                        <div><label class="font-bold text-sm text-blue-800">Select Site</label><select id="siteId" class="w-full border p-2 rounded bg-yellow-100 font-bold" required onchange="checkDraft()"><option value="">Select...</option></select></div>
-                        <div>
-                            <label class="font-semibold text-sm text-blue-700">Weather</label>
-                            <div class="flex gap-1"><select id="weather" class="w-full border p-2 rounded"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select>
-                            <button type="button" onclick="fetchLiveWeather()" class="bg-blue-500 text-white px-2 rounded font-bold" title="Auto GPS Weather"><i class="fa-solid fa-cloud-sun"></i></button></div>
+                <!-- 1. General (Always open) -->
+                <div class="app-card border-t-4 border-blue-500">
+                    <h3 class="font-bold text-gray-800 mb-4 text-lg"><i class="fa-solid fa-clipboard-list text-blue-500 mr-2"></i>General Info</h3>
+                    <div class="space-y-4">
+                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" id="date" class="input-mobile font-bold" required onchange="checkDraft()"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Select Site</label><select id="siteId" class="input-mobile font-bold text-blue-800 bg-blue-50" required onchange="checkDraft()"><option value="">Loading...</option></select></div>
+                        <div class="flex gap-2">
+                            <div class="flex-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Weather</label><select id="weather" class="input-mobile"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
+                            <div class="pt-5"><button type="button" onclick="fetchLiveWeather()" class="bg-blue-100 text-blue-600 h-[50px] px-4 rounded-xl font-bold"><i class="fa-solid fa-location-crosshairs"></i></button></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-orange-50 p-4 rounded border border-orange-200">
-                    <div class="flex justify-between items-center mb-2"><h3 class="font-bold text-orange-800">2. Weather Delays</h3><button type="button" onclick="autoFetchRainDelays()" class="bg-blue-600 text-white text-xs font-bold rounded px-3 py-1"><i class="fa-solid fa-satellite-dish"></i> Auto Sync Rain</button></div>
-                    <div class="flex gap-2 mb-2"><input type="time" id="dFrom" class="border p-2 rounded"><input type="time" id="dTo" class="border p-2 rounded"><input type="text" id="dReason" placeholder="Reason" class="border p-2 rounded flex-1"><button type="button" onclick="addD('delays',['dFrom','dTo','dReason'],['f','t','r'])" class="bg-orange-600 text-white font-bold rounded px-4">Add</button></div>
-                    <table class="w-full text-sm bg-white border"><tbody id="tb-delays"></tbody></table>
+                <!-- Easy Add Buttons Section -->
+                <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Add Records</h3>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button type="button" onclick="openM('modalWorker')" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Worker</button>
+                    <button type="button" onclick="openM('modalDelay')" class="bg-white border-2 border-orange-100 text-orange-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-orange-50"><i class="fa-solid fa-cloud-rain text-2xl"></i> Add Delay</button>
+                    <button type="button" onclick="openM('modalMeasure')" class="bg-white border-2 border-teal-100 text-teal-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-teal-50"><i class="fa-solid fa-ruler-combined text-2xl"></i> Measurement</button>
+                    <button type="button" onclick="openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
+                    <button type="button" onclick="openM('modalVisit')" class="bg-white border-2 border-purple-100 text-purple-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-purple-50 col-span-2"><i class="fa-solid fa-users text-2xl"></i> Visitor & Special Notes</button>
                 </div>
 
-                <div class="bg-teal-50 p-4 rounded border border-teal-200">
-                    <h3 class="font-bold text-teal-800 mb-2">3. Work Measurements</h3>
-                    <div class="flex gap-2 mb-2"><input type="text" id="mDesc" placeholder="Work Desc" class="border p-2 rounded flex-1"><input type="text" id="mUnit" placeholder="Unit/Qty" class="border p-2 rounded"><button type="button" onclick="addD('measures',['mDesc','mUnit'],['d','u'])" class="bg-teal-600 text-white font-bold rounded px-4">Add</button></div>
-                    <table class="w-full text-sm bg-white border"><tbody id="tb-measures"></tbody></table>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-green-50 p-4 rounded border border-green-200">
-                        <h3 class="font-bold text-green-800 mb-2">4A. Supplier Materials</h3>
-                        <div class="flex gap-1 mb-2"><input type="text" id="sMat" placeholder="Material" class="border p-1 rounded flex-1"><input type="text" id="sQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="sName" placeholder="Supplier" class="border p-1 rounded"><button type="button" onclick="addD('sups',['sMat','sQty','sName'],['m','q','n'])" class="bg-green-600 text-white font-bold rounded px-2">Add</button></div>
-                        <table class="w-full text-xs bg-white border"><tbody id="tb-sups"></tbody></table>
-                    </div>
-                    <div class="bg-lime-50 p-4 rounded border border-lime-200">
-                        <h3 class="font-bold text-lime-800 mb-2">4B. Sub-Contractors</h3>
-                        <div class="flex gap-1 mb-2"><input type="text" id="subTask" placeholder="Task" class="border p-1 rounded flex-1"><input type="text" id="subQty" placeholder="Qty" class="border p-1 rounded w-16"><input type="text" id="subName" placeholder="Name" class="border p-1 rounded"><button type="button" onclick="addD('subs',['subTask','subQty','subName'],['t','q','n'])" class="bg-lime-600 text-white font-bold rounded px-2">Add</button></div>
-                        <table class="w-full text-xs bg-white border"><tbody id="tb-subs"></tbody></table>
-                    </div>
-                </div>
-
-                <div class="bg-purple-50 p-4 rounded border border-purple-200">
-                    <h3 class="font-bold text-purple-800 mb-2">5. Visitors & Special Notes</h3>
-                    <div class="flex gap-2 mb-2">
-                        <select id="vName" class="border p-2 rounded w-1/4 font-bold text-purple-900"><option value="">Select...</option><option value="Engineer">Engineer</option><option value="Architect">Architect</option><option value="Boss">Boss</option><option value="QS">QS</option><option value="Client">Client</option><option value="Client's Party">Client's Party</option></select>
-                        <input type="text" id="vNote" placeholder="Special Note / Instruction" class="border p-2 rounded flex-1"><input type="time" id="vTime" class="border p-2 rounded">
-                        <button type="button" onclick="addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded px-4">Add</button>
-                    </div>
-                    <table class="w-full text-sm bg-white border"><tbody id="tb-visits"></tbody></table>
-                </div>
-
-                <!-- 6. LABOUR (UPDATED WITH REMARKS FOR EARLY LEAVE / TRANSFERS) -->
-                <div class="bg-blue-50 p-4 rounded border border-blue-200">
-                    <h3 class="font-bold text-blue-800 mb-2">6. Labour & Advances (Attendance)</h3>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <input type="text" id="wName" placeholder="Name" class="border p-2 rounded w-1/4">
-                        <select id="wType" class="border p-2 rounded"><option>SK</option><option>USK</option></select>
-                        <input type="text" id="wOT" placeholder="OT (Hrs)" class="border p-2 rounded w-20">
-                        <input type="number" id="wAdv" placeholder="Adv Rs" class="border p-2 rounded w-24">
-                        <input type="text" id="wRem" placeholder="Remarks (Left Early / Site Transfer)" class="border p-2 rounded flex-1">
-                        <button type="button" onclick="addD('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'])" class="bg-blue-600 text-white font-bold rounded px-4">Add</button>
-                    </div>
-                    <table class="w-full text-sm bg-white border"><tbody id="tb-workers"></tbody></table>
+                <!-- Preview Area -->
+                <div id="previewArea" class="space-y-4 mb-6">
+                    <!-- Dynamic Lists will appear here -->
+                    <div id="list-workers"></div>
+                    <div id="list-delays"></div>
+                    <div id="list-measures"></div>
+                    <div id="list-supsubs"></div>
+                    <div id="list-visits"></div>
                 </div>
 
                 <input type="hidden" id="prepBy">
-                <div class="flex flex-col md:flex-row gap-4 mt-6">
-                    <button type="button" onclick="saveRecord('Draft')" class="w-full md:w-1/2 bg-gray-800 text-white font-bold py-4 rounded text-lg"><i class="fa-solid fa-floppy-disk"></i> Save as Draft (Update Later)</button>
-                    <button type="button" onclick="saveRecord('Pending Approval')" class="w-full md:w-1/2 bg-blue-900 text-white font-bold py-4 rounded text-lg"><i class="fa-solid fa-cloud-arrow-up"></i> Final Submit</button>
+                <div class="flex gap-3 mt-8">
+                    <button type="button" onclick="saveRecord('Draft')" class="btn-mobile bg-gray-200 text-gray-800 flex-1"><i class="fa-solid fa-floppy-disk"></i> Draft</button>
+                    <button type="button" onclick="saveRecord('Pending Approval')" class="btn-mobile bg-blue-600 text-white flex-1 shadow-lg shadow-blue-500/30"><i class="fa-solid fa-paper-plane"></i> Submit</button>
                 </div>
             </form>
         </div>
 
+        <!-- HISTORY TAB -->
         <div id="tab-history" class="tab-content">
-            <h2 class="text-2xl font-bold mb-4">My Submitted Reports</h2>
-            <p class="text-sm text-gray-500 mb-4">* Reports can be edited within 48 hours of final submission.</p>
-            <table class="w-full text-left border bg-white shadow-sm"><thead class="bg-gray-200"><tr><th class="p-3 border">Date</th><th class="p-3 border">Site</th><th class="p-3 border text-center">Status</th><th class="p-3 border text-center">Action</th></tr></thead><tbody id="tbHistory"></tbody></table>
+            <h2 class="text-xl font-bold mb-4 px-2">History & Edits</h2>
+            <div id="historyList" class="space-y-3">
+                <p class="text-center text-gray-400 mt-10">Loading...</p>
+            </div>
         </div>
     </div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around p-3 pb-safe z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('entry')" id="nav-entry" class="nav-btn text-blue-600 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-pen-to-square text-xl"></i> Entry</button>
+        <button onclick="switchTab('history')" id="nav-history" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-clock-rotate-left text-xl"></i> History</button>
+    </div>
+
+    <!-- ADD RECORD MODALS (Mobile Friendly Popups) -->
+    
+    <!-- Worker Modal -->
+    <div id="modalWorker" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-blue-800">Add Labour</h3>
+        <div class="space-y-3">
+            <input type="text" id="wName" class="input-mobile" placeholder="Labour Name">
+            <select id="wType" class="input-mobile"><option>SK</option><option>USK</option></select>
+            <div class="flex gap-2"><input type="number" id="wOT" class="input-mobile" placeholder="OT Hrs"><input type="number" id="wAdv" class="input-mobile" placeholder="Advance Rs"></div>
+            <input type="text" id="wRem" class="input-mobile" placeholder="Remarks (Leave/Transfer)">
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'], 'modalWorker')" class="btn-mobile bg-blue-600 text-white">Save</button></div>
+        </div>
+    </div></div>
+
+    <!-- Delay Modal -->
+    <div id="modalDelay" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-orange-800">Add Weather Delay</h3>
+        <div class="space-y-3">
+            <div class="flex gap-2 items-center"><span class="text-sm font-bold text-gray-500">From:</span><input type="time" id="dFrom" class="input-mobile"><span class="text-sm font-bold text-gray-500">To:</span><input type="time" id="dTo" class="input-mobile"></div>
+            <input type="text" id="dReason" class="input-mobile" placeholder="Reason (e.g. Heavy Rain)">
+            <button type="button" onclick="autoFetchRainDelays()" class="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-bold text-sm mb-2"><i class="fa-solid fa-satellite-dish"></i> Auto GPS Sync</button>
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalDelay')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('delays',['dFrom','dTo','dReason'],['f','t','r'], 'modalDelay')" class="btn-mobile bg-orange-600 text-white">Save</button></div>
+        </div>
+    </div></div>
+
+    <!-- Measure Modal -->
+    <div id="modalMeasure" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-teal-800">Add Measurement</h3>
+        <div class="space-y-3">
+            <textarea id="mDesc" class="input-mobile" rows="2" placeholder="Work Description"></textarea>
+            <input type="text" id="mUnit" class="input-mobile" placeholder="Qty / Unit (e.g. 2 Cubes)">
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalMeasure')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('measures',['mDesc','mUnit'],['d','u'], 'modalMeasure')" class="btn-mobile bg-teal-600 text-white">Save</button></div>
+        </div>
+    </div></div>
+
+    <!-- Material/Sub Modal -->
+    <div id="modalSupSub" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-green-800">Add Delivery / Sub-Contractor</h3>
+        <div class="space-y-3">
+            <select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select>
+            <input type="text" id="ssName" class="input-mobile" placeholder="Material Name">
+            <div class="flex gap-2"><input type="text" id="ssQty" class="input-mobile" placeholder="Qty"><input type="text" id="ssProv" class="input-mobile" placeholder="Provider/Supplier Name"></div>
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalSupSub')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="saveSupSub()" class="btn-mobile bg-green-600 text-white">Save</button></div>
+        </div>
+    </div></div>
+
+    <!-- Visit Modal -->
+    <div id="modalVisit" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-purple-800">Visitor & Notes</h3>
+        <div class="space-y-3">
+            <select id="vName" class="input-mobile font-bold"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option></select>
+            <input type="time" id="vTime" class="input-mobile">
+            <textarea id="vNote" class="input-mobile" rows="2" placeholder="Special Instructions / Notes"></textarea>
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalVisit')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('visits',['vName','vNote','vTime'],['n','no','t'], 'modalVisit')" class="btn-mobile bg-purple-600 text-white">Save</button></div>
+        </div>
+    </div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -119,8 +157,16 @@
         const app = initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" }); 
         const auth = getAuth(app); const db = getFirestore(app);
 
-        window.switchTab = (tab) => { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.getElementById('tab-'+tab).classList.add('active'); if(tab==='history') window.loadHistory(); };
+        window.switchTab = (tab) => { 
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); 
+            document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('text-blue-600'); e.classList.add('text-gray-400');});
+            document.getElementById('tab-'+tab).classList.add('active'); 
+            document.getElementById('nav-'+tab).classList.add('text-blue-600'); document.getElementById('nav-'+tab).classList.remove('text-gray-400');
+            if(tab==='history') window.loadHistory(); 
+        };
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
+        window.openM = (id) => document.getElementById(id).style.display = 'block';
+        window.closeM = (id) => document.getElementById(id).style.display = 'none';
 
         let mySites = [];
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
@@ -129,7 +175,7 @@
         auth.onAuthStateChanged(async user => {
             if(!user) return window.location.href = "index.html";
             const uName = user.email.split('@')[0];
-            document.getElementById('prepBy').value = uName; document.getElementById('supInfo').innerText = "Logged in: " + uName;
+            document.getElementById('prepBy').value = uName; document.getElementById('supInfo').innerText = "Hi, " + uName;
             const uDoc = await getDoc(doc(db, "users", user.uid));
             if(uDoc.exists() && uDoc.data().assignedSites) {
                 mySites = uDoc.data().assignedSites;
@@ -138,27 +184,40 @@
             }
         });
 
-        const renderAllTbs = () => {
-            const rTb = (arr, id, keys) => {
-                const tb = document.getElementById(id); tb.innerHTML='';
-                arr.forEach((item, idx) => {
-                    let tr = document.createElement('tr');
-                    keys.forEach(k => { let td = document.createElement('td'); td.className="border p-1"; td.innerText = item[k]||'-'; tr.appendChild(td); });
-                    let delTd = document.createElement('td'); delTd.className="border p-1 text-center";
-                    delTd.innerHTML = `<button type="button" onclick="delRow('${id.split('-')[1]}',${idx})" class="text-red-500 font-bold"><i class="fa-solid fa-xmark"></i></button>`;
-                    tr.appendChild(delTd); tb.appendChild(tr);
-                });
+        // Mobile Friendly List Renderer
+        const renderMobileLists = () => {
+            const rL = (arr, id, icon, titleField, subField) => {
+                const con = document.getElementById(id); con.innerHTML='';
+                if(arr.length > 0) {
+                    con.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${arr.length} Record(s) Added</h4>`;
+                    arr.forEach((item, idx) => {
+                        let div = document.createElement('div'); div.className = "list-card shadow-sm";
+                        div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${icon} text-gray-400 text-lg"></i><div><p class="font-bold text-sm text-gray-800">${item[titleField]}</p><p class="text-xs text-gray-500">${item[subField]||''}</p></div></div><button type="button" onclick="delRow('${id.split('-')[1]}',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`;
+                        con.appendChild(div);
+                    });
+                }
             };
-            rTb(dData.delays, 'tb-delays', ['f','t','r']); rTb(dData.measures, 'tb-measures', ['d','u']); rTb(dData.sups, 'tb-sups', ['m','q','n']); rTb(dData.subs, 'tb-subs', ['t','q','n']); rTb(dData.visits, 'tb-visits', ['n','no','t']); 
-            rTb(dData.workers, 'tb-workers', ['n','t','o','a','rem']); // Includes new rem column
+            rL(dData.workers, 'list-workers', 'fa-helmet-safety', 'n', 't');
+            rL(dData.delays, 'list-delays', 'fa-cloud-rain', 'r', 'f');
+            rL(dData.measures, 'list-measures', 'fa-ruler-combined', 'd', 'u');
+            rL(dData.sups, 'list-supsubs', 'fa-box', 'm', 'n');
+            rL(dData.subs, 'list-supsubs', 'fa-users-gear', 't', 'n'); // Combine sups and subs visually
+            rL(dData.visits, 'list-visits', 'fa-user-tie', 'n', 'no');
         };
 
-        window.addD = (arrName, inIds, keys) => {
-            if(!document.getElementById(inIds[0]).value) return; 
+        window.addM = (arrName, inIds, keys, modalId) => {
+            if(!document.getElementById(inIds[0]).value) return alert("Required field missing!"); 
             let obj = {}; inIds.forEach((id, i) => { obj[keys[i]] = document.getElementById(id).value || '-'; document.getElementById(id).value = ''; });
-            dData[arrName].push(obj); renderAllTbs();
+            dData[arrName].push(obj); renderMobileLists(); window.closeM(modalId);
         };
-        window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); renderAllTbs(); };
+        
+        window.saveSupSub = () => {
+            const type = document.getElementById('ssType').value;
+            if(type === 'sup') window.addM('sups',['ssName','ssQty','ssProv'],['m','q','n'], 'modalSupSub');
+            else window.addM('subs',['ssName','ssQty','ssProv'],['t','q','n'], 'modalSupSub');
+        };
+
+        window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); renderMobileLists(); };
 
         window.checkDraft = async () => {
             const date = document.getElementById('date').value; const site = document.getElementById('siteId').value;
@@ -167,51 +226,50 @@
             const snap = await getDocs(q);
             if(!snap.empty) {
                 const docSnap = snap.docs[0]; const r = docSnap.data();
-                document.getElementById('currentDocId').value = docSnap.id; document.getElementById('docNo').value = r.docNo||''; document.getElementById('weather').value = r.weather||'Sunny';
-                dData = r.data || { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] };
-                renderAllTbs();
-                document.getElementById('statusBadge').className = r.status==="Draft" ? "ml-2 text-sm bg-yellow-200 text-yellow-800 px-2 rounded" : "ml-2 text-sm bg-green-200 text-green-800 px-2 rounded";
-                document.getElementById('statusBadge').innerText = r.status==="Draft" ? "Draft Loaded" : "Editing Final";
+                document.getElementById('currentDocId').value = docSnap.id; document.getElementById('weather').value = r.weather||'Sunny';
+                dData = r.data || { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] }; renderMobileLists();
+                const b = document.getElementById('statusBadge'); b.className = r.status==="Draft" ? "bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-xs font-bold uppercase" : "bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs font-bold uppercase";
+                b.innerText = r.status==="Draft" ? "Draft Loaded" : "Editing Final";
             } else {
-                document.getElementById('currentDocId').value = ""; dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] }; renderAllTbs();
-                document.getElementById('statusBadge').className = "ml-2 text-sm bg-gray-200 text-gray-800 px-2 rounded"; document.getElementById('statusBadge').innerText = "New Record";
+                document.getElementById('currentDocId').value = ""; dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] }; renderMobileLists();
+                const b = document.getElementById('statusBadge'); b.className = "bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"; b.innerText = "New";
             }
         };
 
         window.saveRecord = async (statusType) => {
             const date = document.getElementById('date').value; const site = document.getElementById('siteId').value;
             if(!site) return alert("Select a site first!");
-            const payload = { date, docNo: document.getElementById('docNo').value, siteId: site, weather: document.getElementById('weather').value, data: dData, preparedBy: document.getElementById('prepBy').value, status: statusType, timestamp: new Date() };
+            const payload = { date, siteId: site, weather: document.getElementById('weather').value, data: dData, preparedBy: document.getElementById('prepBy').value, status: statusType, timestamp: new Date() };
             try {
                 const curId = document.getElementById('currentDocId').value;
-                if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); } 
-                else { const res = await addDoc(collection(db, "daily_reports"), payload); document.getElementById('currentDocId').value = res.id; }
-                alert(statusType === "Draft" ? "Draft Saved successfully!" : "Final Report Submitted for Approval!");
-                document.getElementById('statusBadge').innerText = statusType;
-                if(statusType !== "Draft") { dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] }; document.getElementById('dprForm').reset(); renderAllTbs(); document.getElementById('currentDocId').value=""; }
+                if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); } else { const res = await addDoc(collection(db, "daily_reports"), payload); document.getElementById('currentDocId').value = res.id; }
+                alert(statusType === "Draft" ? "Draft Saved!" : "Sent for Approval!"); document.getElementById('statusBadge').innerText = statusType;
+                if(statusType !== "Draft") { dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[] }; document.getElementById('dprForm').reset(); renderMobileLists(); document.getElementById('currentDocId').value=""; }
             } catch(e) { alert(e.message); }
         };
 
         window.loadHistory = async () => {
             if(!mySites.length) return;
             const q = query(collection(db, "daily_reports"), where("siteId", "in", mySites), where("preparedBy","==",document.getElementById('prepBy').value));
-            const snap = await getDocs(q); const tb = document.getElementById('tbHistory'); tb.innerHTML='';
+            const snap = await getDocs(q); const con = document.getElementById('historyList'); con.innerHTML='';
             let myReports = []; snap.forEach(d => { let r=d.data(); r.id=d.id; myReports.push(r); });
             myReports.sort((a,b)=>(b.timestamp?.toMillis()||0)-(a.timestamp?.toMillis()||0));
+            if(myReports.length===0) return con.innerHTML = '<p class="text-center text-gray-400 mt-10">No records found.</p>';
             
             myReports.forEach((r) => {
-                let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-800 px-2 rounded font-bold">Approved</span>` : r.status==="Draft" ? `<span class="bg-gray-200 text-gray-800 px-2 rounded font-bold">Draft</span>` : `<span class="bg-yellow-100 text-yellow-800 px-2 rounded font-bold">Pending</span>`;
-                let acts = `-`;
-                const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60);
-                if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="bg-yellow-500 text-white px-3 py-1 rounded shadow"><i class="fa-solid fa-pen"></i> Edit</button>`; }
-                let tr=document.createElement('tr'); tr.innerHTML=`<td class="p-3 border">${r.date}</td><td class="p-3 border">${r.siteId}</td><td class="p-3 border text-center">${badge}</td><td class="p-3 border text-center">${acts}</td>`; tb.appendChild(tr);
+                let color = r.status==="Approved" ? "text-green-600 bg-green-50" : r.status==="Draft" ? "text-gray-600 bg-gray-100" : "text-yellow-600 bg-yellow-50";
+                let acts = `-`; const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60);
+                if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="text-blue-600 font-bold p-2"><i class="fa-solid fa-pen"></i></button>`; }
+                
+                let div = document.createElement('div'); div.className = "app-card flex justify-between items-center p-4 !mb-3";
+                div.innerHTML = `<div><p class="font-black text-lg">${r.date}</p><p class="text-xs text-gray-500 font-bold">${r.siteId}</p><span class="text-xs font-bold px-2 py-1 rounded mt-1 inline-block ${color}">${r.status}</span></div>${acts}`;
+                con.appendChild(div);
             });
         };
 
         window.editRep = (d, s) => { document.getElementById('date').value = d; document.getElementById('siteId').value = s; window.switchTab('entry'); window.checkDraft(); };
-
-        window.fetchLiveWeather = () => { if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(async pos => { try { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`); const data = await res.json(); const c = data.current_weather.weathercode; let w = "Sunny"; if(c>0&&c<=3)w="Cloudy"; if(c>=51&&c<=67)w="Light Shower"; if(c>=80)w="Heavy Rain"; document.getElementById('weather').value=w; alert("Live Weather: "+w); } catch(e){} }); } };
-        window.autoFetchRainDelays = async () => { alert("Feature active. Requires valid site GPS data saved by Admin to auto-fetch."); };
+        window.fetchLiveWeather = () => { if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(async pos => { try { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`); const data = await res.json(); const c = data.current_weather.weathercode; let w = "Sunny"; if(c>0&&c<=3)w="Cloudy"; if(c>=51&&c<=67)w="Light Shower"; if(c>=80)w="Heavy Rain"; document.getElementById('weather').value=w; alert("Location Weather: "+w); } catch(e){} }); } };
+        window.autoFetchRainDelays = () => { alert("Feature active. Requires valid site GPS data saved by Admin to auto-fetch."); window.closeM('modalDelay'); };
     </script>
 </body>
 </html>
