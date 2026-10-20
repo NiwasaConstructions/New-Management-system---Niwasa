@@ -50,14 +50,13 @@
 
         window.loadCustomerReports = async (sites) => {
             const container = document.getElementById('reportsContainer');
-            // Show only APPROVED reports to customer
             const q = query(collection(db, "daily_reports"), where("siteId", "in", sites), where("status", "==", "Approved"));
             const snap = await getDocs(q); clientReports = []; snap.forEach(d => clientReports.push(d.data()));
             if(clientReports.length === 0) { container.innerHTML = "<p class='text-center font-bold'>No approved reports found yet.</p>"; return; }
             
             clientReports.sort((a,b) => (b.timestamp?.toMillis()||0) - (a.timestamp?.toMillis()||0));
             container.innerHTML = clientReports.map((r, i) => `
-                <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-100 transition cursor-pointer" onclick="viewRep(${i})">
+                <div class="border rounded-lg p-4 bg-gray-50 shadow-sm border-l-4 border-green-500 flex justify-between items-center hover:bg-green-100 transition cursor-pointer" onclick="window.viewRep(${i})">
                     <div><span class="font-bold text-lg text-green-900">${r.date}</span> <span class="text-sm text-gray-500">(${r.siteId})</span></div>
                     <button class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold">Open Report</button>
                 </div>`).join('');
@@ -66,7 +65,7 @@
         window.viewRep = (i) => {
             const r = clientReports[i]; const d = r.data || {};
             const workerCount = d.workers ? d.workers.length : 0;
-            const measuresText = d.measures ? d.measures.map(m => m.d + " (" + m.u + ")").join('<br>') : 'No specific measurements today.';
+            const measuresText = d.measures && d.measures.length > 0 ? d.measures.map(m => `• ${m.d} (${m.u})`).join('<br>') : 'No specific measurements today.';
 
             const content = `
                 <div class="bg-green-50 p-4 rounded mb-4 text-sm font-bold flex justify-between"><span>Date: ${r.date}</span><span>Site: ${r.siteId}</span><span>Weather: ${r.weather}</span></div>
