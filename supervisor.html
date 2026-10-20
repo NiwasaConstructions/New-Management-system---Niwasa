@@ -14,15 +14,12 @@
         .btn-mobile { width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
         .btn-mobile:active { opacity: 0.7; }
         .list-card { background: #f3f4f6; border-radius: 10px; padding: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Modals */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
         .modal-content { background-color: #fff; margin: 10% auto; padding: 25px; border-radius: 20px; width: 92%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body class="bg-slate-50 pb-20">
 
-    <!-- Mobile Top Bar -->
     <div class="bg-blue-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
         <div><h1 class="text-xl font-bold">Niwasa DPR</h1><p class="text-blue-200 text-xs" id="supInfo">Loading...</p></div>
         <button onclick="logout()" class="text-red-300 hover:text-red-100 text-2xl"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -31,7 +28,6 @@
     <div class="p-4 max-w-lg mx-auto">
         <!-- ENTRY TAB -->
         <div id="tab-entry" class="tab-content active">
-            
             <div class="flex justify-between items-center mb-4">
                 <span id="statusBadge" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">New</span>
                 <button onclick="checkDraft()" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i> Check Draft</button>
@@ -40,33 +36,29 @@
             <form id="dprForm">
                 <input type="hidden" id="currentDocId" value="">
                 
-                <!-- 1. General (Always open) -->
+                <!-- 1. General Info -->
                 <div class="app-card border-t-4 border-blue-500">
                     <h3 class="font-bold text-gray-800 mb-4 text-lg"><i class="fa-solid fa-clipboard-list text-blue-500 mr-2"></i>General Info</h3>
                     <div class="space-y-4">
                         <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" id="date" class="input-mobile font-bold" required onchange="checkDraft()"></div>
                         <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Select Site</label><select id="siteId" class="input-mobile font-bold text-blue-800 bg-blue-50" required onchange="checkDraft()"><option value="">Loading...</option></select></div>
-                        <div class="flex gap-2">
-                            <div class="flex-1"><label class="text-xs font-bold text-gray-500 uppercase ml-1">Weather</label><select id="weather" class="input-mobile"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
-                            <div class="pt-5"><button type="button" onclick="fetchLiveWeather()" class="bg-blue-100 text-blue-600 h-[50px] px-4 rounded-xl font-bold"><i class="fa-solid fa-location-crosshairs"></i></button></div>
-                        </div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Live Weather (Manual Selection)</label><select id="weather" class="input-mobile font-bold text-orange-700 bg-orange-50"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                     </div>
                 </div>
 
-                <!-- Easy Add Buttons Section -->
+                <!-- Add Buttons -->
                 <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Add Records</h3>
                 
                 <div class="grid grid-cols-2 gap-3 mb-6">
-                    <button type="button" onclick="openM('modalWorker')" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Worker</button>
+                    <button type="button" onclick="openM('modalWorker')" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Labour</button>
                     <button type="button" onclick="openM('modalDelay')" class="bg-white border-2 border-orange-100 text-orange-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-orange-50"><i class="fa-solid fa-cloud-rain text-2xl"></i> Add Delay</button>
                     <button type="button" onclick="openM('modalMeasure')" class="bg-white border-2 border-teal-100 text-teal-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-teal-50"><i class="fa-solid fa-ruler-combined text-2xl"></i> Measurement</button>
-                    <button type="button" onclick="openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
+                    <button type="button" onclick="openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50 text-center"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
                     <button type="button" onclick="openM('modalVisit')" class="bg-white border-2 border-purple-100 text-purple-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-purple-50 col-span-2"><i class="fa-solid fa-users text-2xl"></i> Visitor & Special Notes</button>
                 </div>
 
                 <!-- Preview Area -->
                 <div id="previewArea" class="space-y-4 mb-6">
-                    <!-- Dynamic Lists will appear here -->
                     <div id="list-workers"></div>
                     <div id="list-delays"></div>
                     <div id="list-measures"></div>
@@ -85,9 +77,7 @@
         <!-- HISTORY TAB -->
         <div id="tab-history" class="tab-content">
             <h2 class="text-xl font-bold mb-4 px-2">History & Edits</h2>
-            <div id="historyList" class="space-y-3">
-                <p class="text-center text-gray-400 mt-10">Loading...</p>
-            </div>
+            <div id="historyList" class="space-y-3"><p class="text-center text-gray-400 mt-10">Loading...</p></div>
         </div>
     </div>
 
@@ -97,16 +87,27 @@
         <button onclick="switchTab('history')" id="nav-history" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-clock-rotate-left text-xl"></i> History</button>
     </div>
 
-    <!-- ADD RECORD MODALS (Mobile Friendly Popups) -->
+    <!-- MODALS -->
     
-    <!-- Worker Modal -->
+    <!-- Worker Modal (UPDATED WITH TIME AND REMARK) -->
     <div id="modalWorker" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-blue-800">Add Labour</h3>
         <div class="space-y-3">
             <input type="text" id="wName" class="input-mobile" placeholder="Labour Name">
-            <select id="wType" class="input-mobile"><option>SK</option><option>USK</option></select>
-            <div class="flex gap-2"><input type="number" id="wOT" class="input-mobile" placeholder="OT Hrs"><input type="number" id="wAdv" class="input-mobile" placeholder="Advance Rs"></div>
-            <input type="text" id="wRem" class="input-mobile" placeholder="Remarks (Leave/Transfer)">
-            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('workers',['wName','wType','wOT','wAdv','wRem'],['n','t','o','a','rem'], 'modalWorker')" class="btn-mobile bg-blue-600 text-white">Save</button></div>
+            <div class="flex gap-2">
+                <select id="wType" class="input-mobile"><option>SK</option><option>USK</option></select>
+                <input type="number" id="wOT" class="input-mobile" placeholder="OT Hrs">
+            </div>
+            <input type="number" id="wAdv" class="input-mobile" placeholder="Advance Rs (Optional)">
+            
+            <div class="border-t pt-3 mt-2">
+                <label class="text-xs font-bold text-red-500 uppercase ml-1">If Left Early / Transferred (Optional)</label>
+                <div class="flex gap-2 mt-1">
+                    <input type="time" id="wLeaveTime" class="input-mobile" title="Leave Time">
+                    <input type="text" id="wRem" class="input-mobile flex-1" placeholder="Note (e.g. Transferred to Kandy site)">
+                </div>
+            </div>
+
+            <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('workers',['wName','wType','wOT','wAdv','wLeaveTime','wRem'],['n','t','o','a','lt','rem'], 'modalWorker')" class="btn-mobile bg-blue-600 text-white">Save</button></div>
         </div>
     </div></div>
 
@@ -115,7 +116,6 @@
         <div class="space-y-3">
             <div class="flex gap-2 items-center"><span class="text-sm font-bold text-gray-500">From:</span><input type="time" id="dFrom" class="input-mobile"><span class="text-sm font-bold text-gray-500">To:</span><input type="time" id="dTo" class="input-mobile"></div>
             <input type="text" id="dReason" class="input-mobile" placeholder="Reason (e.g. Heavy Rain)">
-            <button type="button" onclick="autoFetchRainDelays()" class="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-bold text-sm mb-2"><i class="fa-solid fa-satellite-dish"></i> Auto GPS Sync</button>
             <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalDelay')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('delays',['dFrom','dTo','dReason'],['f','t','r'], 'modalDelay')" class="btn-mobile bg-orange-600 text-white">Save</button></div>
         </div>
     </div></div>
@@ -129,12 +129,13 @@
         </div>
     </div></div>
 
-    <!-- Material/Sub Modal -->
+    <!-- Material/Sub Modal (UPDATED WITH OPTIONAL PRICE) -->
     <div id="modalSupSub" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-green-800">Add Delivery / Sub-Contractor</h3>
         <div class="space-y-3">
-            <select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select>
+            <select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name'; document.getElementById('ssProv').placeholder = this.value==='sup'?'Supplier Name':'Team / Person Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select>
             <input type="text" id="ssName" class="input-mobile" placeholder="Material Name">
-            <div class="flex gap-2"><input type="text" id="ssQty" class="input-mobile" placeholder="Qty"><input type="text" id="ssProv" class="input-mobile" placeholder="Provider/Supplier Name"></div>
+            <div class="flex gap-2"><input type="text" id="ssQty" class="input-mobile" placeholder="Qty"><input type="text" id="ssProv" class="input-mobile" placeholder="Supplier Name"></div>
+            <input type="number" id="ssPrice" class="input-mobile" placeholder="Price / Rate Rs. (If known - Optional)">
             <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalSupSub')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="saveSupSub()" class="btn-mobile bg-green-600 text-white">Save</button></div>
         </div>
     </div></div>
@@ -142,7 +143,7 @@
     <!-- Visit Modal -->
     <div id="modalVisit" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-purple-800">Visitor & Notes</h3>
         <div class="space-y-3">
-            <select id="vName" class="input-mobile font-bold"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option></select>
+            <select id="vName" class="input-mobile font-bold"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select>
             <input type="time" id="vTime" class="input-mobile">
             <textarea id="vNote" class="input-mobile" rows="2" placeholder="Special Instructions / Notes"></textarea>
             <div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalVisit')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('visits',['vName','vNote','vTime'],['n','no','t'], 'modalVisit')" class="btn-mobile bg-purple-600 text-white">Save</button></div>
@@ -184,15 +185,20 @@
             }
         });
 
-        // Mobile Friendly List Renderer
         const renderMobileLists = () => {
-            const rL = (arr, id, icon, titleField, subField) => {
+            const rL = (arr, id, icon, titleF, subF) => {
                 const con = document.getElementById(id); con.innerHTML='';
                 if(arr.length > 0) {
                     con.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${arr.length} Record(s) Added</h4>`;
                     arr.forEach((item, idx) => {
+                        let subText = item[subF] || '';
+                        // Special display for workers if they left early
+                        if(id === 'list-workers' && item['lt'] && item['lt'] !== '-') { subText += ` <span class="text-red-500 ml-2"><i class="fa-solid fa-person-walking-arrow-right"></i> Left at ${item['lt']} (${item['rem']})</span>`; }
+                        // Special display for sups/subs if price exists
+                        if(id === 'list-supsubs' && item['p'] && item['p'] !== '-') { subText += ` | Rs.${item['p']}`; }
+
                         let div = document.createElement('div'); div.className = "list-card shadow-sm";
-                        div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${icon} text-gray-400 text-lg"></i><div><p class="font-bold text-sm text-gray-800">${item[titleField]}</p><p class="text-xs text-gray-500">${item[subField]||''}</p></div></div><button type="button" onclick="delRow('${id.split('-')[1]}',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`;
+                        div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${icon} text-gray-400 text-lg w-6 text-center"></i><div><p class="font-bold text-sm text-gray-800">${item[titleF]}</p><p class="text-xs text-gray-500">${subText}</p></div></div><button type="button" onclick="delRow('${id.split('-')[1]}',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`;
                         con.appendChild(div);
                     });
                 }
@@ -200,8 +206,15 @@
             rL(dData.workers, 'list-workers', 'fa-helmet-safety', 'n', 't');
             rL(dData.delays, 'list-delays', 'fa-cloud-rain', 'r', 'f');
             rL(dData.measures, 'list-measures', 'fa-ruler-combined', 'd', 'u');
-            rL(dData.sups, 'list-supsubs', 'fa-box', 'm', 'n');
-            rL(dData.subs, 'list-supsubs', 'fa-users-gear', 't', 'n'); // Combine sups and subs visually
+            
+            // Combine Sups and Subs for mobile view nicely
+            const conSupSub = document.getElementById('list-supsubs'); conSupSub.innerHTML='';
+            let ssCount = dData.sups.length + dData.subs.length;
+            if(ssCount > 0) {
+                conSupSub.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${ssCount} Material/Sub Record(s)</h4>`;
+                dData.sups.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-green-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.m}</p><p class="text-xs text-gray-500">Sup: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="delRow('sups',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); });
+                dData.subs.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-lime-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.t}</p><p class="text-xs text-gray-500">Sub: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="delRow('subs',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); });
+            }
             rL(dData.visits, 'list-visits', 'fa-user-tie', 'n', 'no');
         };
 
@@ -213,8 +226,8 @@
         
         window.saveSupSub = () => {
             const type = document.getElementById('ssType').value;
-            if(type === 'sup') window.addM('sups',['ssName','ssQty','ssProv'],['m','q','n'], 'modalSupSub');
-            else window.addM('subs',['ssName','ssQty','ssProv'],['t','q','n'], 'modalSupSub');
+            if(type === 'sup') window.addM('sups',['ssName','ssQty','ssProv','ssPrice'],['m','q','n','p'], 'modalSupSub');
+            else window.addM('subs',['ssName','ssQty','ssProv','ssPrice'],['t','q','n','p'], 'modalSupSub');
         };
 
         window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); renderMobileLists(); };
@@ -259,7 +272,7 @@
             myReports.forEach((r) => {
                 let color = r.status==="Approved" ? "text-green-600 bg-green-50" : r.status==="Draft" ? "text-gray-600 bg-gray-100" : "text-yellow-600 bg-yellow-50";
                 let acts = `-`; const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60);
-                if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="text-blue-600 font-bold p-2"><i class="fa-solid fa-pen"></i></button>`; }
+                if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="bg-blue-100 text-blue-700 font-bold px-3 py-2 rounded-lg text-sm"><i class="fa-solid fa-pen"></i> Edit</button>`; }
                 
                 let div = document.createElement('div'); div.className = "app-card flex justify-between items-center p-4 !mb-3";
                 div.innerHTML = `<div><p class="font-black text-lg">${r.date}</p><p class="text-xs text-gray-500 font-bold">${r.siteId}</p><span class="text-xs font-bold px-2 py-1 rounded mt-1 inline-block ${color}">${r.status}</span></div>${acts}`;
@@ -268,8 +281,6 @@
         };
 
         window.editRep = (d, s) => { document.getElementById('date').value = d; document.getElementById('siteId').value = s; window.switchTab('entry'); window.checkDraft(); };
-        window.fetchLiveWeather = () => { if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(async pos => { try { const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`); const data = await res.json(); const c = data.current_weather.weathercode; let w = "Sunny"; if(c>0&&c<=3)w="Cloudy"; if(c>=51&&c<=67)w="Light Shower"; if(c>=80)w="Heavy Rain"; document.getElementById('weather').value=w; alert("Location Weather: "+w); } catch(e){} }); } };
-        window.autoFetchRainDelays = () => { alert("Feature active. Requires valid site GPS data saved by Admin to auto-fetch."); window.closeM('modalDelay'); };
     </script>
 </body>
 </html>
