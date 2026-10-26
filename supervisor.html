@@ -29,7 +29,7 @@
 
     <div class="p-4 max-w-lg mx-auto">
         
-        <!-- FIXED DUTY TRACKER CARD -->
+        <!-- DUTY TRACKER CARD -->
         <div class="app-card border-t-4 border-indigo-500 relative overflow-hidden" id="dutyCard">
             <h3 class="font-bold text-gray-800 mb-1 text-lg"><i class="fa-solid fa-user-clock text-indigo-500 mr-2"></i>My Attendance</h3>
             <p class="text-xs text-gray-500 font-bold mb-4" id="dutyDateLabel">Loading...</p>
@@ -40,7 +40,6 @@
         
         <!-- ENTRY TAB -->
         <div id="tab-entry" class="tab-content active">
-            <!-- (Code for entry form remains exactly the same as previous) -->
             <div class="flex justify-between items-center mb-4"><span id="statusBadge" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">New</span><button onclick="checkDraft()" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i> Check Draft</button></div>
             
             <form id="dprForm">
@@ -79,10 +78,13 @@
             </form>
         </div>
 
+        <!-- LABOUR REGISTRATION TAB -->
         <div id="tab-labours" class="tab-content">
             <h2 class="text-xl font-bold mb-4 px-2 text-gray-800">Register New Labour</h2>
             <div class="app-card border-t-4 border-orange-500"><form onsubmit="window.supAddLabour(event)" class="space-y-4"><div><label class="text-xs font-bold text-gray-500">Full Name</label><input type="text" id="lName" class="input-mobile font-bold" required></div><div><label class="text-xs font-bold text-gray-500">Role (SK/USK)</label><select id="lType" class="input-mobile font-bold"><option value="SK">Skilled (SK - Baas)</option><option value="USK">Unskilled (USK - Helper)</option></select></div><div><label class="text-xs font-bold text-gray-500">Daily Wage (Rs.)</label><input type="number" id="lWage" class="input-mobile font-bold text-green-700" required></div><div><label class="text-xs font-bold text-gray-500">OT Rate per Hour (Rs.)</label><input type="number" id="lOTRate" class="input-mobile font-bold text-blue-700" required></div><button type="submit" class="btn-mobile bg-orange-500 text-white mt-4">Save to Database</button></form></div><h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Registered Labours</h3><div id="supLabourList" class="space-y-3 pb-4"></div>
         </div>
+        
+        <!-- HISTORY TAB -->
         <div id="tab-history" class="tab-content"><h2 class="text-xl font-bold mb-4 px-2">History & Edits</h2><div id="historyList" class="space-y-3"><p class="text-center text-gray-400 mt-10">Loading...</p></div></div>
     </div>
 
@@ -93,7 +95,7 @@
         <button onclick="switchTab('history')" id="nav-history" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-clock-rotate-left text-xl"></i> History</button>
     </div>
 
-    <!-- NEW: Modal for Duty On (If Late) & Duty Off (If Early) -->
+    <!-- DUTY REASON MODAL -->
     <div id="modalDutyReason" class="modal">
         <div class="modal-content">
             <h3 class="font-bold text-xl mb-2 text-indigo-800" id="dutyModalTitle">Reason Required</h3>
@@ -154,13 +156,11 @@
             }
             
             window.loadLabourDropdown();
-            
-            // Wait 1 second before fetching duty to ensure DB connection is stable
             setTimeout(() => { window.checkDutyStatus(); }, 1000);
         });
 
         // ---------------------------------------------------------
-        // DUTY TRACKER: 100% SECURE & PREVENTS RE-CLICKS
+        // TIME-BASED DUTY TRACKER (8:15 AM - 4:30 PM)
         // ---------------------------------------------------------
         window.checkDutyStatus = async () => {
             const attId = currentUserId + "_" + todayStr;
@@ -179,7 +179,6 @@
                             <div class="flex gap-2"><button onclick="window.triggerDuty('Early Leave')" class="btn-mobile bg-orange-100 text-orange-700 border border-orange-300 flex-1 text-sm"><i class="fa-solid fa-person-walking-arrow-right"></i> Leave Early</button><button onclick="window.triggerDuty('Completed')" class="btn-mobile bg-gray-800 text-white flex-1 text-sm"><i class="fa-solid fa-stop"></i> Duty Off</button></div>
                         `;
                     } else {
-                        // PREVENTS RE-CLICKING AFTER LOGGED OUT/LEFT
                         let badge = a.status === "Completed" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
                         actDiv.innerHTML = `<div class="flex flex-col gap-2">
                             <div class="flex justify-between items-center ${badge} p-4 rounded-lg font-bold shadow-inner"><span><i class="fa-solid fa-check-circle mr-2"></i> ${a.status}</span><span>${a.timeOut}</span></div>
@@ -189,30 +188,29 @@
                 }
             } catch (error) {
                 actDiv.innerHTML = `<p class="text-sm text-red-500 font-bold text-center"><i class="fa-solid fa-triangle-exclamation"></i> Network error checking status. Please refresh.</p>`;
-                console.error("Duty Status Error:", error);
             }
         };
 
         window.triggerDuty = (action) => {
             const now = new Date();
-            const currentHour = now.getHours(); // 0-23
+            // Convert current time to total minutes to check 8:15 AM and 4:30 PM
+            const currentMinutesOfDay = now.getHours() * 60 + now.getMinutes(); 
             pendingAction = action;
 
             if (action === "Duty On") {
-                if (currentHour >= 9) { 
-                    // Late (After 9 AM)
+                // If it is past 8:15 AM (495 minutes)
+                if (currentMinutesOfDay > 495) { 
                     document.getElementById('dutyModalTitle').innerText = "Late Clock-In";
                     document.getElementById('dutyModalTitle').className = "font-bold text-xl mb-2 text-orange-600";
-                    document.getElementById('dutyModalDesc').innerText = "It's past 9:00 AM. Please provide a reason for being late.";
+                    document.getElementById('dutyModalDesc').innerText = "It's past 8:15 AM. Please provide a reason for being late.";
                     window.openM('modalDutyReason');
                 } else {
-                    // On Time
                     window.executeDutySave("On Time");
                 }
             } else if (action === "Completed") {
-                if (currentHour < 16) {
-                    // Leaving before 4 PM
-                    alert("It's before 4:00 PM. Please use 'Leave Early' if you are leaving the site.");
+                // If it is before 4:30 PM (16:30 -> 990 minutes)
+                if (currentMinutesOfDay < 990) {
+                    alert("It's before 4:30 PM. Please use 'Leave Early' if you are leaving the site.");
                     return;
                 } else {
                     if(!confirm("Are you sure you want to clock out for today? You cannot undo this.")) return;
@@ -226,7 +224,6 @@
             }
         };
 
-        // When Save button clicked on the Reason Modal
         document.getElementById('btnSaveDutyReason').addEventListener('click', () => {
             const reason = document.getElementById('dutyReasonText').value;
             if(!reason) return alert("You must type a reason to proceed.");
@@ -249,11 +246,11 @@
                 } else if(pendingAction === "Early Leave") {
                     await updateDoc(doc(db, "sup_attendance", attId), { timeOut: timeStr, status: "Early Leave", timeOutReason: reasonNote });
                 }
-                window.checkDutyStatus(); // Refresh UI
-            } catch(e) { alert("Network error logging duty. Make sure Admin has updated Security Rules."); window.checkDutyStatus(); }
+                window.checkDutyStatus();
+            } catch(e) { alert("Network error logging duty."); window.checkDutyStatus(); }
         };
 
-        // Labours & Other Scripts remain exactly as before
+        // Standard Functions
         let allCompanySites = []; let allLabours = [];
         window.loadLabourDropdown = async () => { const sitesSnap = await getDocs(collection(db, "sites")); sitesSnap.forEach(d => { if(d.data().status === 'Ongoing') allCompanySites.push(d.data().name); }); const labSnap = await getDocs(collection(db, "labours")); allLabours = []; const lDrop = document.getElementById('wNameSelect'); lDrop.innerHTML='<option value="">Select Labour...</option>'; labSnap.forEach(d => { const l = d.data(); allLabours.push(l); let o = document.createElement('option'); o.value = l.name; o.innerText = l.name; lDrop.appendChild(o); }); };
         window.supLoadLabours = async () => { const labSnap = await getDocs(collection(db, "labours")); const con = document.getElementById('supLabourList'); con.innerHTML = ''; labSnap.forEach(d => { const l = d.data(); let badge = l.type === 'SK' ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">SK</span>` : `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">USK</span>`; con.innerHTML += `<div class="app-card !p-3 flex justify-between items-center mb-2"><div><p class="font-bold text-gray-800">${l.name} ${badge}</p><p class="text-xs text-gray-500">Wage: Rs.${l.dailyRate} | OT: Rs.${l.otRate}/h</p></div><button onclick="window.supDelLabour('${d.id}')" class="text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`; }); };
@@ -280,7 +277,7 @@
         window.saveRecord = async (statusType) => { const date = document.getElementById('date').value; const site = document.getElementById('siteId').value; if(!site) return alert("Select a site first!"); const payload = { date, siteId: site, weather: document.getElementById('weather').value, data: dData, preparedBy: document.getElementById('prepBy').value, status: statusType, timestamp: new Date() }; try { const curId = document.getElementById('currentDocId').value; if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); } else { const res = await addDoc(collection(db, "daily_reports"), payload); document.getElementById('currentDocId').value = res.id; } alert(statusType === "Draft" ? "Draft Saved!" : "Sent for Approval!"); document.getElementById('statusBadge').innerText = statusType; if(statusType !== "Draft") { dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[], photos:[], bills:[] }; document.getElementById('dprForm').reset(); renderMobileLists(); document.getElementById('currentDocId').value=""; } } catch(e) { alert(e.message); } };
 
         window.loadHistory = async () => {
-            const q = query(collection(db, "daily_reports"), where("preparedBy","==",document.getElementById('prepBy').value)); const snap = await getDocs(q); const con = document.getElementById('historyList'); con.innerHTML=''; let myReports = []; snap.forEach(d => { let r=d.data(); r.id=d.id; myReports.push(r); }); myReports.sort((a,b)=>(b.timestamp?.toMillis()||0)-(a.timestamp?.toMillis()||0));
+            if(!mySites.length) return; const q = query(collection(db, "daily_reports"), where("siteId", "in", mySites), where("preparedBy","==",document.getElementById('prepBy').value)); const snap = await getDocs(q); const con = document.getElementById('historyList'); con.innerHTML=''; let myReports = []; snap.forEach(d => { let r=d.data(); r.id=d.id; myReports.push(r); }); myReports.sort((a,b)=>(b.timestamp?.toMillis()||0)-(a.timestamp?.toMillis()||0));
             if(myReports.length===0) return con.innerHTML = '<p class="text-center text-gray-400 mt-10">No records found.</p>';
             myReports.forEach((r) => { let color = r.status==="Approved" ? "text-green-600 bg-green-50" : r.status==="Draft" ? "text-gray-600 bg-gray-100" : "text-yellow-600 bg-yellow-50"; let acts = `-`; const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60); if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="bg-blue-100 text-blue-700 font-bold px-3 py-2 rounded-lg text-sm"><i class="fa-solid fa-pen"></i> Edit</button>`; } let div = document.createElement('div'); div.className = "app-card flex justify-between items-center p-4 !mb-3"; div.innerHTML = `<div><p class="font-black text-lg">${r.date}</p><p class="text-xs text-gray-500 font-bold">${r.siteId}</p><span class="text-xs font-bold px-2 py-1 rounded mt-1 inline-block ${color}">${r.status}</span></div>${acts}`; con.appendChild(div); });
         };
