@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Niwasa Constructions</title>
+    <title>Login - Niwasa ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-blue-900">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-blue-900 relative" id="loginBox">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-black text-blue-900 mb-2">Niwasa Constructions</h1>
-            <p class="text-gray-500 font-bold">Daily Progress Management System</p>
+            <h1 class="text-3xl font-black text-blue-900 mb-2">Niwasa ERP</h1>
+            <p class="text-gray-500 font-bold">Secure Access Portal</p>
         </div>
 
         <form id="loginForm" class="space-y-6">
@@ -20,25 +20,30 @@
                 <label class="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-envelope text-gray-400"></i></div>
-                    <input type="email" id="email" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 outline-none" placeholder="Enter your email" required>
+                    <input type="email" id="email" class="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 outline-none" required>
                 </div>
             </div>
-
             <div>
                 <label class="block text-sm font-bold text-gray-700 mb-2">Password</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-lock text-gray-400"></i></div>
-                    <input type="password" id="password" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-blue-900 outline-none" placeholder="Enter your password" required>
-                    <!-- PASSWORD VIEW TOGGLE -->
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500 hover:text-blue-600" onclick="togglePass('password', 'eyeIcon1')">
-                        <i id="eyeIcon1" class="fa-solid fa-eye"></i>
-                    </div>
+                    <input type="password" id="password" class="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 outline-none" required>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500" onclick="togglePass('password', 'eyeIcon1')"><i id="eyeIcon1" class="fa-solid fa-eye"></i></div>
                 </div>
             </div>
-
             <button type="submit" id="loginBtn" class="w-full bg-blue-900 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition shadow-lg text-lg">Login</button>
             <p id="errorMsg" class="text-red-500 text-sm font-bold text-center mt-4 hidden"></p>
         </form>
+    </div>
+
+    <!-- Multi-Role Selection Modal -->
+    <div id="roleSelector" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+            <h2 class="text-2xl font-black text-gray-800 mb-2">Select Portal</h2>
+            <p class="text-gray-500 text-sm font-bold mb-6">You have multiple access rights.</p>
+            <div class="space-y-3" id="portalButtons"></div>
+            <button onclick="window.location.reload()" class="mt-6 text-red-500 font-bold text-sm hover:underline">Cancel & Logout</button>
+        </div>
     </div>
 
     <script type="module">
@@ -49,11 +54,16 @@
         const app = initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" });
         const auth = getAuth(app); const db = getFirestore(app);
 
-        // Password View Logic
         window.togglePass = (id, iconId) => {
             const el = document.getElementById(id); const icon = document.getElementById(iconId);
-            if(el.type === 'password') { el.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); } 
-            else { el.type = 'password'; icon.classList.add('fa-eye'); icon.classList.remove('fa-eye-slash'); }
+            if(el.type === 'password') { el.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; } 
+            else { el.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+        };
+
+        const portalMap = {
+            'admin': { name: 'Admin / ERP Panel', url: 'admin.html', color: 'bg-blue-600', icon: 'fa-shield' },
+            'supervisor': { name: 'Supervisor App', url: 'supervisor.html', color: 'bg-orange-500', icon: 'fa-helmet-safety' },
+            'customer': { name: 'Client Portal', url: 'customer.html', color: 'bg-green-600', icon: 'fa-user' }
         };
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -66,17 +76,25 @@
                 const userDoc = await getDoc(doc(db, "users", cred.user.uid));
                 
                 if (userDoc.exists()) {
-                    const role = userDoc.data().role;
-                    if (role === 'admin') window.location.href = "admin.html";
-                    else if (role === 'supervisor') window.location.href = "supervisor.html";
-                    else if (role === 'customer') window.location.href = "customer.html";
-                    else { err.innerText = "Unknown role assigned."; err.classList.remove('hidden'); signOut(auth); }
-                } else {
-                    err.innerText = "User role not found in database."; err.classList.remove('hidden'); signOut(auth);
-                }
-            } catch (error) {
-                err.innerText = "Invalid Email or Password!"; err.classList.remove('hidden');
-            }
+                    const uData = userDoc.data();
+                    // Fallback for old single role, or new array format
+                    let accesses = uData.accesses || (uData.role ? [uData.role] : []); 
+                    
+                    if(accesses.length === 0) { err.innerText = "No access assigned."; err.classList.remove('hidden'); auth.signOut(); }
+                    else if(accesses.length === 1) { window.location.href = portalMap[accesses[0]].url; } 
+                    else {
+                        // Show Portal Selector
+                        document.getElementById('loginBox').classList.add('hidden');
+                        const rb = document.getElementById('portalButtons'); rb.innerHTML = '';
+                        accesses.forEach(acc => {
+                            if(portalMap[acc]) {
+                                rb.innerHTML += `<button onclick="window.location.href='${portalMap[acc].url}'" class="w-full ${portalMap[acc].color} text-white font-bold py-4 rounded-xl shadow hover:opacity-90 transition flex items-center justify-center gap-3 text-lg"><i class="fa-solid ${portalMap[acc].icon}"></i> ${portalMap[acc].name}</button>`;
+                            }
+                        });
+                        document.getElementById('roleSelector').classList.remove('hidden');
+                    }
+                } else { err.innerText = "User role not found."; err.classList.remove('hidden'); auth.signOut(); }
+            } catch (error) { err.innerText = "Invalid Email or Password!"; err.classList.remove('hidden'); }
             btn.innerHTML = 'Login';
         });
     </script>
