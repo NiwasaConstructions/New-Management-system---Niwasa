@@ -1,0 +1,16 @@
+{
+  "name": "Niwasa ERP System",
+  "short_name": "Niwasa ERP",
+  "description": "Niwasa Constructions Management System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
