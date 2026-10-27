@@ -6,11 +6,9 @@
     <title>Login - Niwasa ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PWA & Mobile App Support -->
+    <!-- PWA Settings -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3a8a">
-    
-    <!-- iOS (iPhone) Support -->
     <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,7 +16,8 @@
 </head>
 <body class="bg-gray-100 h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-blue-900 relative" id="loginBox">
+    <!-- LOGIN FORM BOX -->
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-8 border-blue-900 relative hidden" id="loginBox">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-black text-blue-900 mb-2">Niwasa ERP</h1>
             <p class="text-gray-500 font-bold">Secure Access Portal</p>
@@ -45,19 +44,25 @@
         </form>
     </div>
 
-    <!-- Multi-Role Selection Modal -->
+    <!-- MULTI-ROLE SELECTION MODAL -->
     <div id="roleSelector" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
             <h2 class="text-2xl font-black text-gray-800 mb-2">Select Portal</h2>
             <p class="text-gray-500 text-sm font-bold mb-6">You have multiple access rights.</p>
             <div class="space-y-3" id="portalButtons"></div>
-            <button onclick="window.location.reload()" class="mt-6 text-red-500 font-bold text-sm hover:underline">Cancel & Logout</button>
+            <button onclick="window.logoutUser()" class="mt-6 text-red-500 font-bold text-sm hover:underline"><i class="fa-solid fa-right-from-bracket mr-1"></i> Logout</button>
         </div>
+    </div>
+
+    <!-- LOADING SPINNER (Shows while checking session) -->
+    <div id="pageLoader" class="flex flex-col items-center justify-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-900 mb-4"></i>
+        <p class="text-gray-500 font-bold">Verifying Session...</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
         const app = initializeApp({ apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM", authDomain: "niwasa-new-labour.firebaseapp.com", projectId: "niwasa-new-labour" });
@@ -68,6 +73,8 @@
             if(el.type === 'password') { el.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; } 
             else { el.type = 'password'; icon.className = 'fa-solid fa-eye'; }
         };
+        
+        window.logoutUser = () => { signOut(auth).then(() => { window.location.reload(); }); };
 
         const portalMap = {
             'admin': { name: 'Admin / ERP Panel', url: 'admin.html', color: 'bg-blue-600', icon: 'fa-shield' },
@@ -75,25 +82,24 @@
             'customer': { name: 'Client Portal', url: 'customer.html', color: 'bg-green-600', icon: 'fa-user' }
         };
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn'); const err = document.getElementById('errorMsg');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...'; err.classList.add('hidden');
+        // NEW: AUTO SESSION CHECKER
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('pageLoader').classList.add('hidden');
             
-            try {
-                const cred = await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-                const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+            if(user) {
+                // User is already signed in! Show Portal Selector without asking password.
+                document.getElementById('loginBox').classList.add('hidden'); 
+                const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if (userDoc.exists()) {
                     const uData = userDoc.data();
-                    // Fallback for old single role, or new array format
                     let accesses = uData.accesses || (uData.role ? [uData.role] : []); 
                     
-                    if(accesses.length === 0) { err.innerText = "No access assigned."; err.classList.remove('hidden'); auth.signOut(); }
-                    else if(accesses.length === 1) { window.location.href = portalMap[accesses[0]].url; } 
-                    else {
-                        // Show Portal Selector
-                        document.getElementById('loginBox').classList.add('hidden');
+                    if(accesses.length === 0) { 
+                        auth.signOut(); document.getElementById('loginBox').classList.remove('hidden');
+                    } else if(accesses.length === 1) { 
+                        window.location.href = portalMap[accesses[0]].url; 
+                    } else {
                         const rb = document.getElementById('portalButtons'); rb.innerHTML = '';
                         accesses.forEach(acc => {
                             if(portalMap[acc]) {
@@ -102,9 +108,27 @@
                         });
                         document.getElementById('roleSelector').classList.remove('hidden');
                     }
-                } else { err.innerText = "User role not found."; err.classList.remove('hidden'); auth.signOut(); }
-            } catch (error) { err.innerText = "Invalid Email or Password!"; err.classList.remove('hidden'); }
-            btn.innerHTML = 'Login';
+                } else { auth.signOut(); document.getElementById('loginBox').classList.remove('hidden'); }
+            } else {
+                // Not signed in, show regular login form
+                document.getElementById('loginBox').classList.remove('hidden');
+                document.getElementById('roleSelector').classList.add('hidden');
+            }
+        });
+
+        // LOGIN FORM SUBMIT
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn'); const err = document.getElementById('errorMsg');
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...'; err.classList.add('hidden');
+            
+            try {
+                // Once this succeeds, the onAuthStateChanged listener above will automatically take over!
+                await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
+            } catch (error) { 
+                err.innerText = "Invalid Email or Password!"; err.classList.remove('hidden'); 
+                btn.innerHTML = 'Login';
+            }
         });
     </script>
 </body>
