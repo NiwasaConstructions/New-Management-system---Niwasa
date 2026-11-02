@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <title>Lorry Cash Migration Tool</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f8fafc; }
+        .box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        button { padding: 15px 30px; font-size: 18px; font-weight: bold; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1d4ed8; }
+        #status { margin-top: 20px; font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2 style="color: #1e3a8a;">Lorry Cash Data Migration</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">මෙමගින් පරණ Database එකේ ඇති Lorry Petty Cash දත්ත සියල්ලම අලුත් සිස්ටම් එක වෙත ස්වයංක්‍රීයව පිටපත් වනු ඇත.</p>
+        
+        <button id="migBtn" onclick="window.startMigration()">Start Migration (දත්ත කොපි කරන්න)</button>
+        <p id="status"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+        // 1. OLD Firebase Config (erp---niwasa-payments)
+        const oldConfig = {
+            apiKey: "AIzaSyCGMzbzofR43a0RfrZxwt_M1--8INcxbxc",
+            authDomain: "erp---niwasa-payments.firebaseapp.com",
+            projectId: "erp---niwasa-payments"
+        };
+
+        // 2. NEW Firebase Config (niwasa-new-labour)
+        const newConfig = {
+            apiKey: "AIzaSyBYG7fHMIe0VHyTQnQKro49fFk95jtjcTM",
+            authDomain: "niwasa-new-labour.firebaseapp.com",
+            projectId: "niwasa-new-labour"
+        };
+
+        // Initialize both apps
+        const oldApp = initializeApp(oldConfig, "OldApp");
+        const newApp = initializeApp(newConfig, "NewApp");
+
+        const oldDb = getFirestore(oldApp);
+        const newDb = getFirestore(newApp);
+
+        window.startMigration = async () => {
+            const btn = document.getElementById('migBtn');
+            const status = document.getElementById('status');
+            btn.disabled = true;
+            btn.innerText = "Migrating... Please wait (කොපි වෙමින් පවතී...)";
+            status.style.color = "#ea580c";
+            status.innerText = "Connecting to Old Database...";
+
+            try {
+                // Get data from old db "lorry_cash" collection
+                const snapshot = await getDocs(collection(oldDb, "lorry_cash"));
+                let count = 0;
+
+                for (const docSnap of snapshot.docs) {
+                    let data = docSnap.data();
+                    
+                    // පරණ සිස්ටම් එකේ සෘණ අගයන් (Negative Values) Expense විදිහටත්, ධන අගයන් Advance විදිහටත් අඳුරගැනීම
+                    let amountVal = parseFloat(data.amount || 0);
+                    let recordType = data.type;
+                    
+                    if(!recordType) {
+                        recordType = amountVal < 0 ? 'EXPENSE' : 'ADVANCE';
+                    }
+
+                    let payload = {
+                        type: recordType,
+                        date: data.date || new Date().toISOString().split('T')[0],
+                        desc: data.desc || data.description || 'Old Record',
+                        amount: Math.abs(amountVal), // Convert to positive number
+                        timestamp: data.timestamp || new Date()
+                    };
+
+                    // Add to new db "pay_lorry" collection
+                    await addDoc(collection(newDb, "pay_lorry"), payload);
+                    count++;
+                    status.innerText = `Migrated ${count} records...`;
+                }
+
+                status.innerHTML = `<span style="color:#16a34a;">Successfully migrated ${count} Lorry Cash records! 🎉</span><br><br><span style="color:#64748b; font-size:14px;">දැන් ඔබට මෙම ෆයිල් එක Close කර සාමාන්‍ය පරිදි admin.html වෙත යා හැක.</span>`;
+            } catch (error) {
+                status.innerHTML = `<span style="color:red;">Error: ${error.message}</span>`;
+            }
+        };
+    </script>
+</body>
+</html>
