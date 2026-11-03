@@ -71,23 +71,12 @@
 
         <div class="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar">
             
-            <!-- Dashboard with Stats -->
-            <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto">
-                <h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-6">Overview Dashboard</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <div class="admin-card border-l-4 border-blue-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-3xl font-black text-blue-900 mt-2" id="statSites">0</p></div>
-                    <div class="admin-card border-l-4 border-green-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Labours Today</h3><p class="text-3xl font-black text-green-700 mt-2" id="statLabours">0</p></div>
-                    <div class="admin-card border-l-4 border-red-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Cost Today (Rs)</h3><p class="text-3xl font-black text-red-600 mt-2" id="statAdvances">0</p></div>
-                    <div class="admin-card border-l-4 border-indigo-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Total Dues (Rs)</h3><p class="text-3xl font-black text-indigo-600 mt-2" id="statDues">0.00</p></div>
-                </div>
-            </div>
+            <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-6">Overview Dashboard</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"><div class="admin-card border-l-4 border-blue-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-3xl font-black text-blue-900 mt-2" id="statSites">0</p></div><div class="admin-card border-l-4 border-green-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Labours Today</h3><p class="text-3xl font-black text-green-700 mt-2" id="statLabours">0</p></div><div class="admin-card border-l-4 border-red-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Cost Today (Rs)</h3><p class="text-3xl font-black text-red-600 mt-2" id="statAdvances">0</p></div><div class="admin-card border-l-4 border-indigo-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Total Dues (Rs)</h3><p class="text-3xl font-black text-indigo-600 mt-2" id="statDues">0.00</p></div></div></div>
 
-            <!-- PAYMENTS & BILLS SECTIONS -->
             <div id="tab-pay_cheques" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800">Cheques Management</h2>
                 </div>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl shadow-sm text-center"><h4 class="text-orange-800 font-bold text-sm uppercase">Total Unrealized</h4><p class="text-2xl font-black text-orange-600 mt-1" id="cqStatUnrealized">Rs. 0.00</p></div>
                     <div class="bg-green-50 border border-green-200 p-4 rounded-xl shadow-sm text-center"><h4 class="text-green-800 font-bold text-sm uppercase">Total Realized</h4><p class="text-2xl font-black text-green-600 mt-1" id="cqStatRealized">Rs. 0.00</p></div>
@@ -105,11 +94,19 @@
                 </div>
             </div>
 
-            <!-- Lorry Petty Cash -->
+            <!-- Lorry Petty Cash (UPDATED WITH MONTH FILTER & BROUGHT FORWARD) -->
             <div id="tab-pay_lorry" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800">Lorry Petty Cash</h2>
                 </div>
+                
+                <!-- NEW: Filter Options -->
+                <div class="flex justify-between items-center mb-6 bg-gray-100 p-4 rounded-xl border border-gray-200">
+                    <label class="font-bold text-gray-700">Filter by Month:</label>
+                    <input type="month" id="lcMonthFilter" class="border border-gray-300 p-2 rounded-lg font-bold text-gray-700 bg-white" onchange="window.loadPayLorry()">
+                    <button onclick="document.getElementById('lcMonthFilter').value=''; window.loadPayLorry()" class="text-sm text-blue-600 font-bold hover:underline">Clear Filter</button>
+                </div>
+
                 <div class="admin-card mb-6 bg-blue-50 border border-blue-200">
                     <form onsubmit="window.addLorryCash(event)" class="flex flex-wrap items-end gap-4">
                         <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Type</label><select id="lcType" class="border p-2 rounded-lg w-full md:w-auto font-bold"><option value="ADVANCE">Advance (+)</option><option value="EXPENSE">Expense (-)</option></select></div>
@@ -154,10 +151,9 @@
     <!-- MODALS SECTION -->
     <div id="modalAddBill" class="modal"><div class="modal-content" style="max-width: 600px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-indigo-900"><i class="fa-solid fa-file-invoice mr-2"></i>Add New Bill</h3><button onclick="window.closeM('modalAddBill')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><form onsubmit="window.addBill(event)" class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-xs font-bold text-gray-500">Select Vendor</label><select id="bVendor" class="w-full border p-2 rounded-lg font-bold text-indigo-900 bg-indigo-50" required><option value="">Select...</option></select></div><div><label class="text-xs font-bold text-gray-500">Date</label><input type="date" id="bDate" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Bill Number</label><input type="text" id="bNumber" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Amount (Rs)</label><input type="number" id="bAmount" class="w-full border p-2 rounded-lg font-bold text-red-600" required></div><div class="md:col-span-2"><label class="text-xs font-bold text-gray-500">Remarks / Items</label><input type="text" id="bRemarks" class="w-full border p-2 rounded-lg" placeholder="e.g. Cement 50 bags, Steel..." required></div></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition mt-4">Save Bill</button></form></div></div>
     
-    <!-- UPDATED: ADD PAYMENT MODAL WITH DESCRIPTION -->
+    <!-- ADD PAYMENT MODAL WITH DESCRIPTION -->
     <div id="modalAddPayment" class="modal"><div class="modal-content" style="max-width: 800px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-green-900"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Make New Payment</h3><button onclick="window.closeM('modalAddPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div><label class="text-xs font-bold text-green-700">1. Select Vendor</label><select id="pVendor" class="w-full border-2 border-green-200 p-2 rounded-lg font-bold text-green-900 bg-green-50" onchange="window.loadVendorBillsForPayment()"><option value="">Select Vendor...</option></select></div><div><label class="text-xs font-bold text-green-700">2. Payment Date</label><input type="date" id="pDate" class="w-full border p-2 rounded-lg" required></div></div><div id="pBillsContainer" class="hidden mb-4 bg-gray-50 p-4 rounded-lg border"><h4 class="font-bold text-sm text-gray-700 mb-2">3. Allocate amounts to Pending Bills</h4><div class="overflow-x-auto max-h-48 custom-scrollbar"><table class="w-full text-sm text-left bg-white"><thead class="bg-gray-200 text-gray-600 text-xs"><tr><th class="p-2 text-center">Select</th><th class="p-2">Bill No</th><th class="p-2 text-right">Due Amt</th><th class="p-2">Pay Amount (Rs)</th></tr></thead><tbody id="pBillsTable"></tbody></table></div><div class="text-right font-black text-green-700 mt-2">Total Allocating: Rs. <span id="pTotalCalc">0.00</span></div></div><form onsubmit="window.processPayment(event)" class="space-y-4 border-t pt-4"><h4 class="font-bold text-sm text-gray-700">4. Payment Details</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         
-        <!-- NEW: DESCRIPTION FIELD -->
         <div class="md:col-span-3">
             <label class="text-xs font-bold text-gray-500">Description / Reason</label>
             <input type="text" id="pDesc" class="w-full border p-2 rounded-lg" placeholder="e.g. Advance payment for cement" required>
@@ -239,7 +235,7 @@
             
             const payPayload = { 
                 payId: "PAY-" + Math.floor(Math.random()*100000), vendorId: vId, date: document.getElementById('pDate').value, 
-                description: document.getElementById('pDesc').value, // NEW DESCRIPTION FIELD
+                description: document.getElementById('pDesc').value, 
                 method: method, totalAmount: totalPay, chequeNo: cqNo, chequeDate: cqDate, chequeStatus: cqStatus, allocations: allocations, timestamp: new Date() 
             }; 
             
@@ -253,11 +249,8 @@
         window.loadPayHistory = async () => { const snap = await getDocs(query(collection(db, "pay_history"), orderBy("timestamp", "desc"))); const tb = document.getElementById('tblPayments'); tb.innerHTML = ''; snap.forEach(d => { const p = d.data(); let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || 'Record'; let methodBadge = p.method.includes('CHEQUE') ? `<span class="text-orange-600 font-bold text-xs"><i class="fa-solid fa-money-check"></i> ${p.method.replace('_', ' ')}</span><br><span class="text-gray-500 text-[10px]">No: ${p.chequeNo}</span>` : `<span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-building-columns"></i> ${p.method.replace('_', ' ')}</span>`; tb.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3">${p.date}</td><td class="p-3 font-bold text-indigo-700">${p.payId}</td><td class="p-3 font-bold">${vName}</td><td class="p-3 text-xs text-gray-500">${p.description || '-'}</td><td class="p-3">${methodBadge}</td><td class="p-3 text-right font-black text-green-700">${parseFloat(p.totalAmount).toLocaleString()}</td><td class="p-3 text-center"><button onclick="window.viewPayment('${d.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-eye"></i></button></td></tr>`; }); if(snap.empty) tb.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">No Payments Recorded</td></tr>`; };
         window.viewPayment = async (id) => { const docRef = doc(db, "pay_history", id); const snap = await getDoc(docRef); if(!snap.exists()) return; const p = snap.data(); document.getElementById('vPayId').innerText = p.payId; document.getElementById('vPayDate').innerText = p.date; document.getElementById('vPayMethod').innerText = p.method.replace('_', ' '); document.getElementById('vPayTotal').innerText = "Rs. " + p.totalAmount.toLocaleString(); document.getElementById('vPayDesc').innerText = p.description || 'N/A'; const cqDiv = document.getElementById('vPayChequeDiv'); if(p.method.includes('CHEQUE')) { cqDiv.classList.remove('hidden'); cqDiv.innerHTML = `Cheque No: ${p.chequeNo} | Date: ${p.chequeDate} | Status: ${p.chequeStatus}`; } else { cqDiv.classList.add('hidden'); } const atb = document.getElementById('vPayAllocations'); atb.innerHTML = ''; if(p.allocations && p.allocations.length > 0) { p.allocations.forEach(a => { let bill = allBills.find(b => b.id === a.billId); let bTxt = bill ? `${bill.billNo} <span class="text-gray-500 font-normal">(${bill.remarks})</span>` : a.billId; atb.innerHTML += `<tr class="border-b"><td class="p-2 font-bold text-xs">${bTxt}</td><td class="p-2 text-right font-bold text-green-600">${a.amount.toLocaleString()}</td></tr>`; }); } else { atb.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-gray-500">Bulk Upload - No Bills Allocated</td></tr>`; } window.openM('modalViewPayment'); };
 
-        // UPDATED: LOAD CHEQUES WITH NO INDEX ERROR AND AUTO-REALIZE LOGIC
         window.loadPayCheques = async () => { 
             const filterVal = document.getElementById('cqFilter').value; 
-            
-            // Fetch ALL payments, bypass index requirements
             const snap = await getDocs(query(collection(db, "pay_history"))); 
             let cheques = [];
             snap.forEach(d => {
@@ -267,27 +260,19 @@
                     cheques.push(p);
                 }
             });
-
-            // Sort by chequeDate asc in JS
             cheques.sort((a,b) => new Date(a.chequeDate) - new Date(b.chequeDate));
 
             const tb = document.getElementById('tblCheques'); tb.innerHTML = ''; 
             let cqUnrealized = 0; let cqRealized = 0; 
-            
             const todayDate = new Date().toISOString().split('T')[0];
 
             for(let p of cheques) { 
-                
-                // AUTO REALIZE LOGIC
                 if(p.chequeStatus === 'PENDING' && p.chequeDate <= todayDate) {
                     p.chequeStatus = 'REALIZED';
-                    // Update in background
                     updateDoc(doc(db, "pay_history", p.id), { chequeStatus: 'REALIZED' });
                 }
-
                 if(p.chequeStatus === 'PENDING') cqUnrealized += parseFloat(p.totalAmount); 
                 if(p.chequeStatus === 'REALIZED') cqRealized += parseFloat(p.totalAmount); 
-                
                 if (filterVal === 'PENDING' && p.chequeStatus !== 'PENDING') continue; 
                 if (filterVal === 'REALIZED' && p.chequeStatus !== 'REALIZED') continue; 
                 
@@ -304,7 +289,48 @@
         };
         window.markChequeRealized = async (id) => { if(confirm("Mark this cheque as realized?")) { await updateDoc(doc(db, "pay_history", id), { chequeStatus: 'REALIZED' }); window.loadPayCheques(); window.calculateAnalytics(); } };
 
-        window.loadPayLorry = async () => { const snap = await getDocs(query(collection(db, "pay_lorry"), orderBy("date", "desc"))); const tb = document.getElementById('tblLorry'); tb.innerHTML = ''; let bal = 0; let records = []; snap.forEach(d => { let r = d.data(); r.id = d.id; records.push(r); }); records.sort((a,b) => new Date(a.date) - new Date(b.date)); records.forEach(r => { if(r.type === 'ADVANCE') bal += parseFloat(r.amount); else bal -= parseFloat(r.amount); r.runBal = bal; }); records.reverse(); records.forEach(r => { let adv = r.type === 'ADVANCE' ? r.amount.toLocaleString() : '-'; let exp = r.type === 'EXPENSE' ? r.amount.toLocaleString() : '-'; tb.innerHTML += `<tr class="border-b hover:bg-blue-50"><td class="p-3">${r.date}</td><td class="p-3 font-bold">${r.desc}</td><td class="p-3 text-right font-bold text-green-600">${adv}</td><td class="p-3 text-right font-bold text-red-600">${exp}</td><td class="p-3 text-right font-black text-blue-800 bg-blue-100">${r.runBal.toLocaleString()}</td><td class="p-3 text-center"><button onclick="window.delLorry('${r.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); if(records.length===0) tb.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">No Lorry Records Found</td></tr>`; };
+        // LORRY PETTY CASH (WITH MONTH FILTER & BROUGHT FORWARD)
+        window.loadPayLorry = async () => { 
+            const filterMonth = document.getElementById('lcMonthFilter')?.value; 
+            const snap = await getDocs(query(collection(db, "pay_lorry"))); 
+            const tb = document.getElementById('tblLorry'); tb.innerHTML = ''; 
+            
+            let records = []; 
+            snap.forEach(d => { let r = d.data(); r.id = d.id; records.push(r); }); 
+            
+            // Sort to ensure precise order of calculation
+            records.sort((a,b) => {
+                let dDiff = new Date(a.date) - new Date(b.date);
+                if (dDiff === 0 && a.timestamp && b.timestamp) return a.timestamp.seconds - b.timestamp.seconds;
+                return dDiff;
+            });
+            
+            let bal = 0; let broughtForward = 0; let displayRecords = [];
+
+            records.forEach(r => { 
+                if(r.type === 'ADVANCE') bal += parseFloat(r.amount); else bal -= parseFloat(r.amount); 
+                r.runBal = bal; 
+                
+                if (filterMonth) {
+                    if (r.date.startsWith(filterMonth)) displayRecords.push(r);
+                    else if (r.date < filterMonth) broughtForward = bal;
+                } else {
+                    displayRecords.push(r);
+                }
+            }); 
+            
+            displayRecords.reverse(); 
+            displayRecords.forEach(r => { 
+                let adv = r.type === 'ADVANCE' ? r.amount.toLocaleString() : '-'; 
+                let exp = r.type === 'EXPENSE' ? r.amount.toLocaleString() : '-'; 
+                tb.innerHTML += `<tr class="border-b hover:bg-blue-50"><td class="p-3">${r.date}</td><td class="p-3 font-bold">${r.desc}</td><td class="p-3 text-right font-bold text-green-600">${adv}</td><td class="p-3 text-right font-bold text-red-600">${exp}</td><td class="p-3 text-right font-black text-blue-800 bg-blue-100">${r.runBal.toLocaleString()}</td><td class="p-3 text-center"><button onclick="window.delLorry('${r.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`; 
+            }); 
+
+            if (filterMonth && displayRecords.length > 0) {
+                tb.innerHTML += `<tr class="border-b bg-gray-200"><td class="p-3 font-bold" colspan="4">Brought Forward (පෙර ශේෂය)</td><td class="p-3 text-right font-black text-gray-800">${broughtForward.toLocaleString()}</td><td></td></tr>`;
+            }
+            if(displayRecords.length === 0) tb.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">No Lorry Records Found for this period</td></tr>`; 
+        };
         window.addLorryCash = async (e) => { e.preventDefault(); const payload = { type: document.getElementById('lcType').value, date: document.getElementById('lcDate').value, desc: document.getElementById('lcDesc').value, amount: parseFloat(document.getElementById('lcAmount').value), timestamp: new Date() }; try { await addDoc(collection(db, "pay_lorry"), payload); e.target.reset(); document.getElementById('lcDate').value = new Date().toISOString().split('T')[0]; window.loadPayLorry(); } catch(err) { alert(err.message); } };
         window.delLorry = async (id) => { if(confirm("Delete Lorry Record?")) { await deleteDoc(doc(db, "pay_lorry", id)); window.loadPayLorry(); } };
 
