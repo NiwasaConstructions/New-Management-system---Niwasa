@@ -6,25 +6,26 @@
     <title>Supervisor App - Niwasa ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <style>
         .tab-content { display: none; } .tab-content.active { display: block; }
         .app-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .input-mobile { width: 100%; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; font-size: 16px; background-color: #f9fafb; outline: none; transition: border-color 0.2s; }
+        .input-mobile { width: 100%; border: 1px solid #d1d5db; border-radius: 12px; padding: 12px; font-size: 15px; background-color: #f9fafb; outline: none; transition: border-color 0.2s; }
+        .input-mobile:focus { border-color: #2563eb; background-color: #fff; }
         .btn-mobile { width: 100%; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .list-card { background: #f3f4f6; border-radius: 10px; padding: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fff; margin: 10% auto; padding: 25px; border-radius: 20px; width: 92%; max-width: 500px; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #fff; margin: 6% auto; padding: 22px; border-radius: 20px; width: 92%; max-width: 480px; max-height: 88vh; overflow-y: auto; }
     </style>
 </head>
-<body class="bg-slate-50 pb-20">
+<body class="bg-slate-50 pb-24">
 
+    <!-- Top Header -->
     <div class="bg-blue-900 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
         <div><h1 class="text-xl font-bold">Niwasa DPR</h1><p class="text-blue-200 text-xs" id="supInfo">Loading...</p></div>
         <div class="flex gap-4">
             <button onclick="window.openM('modalChangePass')" class="text-blue-200 hover:text-white text-lg transition" title="Change Password"><i class="fa-solid fa-key"></i></button>
             <button onclick="window.location.href='index.html'" class="text-blue-200 hover:text-white text-lg transition" title="Switch Portal"><i class="fa-solid fa-shuffle"></i></button>
-            <button onclick="logout()" class="text-red-300 hover:text-red-100 text-xl"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button onclick="window.logout()" class="text-red-300 hover:text-red-100 text-xl"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
     </div>
 
@@ -39,19 +40,22 @@
             </div>
         </div>
         
-        <!-- ENTRY TAB -->
+        <!-- 1. ENTRY TAB -->
         <div id="tab-entry" class="tab-content active">
-            <div class="flex justify-between items-center mb-4"><span id="statusBadge" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">New</span><button onclick="checkDraft()" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i> Check Draft</button></div>
+            <div class="flex justify-between items-center mb-4">
+                <span id="statusBadge" class="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">New</span>
+                <button onclick="window.checkDraft()" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-full"><i class="fa-solid fa-rotate mr-1"></i> Check Draft</button>
+            </div>
             
             <form id="dprForm">
                 <input type="hidden" id="currentDocId" value="">
                 <div class="app-card border-t-4 border-blue-500">
                     <h3 class="font-bold text-gray-800 mb-4 text-lg"><i class="fa-solid fa-clipboard-list text-blue-500 mr-2"></i>General Info</h3>
                     <div class="space-y-4">
-                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" id="date" class="input-mobile font-bold" required onchange="checkDraft()"></div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Select Site</label><select id="siteId" class="input-mobile font-bold text-blue-800 bg-blue-50" required onchange="checkDraft()"><option value="">Loading...</option></select></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Date</label><input type="date" id="date" class="input-mobile font-bold" required onchange="window.checkDraft()"></div>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Select Site</label><select id="siteId" class="input-mobile font-bold text-blue-800 bg-blue-50" required onchange="window.checkDraft()"><option value="">Loading...</option></select></div>
                         
-                        <!-- NEW: SITE CLOSED OPTION -->
+                        <!-- SITE CLOSED OPTION -->
                         <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
                             <label class="flex items-center gap-3 font-bold text-red-700 cursor-pointer">
                                 <input type="checkbox" id="siteClosedCb" class="w-5 h-5 accent-red-600" onchange="window.toggleSiteClosed()">
@@ -64,7 +68,6 @@
 
                         <div><label class="text-xs font-bold text-gray-500 uppercase ml-1">Weather</label><select id="weather" class="input-mobile font-bold text-orange-700 bg-orange-50"><option>Sunny</option><option>Cloudy</option><option>Light Shower</option><option>Heavy Rain</option></select></div>
                         
-                        <!-- NEW: SPECIAL NOTES -->
                         <div>
                             <label class="text-xs font-bold text-gray-500 uppercase ml-1">Special Notes (විශේෂ සටහන්)</label>
                             <textarea id="generalNotes" class="input-mobile" rows="2" placeholder="අද දවස ගැන මොනවා හරි සටහනක් තියෙනම් මෙතන ලියන්න..."></textarea>
@@ -72,61 +75,223 @@
                     </div>
                 </div>
 
-                <!-- WORK SECTIONS (Will be hidden if Site is Closed) -->
+                <!-- WORK SECTIONS -->
                 <div id="workSections">
                     <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Add Progress Records</h3>
                     <div class="grid grid-cols-2 gap-3 mb-6">
-                        <button type="button" onclick="openWorkerModal()" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Labour</button>
-                        <button type="button" onclick="openM('modalMeasure')" class="bg-white border-2 border-teal-100 text-teal-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-teal-50"><i class="fa-solid fa-ruler-combined text-2xl"></i> Measurement</button>
-                        <button type="button" onclick="openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
-                        <button type="button" onclick="openM('modalDelay')" class="bg-white border-2 border-orange-100 text-orange-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-orange-50"><i class="fa-solid fa-cloud-rain text-2xl"></i> Add Delay</button>
-                        <button type="button" onclick="openM('modalVisit')" class="bg-white border-2 border-purple-100 text-purple-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-purple-50 col-span-2"><i class="fa-solid fa-users text-2xl"></i> Visitor & Notes</button>
+                        <button type="button" onclick="window.openWorkerModal()" class="bg-white border-2 border-blue-100 text-blue-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50"><i class="fa-solid fa-helmet-safety text-2xl"></i> Add Labour</button>
+                        <button type="button" onclick="window.openM('modalMeasure')" class="bg-white border-2 border-teal-100 text-teal-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-teal-50"><i class="fa-solid fa-ruler-combined text-2xl"></i> Measurement</button>
+                        <button type="button" onclick="window.openM('modalSupSub')" class="bg-white border-2 border-green-100 text-green-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-green-50"><i class="fa-solid fa-truck-fast text-2xl"></i> Material/Sub</button>
+                        <button type="button" onclick="window.openM('modalDelay')" class="bg-white border-2 border-orange-100 text-orange-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-orange-50"><i class="fa-solid fa-cloud-rain text-2xl"></i> Add Delay</button>
+                        <button type="button" onclick="window.openM('modalVisit')" class="bg-white border-2 border-purple-100 text-purple-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-purple-50"><i class="fa-solid fa-users text-2xl"></i> Visitor & Notes</button>
+                        <button type="button" onclick="window.switchTab('machinery')" class="bg-white border-2 border-amber-200 text-amber-700 p-4 rounded-xl font-bold shadow-sm flex flex-col items-center gap-2 hover:bg-amber-50"><i class="fa-solid fa-screwdriver-wrench text-2xl"></i> Machinery</button>
                     </div>
 
-                    <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Upload Evidence</h3>
+                    <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Upload Evidence <span id="uploadSpin" class="hidden text-blue-600 text-xs ml-2"><i class="fa-solid fa-spinner fa-spin"></i> Uploading...</span></h3>
                     <div class="grid grid-cols-2 gap-3 mb-6">
-                        <button type="button" id="btnUploadPhoto" class="bg-indigo-50 border-2 border-indigo-200 text-indigo-700 p-3 rounded-xl font-bold shadow-sm flex flex-col items-center gap-1 hover:bg-indigo-100"><i class="fa-solid fa-camera text-xl"></i> Site Photos</button>
-                        <button type="button" id="btnUploadBill" class="bg-pink-50 border-2 border-pink-200 text-pink-700 p-3 rounded-xl font-bold shadow-sm flex flex-col items-center gap-1 hover:bg-pink-100"><i class="fa-solid fa-receipt text-xl"></i> Upload Bills</button>
+                        <button type="button" onclick="document.getElementById('filePhotoSup').click()" class="bg-indigo-50 border-2 border-indigo-200 text-indigo-700 p-3 rounded-xl font-bold shadow-sm flex flex-col items-center gap-1 hover:bg-indigo-100"><i class="fa-solid fa-camera text-xl"></i> Site Photos</button>
+                        <button type="button" onclick="document.getElementById('fileBillSup').click()" class="bg-pink-50 border-2 border-pink-200 text-pink-700 p-3 rounded-xl font-bold shadow-sm flex flex-col items-center gap-1 hover:bg-pink-100"><i class="fa-solid fa-receipt text-xl"></i> Upload Bills</button>
+                        <input type="file" id="filePhotoSup" accept="image/*" multiple class="hidden" onchange="window.handleImageSelect(event, 'photos')">
+                        <input type="file" id="fileBillSup" accept="image/*" multiple class="hidden" onchange="window.handleImageSelect(event, 'bills')">
                     </div>
 
                     <div id="previewArea" class="space-y-4 mb-6">
-                        <div id="list-photos" class="flex gap-2 overflow-x-auto"></div><div id="list-bills" class="flex gap-2 overflow-x-auto"></div>
-                        <div id="list-workers"></div><div id="list-delays"></div><div id="list-measures"></div><div id="list-supsubs"></div><div id="list-visits"></div>
+                        <div id="list-photos" class="flex gap-2 overflow-x-auto"></div>
+                        <div id="list-bills" class="flex gap-2 overflow-x-auto"></div>
+                        <div id="list-workers"></div>
+                        <div id="list-delays"></div>
+                        <div id="list-measures"></div>
+                        <div id="list-supsubs"></div>
+                        <div id="list-visits"></div>
                     </div>
                 </div>
 
                 <input type="hidden" id="prepBy">
-                <div class="flex gap-3 mt-8"><button type="button" onclick="saveRecord('Draft')" class="btn-mobile bg-gray-200 text-gray-800 flex-1"><i class="fa-solid fa-floppy-disk"></i> Draft</button><button type="button" onclick="saveRecord('Pending Approval')" class="btn-mobile bg-blue-600 text-white flex-1 shadow-lg shadow-blue-500/30"><i class="fa-solid fa-paper-plane"></i> Submit</button></div>
+                <div class="flex gap-3 mt-8">
+                    <button type="button" onclick="window.saveRecord('Draft')" class="btn-mobile bg-gray-200 text-gray-800 flex-1"><i class="fa-solid fa-floppy-disk"></i> Draft</button>
+                    <button type="button" onclick="window.saveRecord('Pending Approval')" class="btn-mobile bg-blue-600 text-white flex-1 shadow-lg shadow-blue-500/30"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+                </div>
             </form>
         </div>
 
+        <!-- 2. MACHINERY TAB (NEW) -->
+        <div id="tab-machinery" class="tab-content">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-screwdriver-wrench text-amber-600 mr-2"></i>Site Machinery</h2>
+                <button onclick="window.openM('modalAddMachinerySup')" class="bg-amber-600 text-white px-3 py-2 rounded-xl text-xs font-bold shadow">+ Add Item</button>
+            </div>
+            <div class="mb-4">
+                <select id="supMachFilter" class="input-mobile font-bold text-blue-900 bg-blue-50" onchange="window.supLoadMachinery()">
+                    <option value="ALL">All Locations (සියලුම ස්ථාන)</option>
+                </select>
+            </div>
+            <div id="supMachineryList" class="space-y-3 pb-4">
+                <p class="text-center text-gray-400 mt-8">Loading machinery...</p>
+            </div>
+        </div>
+
+        <!-- 3. LABOURS TAB -->
         <div id="tab-labours" class="tab-content">
             <h2 class="text-xl font-bold mb-4 px-2 text-gray-800">Register New Labour</h2>
-            <div class="app-card border-t-4 border-orange-500"><form onsubmit="window.supAddLabour(event)" class="space-y-4"><div><label class="text-xs font-bold text-gray-500">Full Name</label><input type="text" id="lName" class="input-mobile font-bold" required></div><div><label class="text-xs font-bold text-gray-500">Role (SK/USK)</label><select id="lType" class="input-mobile font-bold"><option value="SK">Skilled (SK - Baas)</option><option value="USK">Unskilled (USK - Helper)</option></select></div><div><label class="text-xs font-bold text-gray-500">Daily Wage (Rs.)</label><input type="number" id="lWage" class="input-mobile font-bold text-green-700" required></div><div><label class="text-xs font-bold text-gray-500">OT Rate per Hour (Rs.)</label><input type="number" id="lOTRate" class="input-mobile font-bold text-blue-700" required></div><button type="submit" class="btn-mobile bg-orange-500 text-white mt-4">Save to Database</button></form></div><h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Registered Labours</h3><div id="supLabourList" class="space-y-3 pb-4"></div>
+            <div class="app-card border-t-4 border-orange-500">
+                <form onsubmit="window.supAddLabour(event)" class="space-y-4">
+                    <div><label class="text-xs font-bold text-gray-500">Full Name</label><input type="text" id="lName" class="input-mobile font-bold" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">Role (SK/USK)</label><select id="lType" class="input-mobile font-bold"><option value="SK">Skilled (SK - Baas)</option><option value="USK">Unskilled (USK - Helper)</option></select></div>
+                    <div><label class="text-xs font-bold text-gray-500">Daily Wage (Rs.)</label><input type="number" id="lWage" class="input-mobile font-bold text-green-700" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">OT Rate per Hour (Rs.)</label><input type="number" id="lOTRate" class="input-mobile font-bold text-blue-700" required></div>
+                    <button type="submit" class="btn-mobile bg-orange-500 text-white mt-4">Save to Database</button>
+                </form>
+            </div>
+            <h3 class="font-bold text-gray-600 mb-2 mt-6 px-2 uppercase text-sm tracking-wider">Registered Labours</h3>
+            <div id="supLabourList" class="space-y-3 pb-4"></div>
         </div>
         
-        <div id="tab-history" class="tab-content"><h2 class="text-xl font-bold mb-4 px-2">History & Edits</h2><div id="historyList" class="space-y-3"><p class="text-center text-gray-400 mt-10">Loading...</p></div></div>
+        <!-- 4. HISTORY TAB -->
+        <div id="tab-history" class="tab-content">
+            <h2 class="text-xl font-bold mb-4 px-2">History & Edits</h2>
+            <div id="historyList" class="space-y-3"><p class="text-center text-gray-400 mt-10">Loading...</p></div>
+        </div>
     </div>
 
     <!-- Bottom Nav -->
     <div class="fixed bottom-0 left-0 w-full bg-white border-t flex justify-around p-3 pb-safe z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <button onclick="switchTab('entry')" id="nav-entry" class="nav-btn text-blue-600 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-pen-to-square text-xl"></i> Entry</button>
-        <button onclick="switchTab('labours')" id="nav-labours" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-users text-xl"></i> Labours</button>
-        <button onclick="switchTab('history')" id="nav-history" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-clock-rotate-left text-xl"></i> History</button>
+        <button onclick="window.switchTab('entry')" id="nav-entry" class="nav-btn text-blue-600 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-pen-to-square text-xl"></i> Entry</button>
+        <button onclick="window.switchTab('machinery')" id="nav-machinery" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-screwdriver-wrench text-xl"></i> Machinery</button>
+        <button onclick="window.switchTab('labours')" id="nav-labours" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-users text-xl"></i> Labours</button>
+        <button onclick="window.switchTab('history')" id="nav-history" class="nav-btn text-gray-400 flex flex-col items-center font-bold text-xs gap-1"><i class="fa-solid fa-clock-rotate-left text-xl"></i> History</button>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODALS -->
+    <!-- ========================================== -->
+
+    <!-- ADD LABOUR TO DPR MODAL (UPDATED WITH MANDATORY WORK DONE & MOBILE FIX) -->
+    <div id="modalWorker" class="modal">
+        <div class="modal-content">
+            <h3 class="font-bold text-xl mb-4 text-blue-800"><i class="fa-solid fa-helmet-safety mr-2"></i>Add Labour & Work</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Select Labour *</label>
+                    <select id="wNameSelect" class="input-mobile font-bold text-blue-900 bg-blue-50" onchange="window.autoFillLabourType()">
+                        <option value="">Select Labour...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase ml-1">Role</label>
+                        <input type="text" id="wType" class="input-mobile bg-gray-100 font-bold" placeholder="Type" readonly>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase ml-1">OT Hours</label>
+                        <input type="number" id="wOT" class="input-mobile" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- MANDATORY WORK DONE FIELD -->
+                <div>
+                    <label class="text-xs font-bold text-blue-800 uppercase ml-1">අද දින කළ වැඩ (Work Done Today) *</label>
+                    <textarea id="wWork" class="input-mobile border-blue-300 bg-blue-50/40 font-semibold" rows="2" placeholder="උදා: පළමු මහලේ කපරාරු කිරීම / කොන්ක්‍රීට් දැමීම..." required></textarea>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Advance Rs (Optional)</label>
+                    <input type="number" id="wAdv" class="input-mobile" placeholder="Advance Rs">
+                </div>
+
+                <!-- MOBILE-FRIENDLY EARLY LEAVE / TRANSFER SECTION -->
+                <div class="border-t pt-3 mt-2">
+                    <label class="text-xs font-bold text-red-600 uppercase ml-1 block mb-1">Status (කලින් ගියාද / Transfer කළාද?)</label>
+                    <select id="wReasonType" class="input-mobile font-bold text-gray-800" onchange="window.toggleTransferSite()">
+                        <option value="None">None (Full Day - සම්පූර්ණ දවස)</option>
+                        <option value="Left Early">Left Early (කලින් ගියා)</option>
+                        <option value="Transferred">Transferred (වෙන තැනකට මාරු කළා)</option>
+                    </select>
+
+                    <!-- Hidden by default when "None" is selected; stacks cleanly on mobile -->
+                    <div id="earlyTransferBox" class="hidden space-y-3 mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+                        <div>
+                            <label class="text-xs font-bold text-red-700 uppercase block mb-1">ගිය වෙලාව (Time) *</label>
+                            <input type="time" id="wLeaveTime" class="input-mobile bg-white border-red-300 font-bold">
+                        </div>
+                        <div id="wRemTextWrap">
+                            <label class="text-xs font-bold text-red-700 uppercase block mb-1">කලින් යාමට හේතුව (Reason) *</label>
+                            <input type="text" id="wRemText" class="input-mobile bg-white border-red-300" placeholder="උදා: අසනීප වීම නිසා...">
+                        </div>
+                        <div id="wRemSiteWrap" class="hidden">
+                            <label class="text-xs font-bold text-blue-800 uppercase block mb-1">මාරු කළ ස්ථානය (Transfer To) *</label>
+                            <select id="wRemSite" class="input-mobile bg-white border-blue-300 font-bold text-blue-900"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-3">
+                    <button type="button" onclick="window.closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button>
+                    <button type="button" onclick="window.saveWorkerData()" class="btn-mobile bg-blue-600 text-white flex-1">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MACHINERY MODAL (SUPERVISOR) -->
+    <div id="modalAddMachinerySup" class="modal">
+        <div class="modal-content">
+            <h3 class="font-bold text-xl mb-4 text-amber-800"><i class="fa-solid fa-screwdriver-wrench mr-2"></i>Add Machinery / Tool</h3>
+            <form onsubmit="window.supAddMachinery(event)" class="space-y-3">
+                <div><label class="text-xs font-bold text-gray-500">Item Name *</label><input type="text" id="smName" class="input-mobile font-bold" placeholder="e.g. Concrete Mixer / Hilti Drill" required></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="text-xs font-bold text-gray-500">Code / ID</label><input type="text" id="smCode" class="input-mobile" placeholder="e.g. MC-01"></div>
+                    <div><label class="text-xs font-bold text-gray-500">Quantity *</label><input type="number" id="smQty" class="input-mobile font-bold" value="1" min="1" required></div>
+                </div>
+                <div><label class="text-xs font-bold text-gray-500">Current Site / Location *</label><select id="smSite" class="input-mobile font-bold text-blue-900 bg-blue-50" required></select></div>
+                <div><label class="text-xs font-bold text-gray-500">Condition</label><select id="smStatus" class="input-mobile font-bold"><option value="Working">Working (හොඳ තත්ත්වයේ)</option><option value="Repair">Under Repair (අලුත්වැඩියාවේ)</option></select></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="window.closeM('modalAddMachinerySup')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button>
+                    <button type="submit" class="btn-mobile bg-amber-600 text-white flex-1">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TRANSFER MACHINERY MODAL (SUPERVISOR) -->
+    <div id="modalTransferMachSup" class="modal">
+        <div class="modal-content">
+            <h3 class="font-bold text-xl mb-2 text-indigo-900"><i class="fa-solid fa-right-left mr-2"></i>Transfer Machinery</h3>
+            <p class="text-sm font-bold text-amber-700 mb-4" id="stmItemTitle"></p>
+            <form onsubmit="window.supConfirmTransferMach(event)" class="space-y-3">
+                <input type="hidden" id="stmDocId">
+                <input type="hidden" id="stmFromSite">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Transfer To (යවන ස්ථානය) *</label>
+                    <select id="stmToSite" class="input-mobile font-bold text-indigo-900 bg-indigo-50" required></select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Date *</label>
+                    <input type="date" id="stmDate" class="input-mobile font-bold" required>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Note / Reason</label>
+                    <input type="text" id="stmNote" class="input-mobile" placeholder="උදා: වැඩ අවසන් වූ නිසා ඔෆිස් එකට යැවීම">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="window.closeM('modalTransferMachSup')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button>
+                    <button type="submit" class="btn-mobile bg-indigo-600 text-white flex-1">Transfer</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- CHANGE PASSWORD MODAL -->
     <div id="modalChangePass" class="modal"><div class="modal-content" style="max-width: 400px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-blue-900"><i class="fa-solid fa-key mr-2"></i>Change Password</h3><button onclick="window.closeM('modalChangePass')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><form onsubmit="window.updateUserPass(event)" class="space-y-4"><div><label class="text-xs font-bold text-gray-500 uppercase">Current Password</label><input type="password" id="cpCurrent" class="input-mobile" required></div><div><label class="text-xs font-bold text-gray-500 uppercase">New Password</label><input type="password" id="cpNew" class="input-mobile" required minlength="6"></div><div><label class="text-xs font-bold text-gray-500 uppercase">Confirm New Password</label><input type="password" id="cpConfirm" class="input-mobile" required minlength="6"></div><button type="submit" id="btnUpdatePass" class="btn-mobile bg-blue-600 text-white mt-4">Update Password</button></form></div></div>
 
     <!-- DUTY REASON MODAL -->
-    <div id="modalDutyReason" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-2 text-indigo-800" id="dutyModalTitle">Reason Required</h3><p class="text-sm text-gray-500 mb-4" id="dutyModalDesc">Please provide a reason.</p><div class="space-y-3"><textarea id="dutyReasonText" class="input-mobile" rows="3" placeholder="e.g. Traffic, Rain, Sick..."></textarea><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalDutyReason')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button><button type="button" id="btnSaveDutyReason" class="btn-mobile bg-indigo-600 text-white flex-1">Submit & Save</button></div></div></div></div>
+    <div id="modalDutyReason" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-2 text-indigo-800" id="dutyModalTitle">Reason Required</h3><p class="text-sm text-gray-500 mb-4" id="dutyModalDesc">Please provide a reason.</p><div class="space-y-3"><textarea id="dutyReasonText" class="input-mobile" rows="3" placeholder="e.g. Traffic, Rain, Sick..."></textarea><div class="flex gap-2 mt-4"><button type="button" onclick="window.closeM('modalDutyReason')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button><button type="button" id="btnSaveDutyReason" class="btn-mobile bg-indigo-600 text-white flex-1">Submit & Save</button></div></div></div></div>
 
     <!-- General Modals -->
-    <div id="modalWorker" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-blue-800">Add Labour</h3><div class="space-y-3"><select id="wNameSelect" class="input-mobile font-bold text-blue-900 bg-blue-50" onchange="autoFillLabourType()"><option value="">Select Labour...</option></select><div class="flex gap-2"><input type="text" id="wType" class="input-mobile bg-gray-100" placeholder="Type" readonly><input type="number" id="wOT" class="input-mobile" placeholder="OT Hrs"></div><input type="number" id="wAdv" class="input-mobile" placeholder="Advance Rs (Optional)"><div class="border-t pt-3 mt-2"><label class="text-xs font-bold text-red-500 uppercase ml-1">If Left Early / Transferred</label><select id="wReasonType" class="input-mobile mt-1 font-bold text-gray-700" onchange="toggleTransferSite()"><option value="None">None (Full Day)</option><option value="Left Early">Left Early</option><option value="Transferred">Transferred</option></select><div class="flex gap-2 mt-2"><input type="time" id="wLeaveTime" class="input-mobile" title="Time"><input type="text" id="wRemText" class="input-mobile flex-1" placeholder="Note"><select id="wRemSite" class="input-mobile flex-1 hidden font-bold text-blue-800 bg-blue-50"></select></div></div><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalWorker')" class="btn-mobile bg-gray-200 text-gray-800 flex-1">Cancel</button><button type="button" onclick="saveWorkerData()" class="btn-mobile bg-blue-600 text-white flex-1">Save</button></div></div></div></div>
-    <div id="modalDelay" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-orange-800">Add Delay</h3><div class="space-y-3"><div class="flex gap-2 items-center"><input type="time" id="dFrom" class="input-mobile"><input type="time" id="dTo" class="input-mobile"></div><input type="text" id="dReason" class="input-mobile" placeholder="Reason"><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalDelay')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('delays',['dFrom','dTo','dReason'],['f','t','r'], 'modalDelay')" class="btn-mobile bg-orange-600 text-white">Save</button></div></div></div></div>
-    <div id="modalMeasure" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-teal-800">Add Measurement</h3><div class="space-y-3"><textarea id="mDesc" class="input-mobile" rows="2" placeholder="Work Description"></textarea><input type="text" id="mUnit" class="input-mobile" placeholder="Qty / Unit"><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalMeasure')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('measures',['mDesc','mUnit'],['d','u'], 'modalMeasure')" class="btn-mobile bg-teal-600 text-white">Save</button></div></div></div></div>
-    <div id="modalSupSub" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-green-800">Material / Sub-Contractor</h3><div class="space-y-3"><select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name'; document.getElementById('ssProv').placeholder = this.value==='sup'?'Supplier Name':'Team / Person Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select><input type="text" id="ssName" class="input-mobile" placeholder="Material Name"><div class="flex gap-2"><input type="text" id="ssQty" class="input-mobile" placeholder="Qty"><input type="text" id="ssProv" class="input-mobile" placeholder="Supplier Name"></div><input type="number" id="ssPrice" class="input-mobile" placeholder="Price Rs (Opt)"><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalSupSub')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="saveSupSub()" class="btn-mobile bg-green-600 text-white">Save</button></div></div></div></div>
-    <div id="modalVisit" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-purple-800">Visitor & Notes</h3><div class="space-y-3"><select id="vName" class="input-mobile font-bold"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select><input type="time" id="vTime" class="input-mobile"><textarea id="vNote" class="input-mobile" rows="2" placeholder="Notes"></textarea><div class="flex gap-2 mt-4"><button type="button" onclick="closeM('modalVisit')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="addM('visits',['vName','vNote','vTime'],['n','no','t'], 'modalVisit')" class="btn-mobile bg-purple-600 text-white">Save</button></div></div></div></div>
+    <div id="modalDelay" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-orange-800">Add Delay</h3><div class="space-y-3"><div class="grid grid-cols-2 gap-2"><div><label class="text-xs font-bold text-gray-500">From</label><input type="time" id="dFrom" class="input-mobile"></div><div><label class="text-xs font-bold text-gray-500">To</label><input type="time" id="dTo" class="input-mobile"></div></div><input type="text" id="dReason" class="input-mobile" placeholder="Reason"><div class="flex gap-2 mt-4"><button type="button" onclick="window.closeM('modalDelay')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="window.addM('delays',['dFrom','dTo','dReason'],['f','t','r'], 'modalDelay')" class="btn-mobile bg-orange-600 text-white">Save</button></div></div></div></div>
+    <div id="modalMeasure" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-teal-800">Add Measurement</h3><div class="space-y-3"><textarea id="mDesc" class="input-mobile" rows="2" placeholder="Work Description"></textarea><input type="text" id="mUnit" class="input-mobile" placeholder="Qty / Unit"><div class="flex gap-2 mt-4"><button type="button" onclick="window.closeM('modalMeasure')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="window.addM('measures',['mDesc','mUnit'],['d','u'], 'modalMeasure')" class="btn-mobile bg-teal-600 text-white">Save</button></div></div></div></div>
+    <div id="modalSupSub" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-green-800">Material / Sub-Contractor</h3><div class="space-y-3"><select id="ssType" class="input-mobile text-blue-800 font-bold" onchange="document.getElementById('ssName').placeholder = this.value==='sup'?'Material Name':'Task Name'; document.getElementById('ssProv').placeholder = this.value==='sup'?'Supplier Name':'Team / Person Name';"><option value="sup">1. Supplier Material</option><option value="sub">2. Sub-Contractor</option></select><input type="text" id="ssName" class="input-mobile" placeholder="Material Name"><div class="grid grid-cols-2 gap-2"><input type="text" id="ssQty" class="input-mobile" placeholder="Qty"><input type="text" id="ssProv" class="input-mobile" placeholder="Supplier Name"></div><input type="number" id="ssPrice" class="input-mobile" placeholder="Price Rs (Opt)"><div class="flex gap-2 mt-4"><button type="button" onclick="window.closeM('modalSupSub')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="window.saveSupSub()" class="btn-mobile bg-green-600 text-white">Save</button></div></div></div></div>
+    <div id="modalVisit" class="modal"><div class="modal-content"><h3 class="font-bold text-xl mb-4 text-purple-800">Visitor & Notes</h3><div class="space-y-3"><select id="vName" class="input-mobile font-bold"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option><option>Client's Party</option></select><input type="time" id="vTime" class="input-mobile"><textarea id="vNote" class="input-mobile" rows="2" placeholder="Notes"></textarea><div class="flex gap-2 mt-4"><button type="button" onclick="window.closeM('modalVisit')" class="btn-mobile bg-gray-200 text-gray-800">Cancel</button><button type="button" onclick="window.addM('visits',['vName','vNote','vTime'],['n','no','t'], 'modalVisit')" class="btn-mobile bg-purple-600 text-white">Save</button></div></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -138,21 +303,100 @@
 
         let dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[], photos:[], bills:[] };
         let currentUserEmail = ""; let currentUserId = ""; let currentUserName = ""; let pendingAction = "";
+        let allCompanySites = []; let allLabours = [];
 
-        const cloudName = 'YOUR_CLOUD_NAME'; const uploadPreset = 'YOUR_PRESET'; const apiKey = '398475757325247';
-        if(typeof cloudinary !== 'undefined') {
-            var photoWidget = cloudinary.createUploadWidget({ cloudName: cloudName, uploadPreset: uploadPreset, apiKey: apiKey, sources: ['local', 'camera'], multiple: true, maxFiles: 5 }, (error, result) => { if (!error && result && result.event === "success") { dData.photos.push(result.info.secure_url); renderMobileLists(); } });
-            var billWidget = cloudinary.createUploadWidget({ cloudName: cloudName, uploadPreset: uploadPreset, apiKey: apiKey, sources: ['local', 'camera'], multiple: true, maxFiles: 5 }, (error, result) => { if (!error && result && result.event === "success") { dData.bills.push(result.info.secure_url); renderMobileLists(); } });
-            document.getElementById("btnUploadPhoto").addEventListener("click", () => photoWidget.open()); document.getElementById("btnUploadBill").addEventListener("click", () => billWidget.open());
+        // CLOUDINARY SIGNED UPLOAD + SMART CANVAS COMPRESSION FALLBACK
+        const CLOUD_API_KEY = "398475757325247";
+        const CLOUD_API_SECRET = "rmfpDwb1Vg0nquxJdmhoW3QrYMQ";
+        const CLOUD_NAME = localStorage.getItem("niwasa_cloud_name") || "";
+
+        async function sha1(str) {
+            const buf = new TextEncoder().encode(str);
+            const hash = await crypto.subtle.digest("SHA-1", buf);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
         }
 
-        window.switchTab = (tab) => { document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('text-blue-600'); e.classList.add('text-gray-400');}); document.getElementById('tab-'+tab).classList.add('active'); document.getElementById('nav-'+tab).classList.add('text-blue-600'); document.getElementById('nav-'+tab).classList.remove('text-gray-400'); if(tab==='history') window.loadHistory(); if(tab==='labours') window.supLoadLabours(); };
+        function compressImageToDataUrl(file, maxWidth = 900, quality = 0.65) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement("canvas");
+                        let w = img.width, h = img.height;
+                        if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext("2d");
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL("image/jpeg", quality));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function uploadSingleImage(file) {
+            if (CLOUD_NAME) {
+                try {
+                    const timestamp = Math.round(new Date().getTime() / 1000);
+                    const sigStr = `timestamp=${timestamp}${CLOUD_API_SECRET}`;
+                    const signature = await sha1(sigStr);
+                    const fd = new FormData();
+                    fd.append("file", file);
+                    fd.append("api_key", CLOUD_API_KEY);
+                    fd.append("timestamp", timestamp);
+                    fd.append("signature", signature);
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: fd });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json.secure_url) return json.secure_url;
+                    }
+                } catch (e) { console.warn("Cloudinary fallback to compressed storage:", e); }
+            }
+            return await compressImageToDataUrl(file);
+        }
+
+        window.handleImageSelect = async (event, type) => {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+            const spin = document.getElementById("uploadSpin");
+            if (spin) spin.classList.remove("hidden");
+            try {
+                for (const file of files) {
+                    const url = await uploadSingleImage(file);
+                    if (!dData[type]) dData[type] = [];
+                    dData[type].push(url);
+                }
+                renderMobileLists();
+            } catch (err) {
+                alert("Image processing error: " + err.message);
+            } finally {
+                if (spin) spin.classList.add("hidden");
+                event.target.value = "";
+            }
+        };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('text-blue-600'); e.classList.add('text-gray-400');});
+            document.getElementById('tab-'+tab).classList.add('active');
+            document.getElementById('nav-'+tab).classList.add('text-blue-600');
+            document.getElementById('nav-'+tab).classList.remove('text-gray-400');
+            if(tab==='history') window.loadHistory();
+            if(tab==='labours') window.supLoadLabours();
+            if(tab==='machinery') window.supLoadMachinery();
+        };
+
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
         window.openM = (id) => document.getElementById(id).style.display = 'block';
         window.closeM = (id) => { document.getElementById(id).style.display = 'none'; if(document.getElementById('dutyReasonText')) document.getElementById('dutyReasonText').value = ''; };
 
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('date').value = todayStr;
+        document.getElementById('stmDate').value = todayStr;
         document.getElementById('dutyDateLabel').innerText = new Date().toDateString();
 
         auth.onAuthStateChanged(async user => {
@@ -162,11 +406,13 @@
             
             const uDoc = await getDoc(doc(db, "users", user.uid));
             if(uDoc.exists() && uDoc.data().assignedSites) { 
-                let mySites = uDoc.data().assignedSites; const drop = document.getElementById('siteId'); drop.innerHTML='<option value="">Select Site...</option>'; 
+                let mySites = uDoc.data().assignedSites;
+                const drop = document.getElementById('siteId');
+                drop.innerHTML='<option value="">Select Site...</option>'; 
                 mySites.forEach(s => { let o=document.createElement('option'); o.value=s; o.innerText=s; drop.appendChild(o); }); 
             }
-            window.loadLabourDropdown();
-            setTimeout(() => { window.checkDutyStatus(); }, 1000);
+            await window.loadLabourDropdown();
+            setTimeout(() => { window.checkDutyStatus(); }, 800);
         });
 
         window.updateUserPass = async (e) => { e.preventDefault(); const curP = document.getElementById('cpCurrent').value; const newP = document.getElementById('cpNew').value; const conP = document.getElementById('cpConfirm').value; if(newP !== conP) return alert("New Passwords do not match!"); const btn = document.getElementById('btnUpdatePass'); btn.innerText = "Updating..."; try { const user = auth.currentUser; const cred = EmailAuthProvider.credential(user.email, curP); await reauthenticateWithCredential(user, cred); await updatePassword(user, newP); alert("Password updated successfully!"); window.closeM('modalChangePass'); e.target.reset(); } catch(err) { alert("Error: " + err.message); } btn.innerText = "Update Password"; };
@@ -176,29 +422,241 @@
         if(document.getElementById('btnSaveDutyReason')){ document.getElementById('btnSaveDutyReason').addEventListener('click', () => { const reason = document.getElementById('dutyReasonText').value; if(!reason) return alert("You must type a reason to proceed."); window.executeDutySave(reason); }); }
         window.executeDutySave = async (reasonNote) => { document.getElementById('dutyActions').innerHTML = `<p class="text-sm text-gray-400 font-bold text-center"><i class="fa-solid fa-spinner fa-spin"></i> Saving...</p>`; window.closeM('modalDutyReason'); const attId = currentUserId + "_" + todayStr; const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); const sId = document.getElementById('siteId').value || 'Unassigned Site'; try { if(pendingAction === "Duty On") { await setDoc(doc(db, "sup_attendance", attId), { uid: currentUserId, email: currentUserEmail, name: currentUserName, date: todayStr, siteId: sId, timeIn: timeStr, timeInReason: reasonNote, status: "On Duty", timestamp: new Date() }); } else if(pendingAction === "Completed") { await updateDoc(doc(db, "sup_attendance", attId), { timeOut: timeStr, status: "Completed", timeOutReason: reasonNote }); } else if(pendingAction === "Early Leave") { await updateDoc(doc(db, "sup_attendance", attId), { timeOut: timeStr, status: "Early Leave", timeOutReason: reasonNote }); } window.checkDutyStatus(); } catch(e) { alert("Network error logging duty."); window.checkDutyStatus(); } };
 
-        // NEW: Toggle Site Closed Sections
         window.toggleSiteClosed = () => {
             const isClosed = document.getElementById('siteClosedCb').checked;
             const reasonDiv = document.getElementById('closeReasonDiv');
             const workSections = document.getElementById('workSections');
-            if(isClosed) {
-                reasonDiv.classList.remove('hidden'); workSections.classList.add('hidden');
-            } else {
-                reasonDiv.classList.add('hidden'); workSections.classList.remove('hidden');
-            }
+            if(isClosed) { reasonDiv.classList.remove('hidden'); workSections.classList.add('hidden'); } 
+            else { reasonDiv.classList.add('hidden'); workSections.classList.remove('hidden'); }
         };
 
-        let allCompanySites = []; let allLabours = [];
-        window.loadLabourDropdown = async () => { const sitesSnap = await getDocs(collection(db, "sites")); sitesSnap.forEach(d => { if(d.data().status === 'Ongoing') allCompanySites.push(d.data().name); }); const labSnap = await getDocs(collection(db, "labours")); allLabours = []; const lDrop = document.getElementById('wNameSelect'); lDrop.innerHTML='<option value="">Select Labour...</option>'; labSnap.forEach(d => { const l = d.data(); allLabours.push(l); let o = document.createElement('option'); o.value = l.name; o.innerText = l.name; lDrop.appendChild(o); }); };
+        window.loadLabourDropdown = async () => {
+            const sitesSnap = await getDocs(collection(db, "sites"));
+            allCompanySites = [];
+            sitesSnap.forEach(d => { if(d.data().status === 'Ongoing') allCompanySites.push(d.data().name); });
+            
+            // Populate machinery location dropdowns
+            const smSite = document.getElementById('smSite');
+            const supMachFilter = document.getElementById('supMachFilter');
+            if(smSite) {
+                smSite.innerHTML = `<option value="Head Office">Head Office (ඔෆිස් එක)</option>`;
+                allCompanySites.forEach(s => { smSite.innerHTML += `<option value="${s}">${s}</option>`; });
+            }
+            if(supMachFilter) {
+                supMachFilter.innerHTML = `<option value="ALL">All Locations (සියලුම ස්ථාන)</option><option value="Head Office">Head Office (ඔෆිස් එක)</option>`;
+                allCompanySites.forEach(s => { supMachFilter.innerHTML += `<option value="${s}">${s}</option>`; });
+            }
+
+            const labSnap = await getDocs(collection(db, "labours"));
+            allLabours = [];
+            const lDrop = document.getElementById('wNameSelect');
+            lDrop.innerHTML='<option value="">Select Labour...</option>';
+            labSnap.forEach(d => {
+                const l = d.data(); allLabours.push(l);
+                let o = document.createElement('option'); o.value = l.name; o.innerText = l.name; lDrop.appendChild(o);
+            });
+        };
+
+        // MACHINERY FUNCTIONS (SUPERVISOR)
+        window.supLoadMachinery = async () => {
+            const filterLoc = document.getElementById('supMachFilter').value;
+            const snap = await getDocs(collection(db, "machinery"));
+            const con = document.getElementById('supMachineryList');
+            con.innerHTML = '';
+            let items = [];
+            snap.forEach(d => { let m = d.data(); m.id = d.id; items.push(m); });
+            if(filterLoc !== 'ALL') items = items.filter(x => x.site === filterLoc);
+
+            if(items.length === 0) {
+                con.innerHTML = `<p class="text-center text-gray-400 mt-8 font-bold">No machinery found for this location.</p>`;
+                return;
+            }
+            items.forEach(m => {
+                let locBadge = m.site === 'Head Office' ? `<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-bold">Head Office</span>` : `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">${m.site}</span>`;
+                let statBadge = m.status === 'Working' ? `<span class="text-green-600 text-xs font-bold">● Working</span>` : `<span class="text-red-600 text-xs font-bold">● Repair</span>`;
+                let lastLog = m.lastTransfer ? `<p class="text-[11px] text-gray-500 mt-1"><i class="fa-solid fa-clock-rotate-left mr-1"></i>${m.lastTransfer}</p>` : '';
+                con.innerHTML += `
+                <div class="app-card !p-4 !mb-3 border-l-4 border-amber-500 flex justify-between items-center">
+                    <div>
+                        <p class="font-black text-gray-800 text-base">${m.name} <span class="text-xs font-normal text-gray-500">(${m.code || '-'})</span></p>
+                        <div class="flex items-center gap-2 mt-1">${locBadge} <span class="text-xs font-bold text-gray-600">Qty: ${m.qty}</span> ${statBadge}</div>
+                        ${lastLog}
+                    </div>
+                    <button onclick="window.openSupTransferMach('${m.id}','${m.name}','${m.site}')" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-xl font-bold text-xs flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-right-left"></i> Transfer
+                    </button>
+                </div>`;
+            });
+        };
+
+        window.supAddMachinery = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, "machinery"), {
+                name: document.getElementById('smName').value,
+                code: document.getElementById('smCode').value || '-',
+                qty: parseInt(document.getElementById('smQty').value) || 1,
+                site: document.getElementById('smSite').value,
+                status: document.getElementById('smStatus').value,
+                lastTransfer: `Added on ${todayStr} by ${currentUserName}`,
+                timestamp: new Date()
+            });
+            e.target.reset();
+            window.closeM('modalAddMachinerySup');
+            window.supLoadMachinery();
+            alert("Machinery Added!");
+        };
+
+        window.openSupTransferMach = (id, name, curSite) => {
+            document.getElementById('stmDocId').value = id;
+            document.getElementById('stmFromSite').value = curSite;
+            document.getElementById('stmItemTitle').innerText = `${name} (Current: ${curSite})`;
+            const drop = document.getElementById('stmToSite');
+            drop.innerHTML = `<option value="">Select Destination...</option>`;
+            if(curSite !== 'Head Office') drop.innerHTML += `<option value="Head Office">Head Office (ඔෆිස් එකට)</option>`;
+            allCompanySites.forEach(s => {
+                if(s !== curSite) drop.innerHTML += `<option value="${s}">${s}</option>`;
+            });
+            window.openM('modalTransferMachSup');
+        };
+
+        window.supConfirmTransferMach = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('stmDocId').value;
+            const fromSite = document.getElementById('stmFromSite').value;
+            const toSite = document.getElementById('stmToSite').value;
+            const tDate = document.getElementById('stmDate').value;
+            const note = document.getElementById('stmNote').value;
+            if(!toSite) return alert("Select destination!");
+            const logText = `${tDate}: ${fromSite} ➔ ${toSite} (${note || 'Transferred by ' + currentUserName})`;
+            await updateDoc(doc(db, "machinery", id), {
+                site: toSite,
+                lastTransfer: logText,
+                timestamp: new Date()
+            });
+            window.closeM('modalTransferMachSup');
+            window.supLoadMachinery();
+            alert("Machinery Transferred Successfully!");
+        };
+
         window.supLoadLabours = async () => { const labSnap = await getDocs(collection(db, "labours")); const con = document.getElementById('supLabourList'); con.innerHTML = ''; labSnap.forEach(d => { const l = d.data(); let badge = l.type === 'SK' ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">SK</span>` : `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">USK</span>`; con.innerHTML += `<div class="app-card !p-3 flex justify-between items-center mb-2"><div><p class="font-bold text-gray-800">${l.name} ${badge}</p><p class="text-xs text-gray-500">Wage: Rs.${l.dailyRate} | OT: Rs.${l.otRate}/h</p></div><button onclick="window.supDelLabour('${d.id}')" class="text-red-400 p-2"><i class="fa-solid fa-trash"></i></button></div>`; }); };
         window.supAddLabour = async (e) => { e.preventDefault(); await addDoc(collection(db, "labours"), { name: document.getElementById('lName').value, type: document.getElementById('lType').value, dailyRate: parseFloat(document.getElementById('lWage').value), otRate: parseFloat(document.getElementById('lOTRate').value), addedAt: new Date() }); e.target.reset(); window.supLoadLabours(); window.loadLabourDropdown(); alert("Labour Registered Successfully!"); };
         window.supDelLabour = async (id) => { if(confirm("Remove this labourer?")) { await deleteDoc(doc(db, "labours", id)); window.supLoadLabours(); window.loadLabourDropdown(); } };
         window.autoFillLabourType = () => { const selName = document.getElementById('wNameSelect').value; const lab = allLabours.find(x => x.name === selName); document.getElementById('wType').value = lab ? lab.type : ''; };
-        window.openWorkerModal = () => { document.getElementById('wReasonType').value = "None"; window.toggleTransferSite(); document.getElementById('wNameSelect').value=""; document.getElementById('wType').value=""; window.openM('modalWorker'); };
-        window.toggleTransferSite = () => { const reason = document.getElementById('wReasonType').value; const textInput = document.getElementById('wRemText'); const siteSelect = document.getElementById('wRemSite'); const currentSite = document.getElementById('siteId').value; if (reason === 'Transferred') { textInput.classList.add('hidden'); siteSelect.classList.remove('hidden'); siteSelect.innerHTML = '<option value="">Transfer To...</option>'; allCompanySites.forEach(s => { if(s !== currentSite) { let o=document.createElement('option'); o.value=s; o.innerText=s; siteSelect.appendChild(o); } }); } else { siteSelect.classList.add('hidden'); textInput.classList.remove('hidden'); textInput.placeholder = reason === 'Left Early' ? 'Note (e.g. Sick)' : 'Remarks'; } };
-        window.saveWorkerData = () => { const n = document.getElementById('wNameSelect').value; if(!n) return alert("Select a Labour Name!"); const reasonType = document.getElementById('wReasonType').value; let finalRemark = ""; if(reasonType === "Left Early") { const note = document.getElementById('wRemText').value; finalRemark = note ? `Left Early - ${note}` : `Left Early`; } else if (reasonType === "Transferred") { const tSite = document.getElementById('wRemSite').value; if(!tSite) return alert("Select transfer site."); finalRemark = `Transferred to ${tSite}`; } else { finalRemark = document.getElementById('wRemText').value || "-"; } dData.workers.push({ n: n, t: document.getElementById('wType').value || '-', o: document.getElementById('wOT').value || '-', a: document.getElementById('wAdv').value || '-', lt: document.getElementById('wLeaveTime').value || '-', rem: finalRemark }); ['wOT','wAdv','wLeaveTime','wRemText'].forEach(id => document.getElementById(id).value = ''); renderMobileLists(); window.closeM('modalWorker'); };
-        const renderMobileLists = () => { const pCon = document.getElementById('list-photos'); pCon.innerHTML=''; if(dData.photos) dData.photos.forEach((url, i) => { pCon.innerHTML += `<div class="relative"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border shadow-sm"><button type="button" onclick="delImg('photos',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; }); const bCon = document.getElementById('list-bills'); bCon.innerHTML=''; if(dData.bills) dData.bills.forEach((url, i) => { bCon.innerHTML += `<div class="relative"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border border-pink-300 shadow-sm"><button type="button" onclick="delImg('bills',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; }); const rL = (arr, id, icon, titleF, subF) => { const con = document.getElementById(id); con.innerHTML=''; if(arr.length > 0) { con.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${arr.length} Record(s) Added</h4>`; arr.forEach((item, idx) => { let subText = item[subF] || ''; if(id === 'list-workers') { if(item.lt && item.lt !== '-') subText += ` <span class="text-red-500 ml-2 font-bold"><i class="fa-regular fa-clock"></i> ${item.lt}</span>`; if(item.rem && item.rem !== '-') subText += ` <span class="text-red-600 block mt-1"><i class="fa-solid fa-arrow-right-from-bracket"></i> ${item.rem}</span>`; } if(id === 'list-supsubs' && item['p'] && item['p'] !== '-') { subText += ` | Rs.${item['p']}`; } let div = document.createElement('div'); div.className = "list-card shadow-sm"; div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${icon} text-gray-400 text-lg w-6 text-center"></i><div><p class="font-bold text-sm text-gray-800">${item[titleF]}</p><p class="text-xs text-gray-500">${subText}</p></div></div><button type="button" onclick="delRow('${id.split('-')[1]}',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; con.appendChild(div); }); } }; rL(dData.workers, 'list-workers', 'fa-helmet-safety', 'n', 't'); rL(dData.delays, 'list-delays', 'fa-cloud-rain', 'r', 'f'); rL(dData.measures, 'list-measures', 'fa-ruler-combined', 'd', 'u'); const conSupSub = document.getElementById('list-supsubs'); conSupSub.innerHTML=''; let ssCount = dData.sups.length + dData.subs.length; if(ssCount > 0) { conSupSub.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${ssCount} Material/Sub Record(s)</h4>`; dData.sups.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-green-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.m}</p><p class="text-xs text-gray-500">Sup: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="delRow('sups',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); }); dData.subs.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-lime-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.t}</p><p class="text-xs text-gray-500">Sub: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="delRow('subs',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); }); } rL(dData.visits, 'list-visits', 'fa-user-tie', 'n', 'no'); };
-        window.delImg = (type, idx) => { dData[type].splice(idx, 1); renderMobileLists(); }; window.addM = (arrName, inIds, keys, modalId) => { if(!document.getElementById(inIds[0]).value) return alert("Required field missing!"); let obj = {}; inIds.forEach((id, i) => { obj[keys[i]] = document.getElementById(id).value || '-'; document.getElementById(id).value = ''; }); dData[arrName].push(obj); renderMobileLists(); window.closeM(modalId); }; window.saveSupSub = () => { const type = document.getElementById('ssType').value; if(type === 'sup') window.addM('sups',['ssName','ssQty','ssProv','ssPrice'],['m','q','n','p'], 'modalSupSub'); else window.addM('subs',['ssName','ssQty','ssProv','ssPrice'],['t','q','n','p'], 'modalSupSub'); }; window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); renderMobileLists(); };
+        
+        window.openWorkerModal = () => {
+            document.getElementById('wReasonType').value = "None";
+            window.toggleTransferSite();
+            document.getElementById('wNameSelect').value = "";
+            document.getElementById('wType').value = "";
+            document.getElementById('wWork').value = "";
+            window.openM('modalWorker');
+        };
+
+        // FIXED MOBILE TOGGLE FOR EARLY LEAVE & TRANSFER
+        window.toggleTransferSite = () => {
+            const reason = document.getElementById('wReasonType').value;
+            const box = document.getElementById('earlyTransferBox');
+            const textWrap = document.getElementById('wRemTextWrap');
+            const siteWrap = document.getElementById('wRemSiteWrap');
+            const siteSelect = document.getElementById('wRemSite');
+            const currentSite = document.getElementById('siteId').value;
+
+            if (reason === 'None') {
+                box.classList.add('hidden');
+            } else if (reason === 'Left Early') {
+                box.classList.remove('hidden');
+                textWrap.classList.remove('hidden');
+                siteWrap.classList.add('hidden');
+            } else if (reason === 'Transferred') {
+                box.classList.remove('hidden');
+                textWrap.classList.add('hidden');
+                siteWrap.classList.remove('hidden');
+                siteSelect.innerHTML = '<option value="">Select Site / Office...</option><option value="Head Office">Head Office (ඔෆිස් එක)</option>';
+                allCompanySites.forEach(s => {
+                    if(s !== currentSite) {
+                        let o = document.createElement('option'); o.value = s; o.innerText = s; siteSelect.appendChild(o);
+                    }
+                });
+            }
+        };
+
+        window.saveWorkerData = () => {
+            const n = document.getElementById('wNameSelect').value;
+            const workDone = document.getElementById('wWork').value.trim();
+            if(!n) return alert("කරුණාකර සේවකයාගේ නම තෝරන්න (Select a Labour Name)!");
+            if(!workDone) return alert("කරුණාකර එම සේවකයා අද දින කළ වැඩ (Work Done Today) ඇතුළත් කරන්න!");
+
+            const reasonType = document.getElementById('wReasonType').value;
+            const leaveTime = document.getElementById('wLeaveTime').value;
+            let finalRemark = "-";
+
+            if(reasonType === "Left Early") {
+                const note = document.getElementById('wRemText').value.trim();
+                if(!leaveTime || !note) return alert("කලින් ගිය වෙලාව (Time) සහ හේතුව (Reason) අනිවාර්යයෙන්ම ඇතුළත් කරන්න!");
+                finalRemark = `Left Early - ${note}`;
+            } else if (reasonType === "Transferred") {
+                const tSite = document.getElementById('wRemSite').value;
+                if(!leaveTime || !tSite) return alert("මාරු කළ වෙලාව (Time) සහ ස්ථානය (Site/Office) තෝරන්න!");
+                finalRemark = `Transferred to ${tSite}`;
+            }
+
+            dData.workers.push({
+                n: n,
+                t: document.getElementById('wType').value || '-',
+                w: workDone,
+                o: document.getElementById('wOT').value || '-',
+                a: document.getElementById('wAdv').value || '-',
+                lt: reasonType === "None" ? '-' : (leaveTime || '-'),
+                rem: finalRemark
+            });
+
+            ['wOT','wAdv','wWork','wLeaveTime','wRemText'].forEach(id => document.getElementById(id).value = '');
+            renderMobileLists();
+            window.closeM('modalWorker');
+        };
+
+        const renderMobileLists = () => {
+            const pCon = document.getElementById('list-photos'); pCon.innerHTML='';
+            if(dData.photos) dData.photos.forEach((url, i) => { pCon.innerHTML += `<div class="relative shrink-0"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border shadow-sm"><button type="button" onclick="window.delImg('photos',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; });
+            
+            const bCon = document.getElementById('list-bills'); bCon.innerHTML='';
+            if(dData.bills) dData.bills.forEach((url, i) => { bCon.innerHTML += `<div class="relative shrink-0"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border border-pink-300 shadow-sm"><button type="button" onclick="window.delImg('bills',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; });
+            
+            const rL = (arr, id, icon, titleF, subF) => {
+                const con = document.getElementById(id); con.innerHTML='';
+                if(arr.length > 0) {
+                    con.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${arr.length} Record(s) Added</h4>`;
+                    arr.forEach((item, idx) => {
+                        let subText = item[subF] || '';
+                        if(id === 'list-workers') {
+                            if(item.w) subText += ` | <span class="text-blue-700 font-semibold">${item.w}</span>`;
+                            if(item.lt && item.lt !== '-') subText += ` <span class="text-red-500 ml-2 font-bold"><i class="fa-regular fa-clock"></i> ${item.lt}</span>`;
+                            if(item.rem && item.rem !== '-') subText += ` <span class="text-red-600 block mt-1"><i class="fa-solid fa-arrow-right-from-bracket"></i> ${item.rem}</span>`;
+                        }
+                        let div = document.createElement('div'); div.className = "list-card shadow-sm";
+                        div.innerHTML = `<div class="flex items-center gap-3"><i class="fa-solid ${icon} text-gray-400 text-lg w-6 text-center"></i><div><p class="font-bold text-sm text-gray-800">${item[titleF]}</p><p class="text-xs text-gray-500">${subText}</p></div></div><button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`;
+                        con.appendChild(div);
+                    });
+                }
+            };
+            rL(dData.workers, 'list-workers', 'fa-helmet-safety', 'n', 't');
+            rL(dData.delays, 'list-delays', 'fa-cloud-rain', 'r', 'f');
+            rL(dData.measures, 'list-measures', 'fa-ruler-combined', 'd', 'u');
+            
+            const conSupSub = document.getElementById('list-supsubs'); conSupSub.innerHTML='';
+            let ssCount = dData.sups.length + dData.subs.length;
+            if(ssCount > 0) {
+                conSupSub.innerHTML = `<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 ml-1">${ssCount} Material/Sub Record(s)</h4>`;
+                dData.sups.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-green-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.m}</p><p class="text-xs text-gray-500">Sup: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="window.delRow('sups',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); });
+                dData.subs.forEach((item, idx) => { let p=item.p!=='-'?`| Rs.${item.p}`:''; let div=document.createElement('div'); div.className="list-card shadow-sm border-l-4 border-lime-500"; div.innerHTML=`<div class="flex items-center gap-3"><div><p class="font-bold text-sm text-gray-800">${item.t}</p><p class="text-xs text-gray-500">Sub: ${item.n} | Qty: ${item.q} ${p}</p></div></div><button type="button" onclick="window.delRow('subs',${idx})" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>`; conSupSub.appendChild(div); });
+            }
+            rL(dData.visits, 'list-visits', 'fa-user-tie', 'n', 'no');
+        };
+
+        window.delImg = (type, idx) => { dData[type].splice(idx, 1); renderMobileLists(); };
+        window.addM = (arrName, inIds, keys, modalId) => { if(!document.getElementById(inIds[0]).value) return alert("Required field missing!"); let obj = {}; inIds.forEach((id, i) => { obj[keys[i]] = document.getElementById(id).value || '-'; document.getElementById(id).value = ''; }); dData[arrName].push(obj); renderMobileLists(); window.closeM(modalId); };
+        window.saveSupSub = () => { const type = document.getElementById('ssType').value; if(type === 'sup') window.addM('sups',['ssName','ssQty','ssProv','ssPrice'],['m','q','n','p'], 'modalSupSub'); else window.addM('subs',['ssName','ssQty','ssProv','ssPrice'],['t','q','n','p'], 'modalSupSub'); };
+        window.delRow = (arrName, idx) => { dData[arrName].splice(idx, 1); renderMobileLists(); };
         
         window.checkDraft = async () => { 
             const date = document.getElementById('date').value; const site = document.getElementById('siteId').value; if(!date || !site) return; 
@@ -208,14 +666,8 @@
                 const docSnap = snap.docs[0]; const r = docSnap.data(); 
                 document.getElementById('currentDocId').value = docSnap.id; document.getElementById('weather').value = r.weather||'Sunny'; 
                 document.getElementById('generalNotes').value = r.notes || '';
-                
-                if(r.siteClosed) {
-                    document.getElementById('siteClosedCb').checked = true;
-                    document.getElementById('closeReason').value = r.closeReason || '';
-                } else {
-                    document.getElementById('siteClosedCb').checked = false;
-                    document.getElementById('closeReason').value = '';
-                }
+                if(r.siteClosed) { document.getElementById('siteClosedCb').checked = true; document.getElementById('closeReason').value = r.closeReason || ''; } 
+                else { document.getElementById('siteClosedCb').checked = false; document.getElementById('closeReason').value = ''; }
                 window.toggleSiteClosed();
 
                 dData = r.data || { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[], photos:[], bills:[] }; 
@@ -232,11 +684,9 @@
         
         window.saveRecord = async (statusType) => { 
             const date = document.getElementById('date').value; const site = document.getElementById('siteId').value; if(!site) return alert("Select a site first!"); 
-            
             const isClosed = document.getElementById('siteClosedCb').checked;
             const closeReason = document.getElementById('closeReason').value;
             if(isClosed && !closeReason) return alert("Please enter the reason for closing the site!");
-            
             const notes = document.getElementById('generalNotes').value;
 
             const payload = { 
@@ -256,13 +706,14 @@
                 if(statusType !== "Draft") { 
                     dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[], photos:[], bills:[] }; 
                     document.getElementById('dprForm').reset(); 
+                    document.getElementById('date').value = todayStr;
                     window.toggleSiteClosed();
                     renderMobileLists(); document.getElementById('currentDocId').value=""; 
                 } 
             } catch(e) { alert(e.message); } 
         };
 
-        window.loadHistory = async () => { const q = query(collection(db, "daily_reports"), where("preparedBy","==",document.getElementById('prepBy').value)); const snap = await getDocs(q); const con = document.getElementById('historyList'); con.innerHTML=''; let myReports = []; snap.forEach(d => { let r=d.data(); r.id=d.id; myReports.push(r); }); myReports.sort((a,b)=>(b.timestamp?.toMillis()||0)-(a.timestamp?.toMillis()||0)); if(myReports.length===0) return con.innerHTML = '<p class="text-center text-gray-400 mt-10">No records found.</p>'; myReports.forEach((r) => { let color = r.status==="Approved" ? "text-green-600 bg-green-50" : r.status==="Draft" ? "text-gray-600 bg-gray-100" : "text-yellow-600 bg-yellow-50"; let closedTag = r.siteClosed ? `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-black uppercase ml-2">Closed</span>` : ``; let acts = `-`; const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60); if(hrsPassed <= 48) { acts = `<button onclick="editRep('${r.date}','${r.siteId}')" class="bg-blue-100 text-blue-700 font-bold px-3 py-2 rounded-lg text-sm"><i class="fa-solid fa-pen"></i> Edit</button>`; } let div = document.createElement('div'); div.className = "app-card flex justify-between items-center p-4 !mb-3"; div.innerHTML = `<div><p class="font-black text-lg">${r.date} ${closedTag}</p><p class="text-xs text-gray-500 font-bold">${r.siteId}</p><span class="text-xs font-bold px-2 py-1 rounded mt-1 inline-block ${color}">${r.status}</span></div>${acts}`; con.appendChild(div); }); };
+        window.loadHistory = async () => { const q = query(collection(db, "daily_reports"), where("preparedBy","==",document.getElementById('prepBy').value)); const snap = await getDocs(q); const con = document.getElementById('historyList'); con.innerHTML=''; let myReports = []; snap.forEach(d => { let r=d.data(); r.id=d.id; myReports.push(r); }); myReports.sort((a,b)=>(b.timestamp?.toMillis()||0)-(a.timestamp?.toMillis()||0)); if(myReports.length===0) return con.innerHTML = '<p class="text-center text-gray-400 mt-10">No records found.</p>'; myReports.forEach((r) => { let color = r.status==="Approved" ? "text-green-600 bg-green-50" : r.status==="Draft" ? "text-gray-600 bg-gray-100" : "text-yellow-600 bg-yellow-50"; let closedTag = r.siteClosed ? `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-black uppercase ml-2">Closed</span>` : ``; let acts = `-`; const hrsPassed = (Date.now() - (r.timestamp?.toMillis()||0)) / (1000 * 60 * 60); if(hrsPassed <= 48) { acts = `<button onclick="window.editRep('${r.date}','${r.siteId}')" class="bg-blue-100 text-blue-700 font-bold px-3 py-2 rounded-lg text-sm"><i class="fa-solid fa-pen"></i> Edit</button>`; } let div = document.createElement('div'); div.className = "app-card flex justify-between items-center p-4 !mb-3"; div.innerHTML = `<div><p class="font-black text-lg">${r.date} ${closedTag}</p><p class="text-xs text-gray-500 font-bold">${r.siteId}</p><span class="text-xs font-bold px-2 py-1 rounded mt-1 inline-block ${color}">${r.status}</span></div>${acts}`; con.appendChild(div); }); };
         window.editRep = (d, s) => { document.getElementById('date').value = d; document.getElementById('siteId').value = s; window.switchTab('entry'); window.checkDraft(); };
     </script>
 </body>
