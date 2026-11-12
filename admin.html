@@ -72,7 +72,7 @@
             
             <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-6">Overview Dashboard</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"><div class="admin-card border-l-4 border-blue-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-3xl font-black text-blue-900 mt-2" id="statSites">0</p></div><div class="admin-card border-l-4 border-green-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Labours Today</h3><p class="text-3xl font-black text-green-700 mt-2" id="statLabours">0</p></div><div class="admin-card border-l-4 border-red-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Cost Today (Rs)</h3><p class="text-3xl font-black text-red-600 mt-2" id="statAdvances">0</p></div><div class="admin-card border-l-4 border-indigo-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Total Dues (Rs)</h3><p class="text-3xl font-black text-indigo-600 mt-2" id="statDues">0.00</p></div></div></div>
 
-            <!-- MACHINERY & TOOLS MANAGEMENT TAB -->
+            <!-- MACHINERY & TOOLS MANAGEMENT TAB (WITH EDIT) -->
             <div id="tab-machinery" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800"><i class="fa-solid fa-screwdriver-wrench text-amber-600 mr-2"></i>Machinery & Tools</h2>
@@ -85,8 +85,9 @@
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="admin-card h-fit border-t-4 border-amber-500">
-                        <h3 class="font-bold border-b pb-2 mb-4 text-amber-900">Add Machinery / Equipment</h3>
-                        <form onsubmit="window.addMachinery(event)" class="space-y-4">
+                        <h3 class="font-bold border-b pb-2 mb-4 text-amber-900" id="machFormTitle">Add Machinery / Equipment</h3>
+                        <form id="machForm" onsubmit="window.saveMachinery(event)" class="space-y-4">
+                            <input type="hidden" id="editMachId">
                             <div><label class="text-xs font-bold text-gray-500 uppercase">Item Name *</label><input type="text" id="machName" class="w-full border p-2 rounded-lg font-bold" placeholder="e.g. Concrete Mixer / Vibrator" required></div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div><label class="text-xs font-bold text-gray-500 uppercase">Code / Serial</label><input type="text" id="machCode" class="w-full border p-2 rounded-lg" placeholder="e.g. MC-01"></div>
@@ -105,7 +106,10 @@
                                     <option value="Repair">Under Repair (අලුත්වැඩියාවේ)</option>
                                 </select>
                             </div>
-                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg shadow">Add Machinery</button>
+                            <div class="flex gap-2">
+                                <button type="submit" id="btnSaveMach" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg shadow">Add Machinery</button>
+                                <button type="button" id="btnCancelMach" onclick="window.cancelEditMach()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold px-4 py-3 rounded-lg">Cancel</button>
+                            </div>
                         </form>
                     </div>
                     <div class="lg:col-span-2 space-y-6">
@@ -143,6 +147,7 @@
                 </div>
             </div>
 
+            <!-- CHEQUES MANAGEMENT (WITH EDIT) -->
             <div id="tab-pay_cheques" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Cheques Management</h2></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -156,10 +161,11 @@
                             <option value="ALL">All Cheques</option><option value="PENDING" selected>Unrealized (Pending) Only</option><option value="REALIZED">Realized Only</option>
                         </select>
                     </div>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left min-w-[600px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date Issued</th><th class="p-3">Cheque No</th><th class="p-3">Bank</th><th class="p-3">Vendor/Payee</th><th class="p-3">Description</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblCheques"></tbody></table></div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left min-w-[650px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date Issued</th><th class="p-3">Cheque No</th><th class="p-3">Bank</th><th class="p-3">Vendor/Payee</th><th class="p-3">Description</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblCheques"></tbody></table></div>
                 </div>
             </div>
 
+            <!-- LORRY PETTY CASH (WITH EDIT) -->
             <div id="tab-pay_lorry" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Lorry Petty Cash</h2></div>
                 <div class="flex justify-between items-center mb-6 bg-gray-100 p-4 rounded-xl border border-gray-200">
@@ -168,28 +174,155 @@
                     <button onclick="document.getElementById('lcMonthFilter').value=''; window.loadPayLorry()" class="text-sm text-blue-600 font-bold hover:underline">Clear Filter</button>
                 </div>
                 <div class="admin-card mb-6 bg-blue-50 border border-blue-200">
-                    <form onsubmit="window.addLorryCash(event)" class="flex flex-wrap items-end gap-4">
+                    <form id="lorryForm" onsubmit="window.saveLorryCash(event)" class="flex flex-wrap items-end gap-4">
+                        <input type="hidden" id="editLorryId">
                         <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Type</label><select id="lcType" class="border p-2 rounded-lg w-full md:w-auto font-bold"><option value="ADVANCE">Advance (+)</option><option value="EXPENSE">Expense (-)</option></select></div>
                         <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Date</label><input type="date" id="lcDate" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div>
                         <div class="flex-1"><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Description</label><input type="text" id="lcDesc" class="w-full border p-2 rounded-lg" required placeholder="e.g. Morning Transfer / Sand"></div>
-                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Amount (Rs)</label><input type="number" id="lcAmount" class="w-full border p-2 rounded-lg font-bold" required></div>
-                        <button type="submit" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Save Record</button>
+                        <div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Amount (Rs)</label><input type="number" step="0.01" id="lcAmount" class="w-full border p-2 rounded-lg font-bold" required></div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button type="submit" id="btnSaveLorry" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg flex-1 md:flex-none">Save Record</button>
+                            <button type="button" id="btnCancelLorry" onclick="window.cancelEditLorry()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg">Cancel</button>
+                        </div>
                     </form>
                 </div>
                 <div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[700px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date</th><th class="p-3">Description</th><th class="p-3 text-right text-green-400">Advance (+)</th><th class="p-3 text-right text-red-400">Expense (-)</th><th class="p-3 text-right font-bold text-blue-300">Balance (Rs)</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblLorry"></tbody></table></div>
             </div>
 
-            <div id="tab-pay_vendors" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Vendors</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="admin-card h-fit border-t-4 border-indigo-600"><h3 class="font-bold border-b pb-2 mb-4">Add New Vendor</h3><form onsubmit="window.addVendor(event)" class="space-y-4"><div><label class="text-xs font-bold text-gray-500">Vendor Name</label><input type="text" id="vName" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Contact No</label><input type="text" id="vContact" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Address</label><input type="text" id="vAddress" class="w-full border p-2 rounded-lg"></div><hr><h6 class="text-xs font-bold text-gray-400 uppercase">Bank Details (Optional)</h6><div><input type="text" id="vAccName" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Account Name"></div><div><input type="text" id="vBankName" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Bank Name"></div><div><input type="text" id="vBranch" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Branch"></div><div><input type="text" id="vAccNo" class="w-full border p-2 rounded-lg text-sm" placeholder="Account Number"></div><button type="submit" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">Save Vendor</button></form></div><div class="lg:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Name</th><th class="p-3">Contact</th><th class="p-3">Bank Details</th><th class="p-3 text-right">Action</th></tr></thead><tbody id="tblVendors"></tbody></table></div></div></div>
-            <div id="tab-pay_bills" class="tab-content max-w-6xl mx-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Bills & Invoices</h2><button onclick="window.openM('modalAddBill')" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Add New Bill</button></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[800px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date</th><th class="p-3">Bill No</th><th class="p-3">Vendor</th><th class="p-3">Remarks</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-right">Paid (Rs)</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblBills"></tbody></table></div></div>
-            <div id="tab-pay_payments" class="tab-content max-w-6xl mx-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Payment History</h2><button onclick="window.openM('modalAddPayment')" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Make Payment</button></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[800px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date</th><th class="p-3">Pay ID</th><th class="p-3">Vendor</th><th class="p-3">Description</th><th class="p-3">Method</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblPayments"></tbody></table></div></div>
+            <!-- VENDORS (WITH FULL EDIT FOR BANK DETAILS & INFO) -->
+            <div id="tab-pay_vendors" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Vendors</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="admin-card h-fit border-t-4 border-indigo-600">
+                        <h3 class="font-bold border-b pb-2 mb-4 text-indigo-900" id="vendorFormTitle">Add New Vendor</h3>
+                        <form id="vendorForm" onsubmit="window.saveVendor(event)" class="space-y-4">
+                            <input type="hidden" id="editVendorId">
+                            <div><label class="text-xs font-bold text-gray-500">Vendor Name *</label><input type="text" id="vName" class="w-full border p-2 rounded-lg font-bold" required></div>
+                            <div><label class="text-xs font-bold text-gray-500">Contact No</label><input type="text" id="vContact" class="w-full border p-2 rounded-lg"></div>
+                            <div><label class="text-xs font-bold text-gray-500">Address</label><input type="text" id="vAddress" class="w-full border p-2 rounded-lg"></div>
+                            <hr>
+                            <h6 class="text-xs font-bold text-indigo-600 uppercase">Bank Details (ගිණුම් විස්තර)</h6>
+                            <div><input type="text" id="vAccName" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Account Holder Name"></div>
+                            <div><input type="text" id="vBankName" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Bank Name (e.g. BOC / Sampath)"></div>
+                            <div><input type="text" id="vBranch" class="w-full border p-2 rounded-lg text-sm mb-2" placeholder="Branch Name"></div>
+                            <div><input type="text" id="vAccNo" class="w-full border p-2 rounded-lg text-sm font-bold" placeholder="Account Number"></div>
+                            <div class="flex gap-2">
+                                <button type="submit" id="btnSaveVendor" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow">Save Vendor</button>
+                                <button type="button" id="btnCancelVendor" onclick="window.cancelEditVendor()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold px-4 py-3 rounded-lg">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2 admin-card overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                <tr><th class="p-3">Name</th><th class="p-3">Contact & Address</th><th class="p-3">Bank Details</th><th class="p-3 text-right">Action</th></tr>
+                            </thead>
+                            <tbody id="tblVendors"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BILLS & INVOICES (WITH EDIT) -->
+            <div id="tab-pay_bills" class="tab-content max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-800">Bills & Invoices</h2>
+                    <button onclick="window.openAddBillModal()" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Add New Bill</button>
+                </div>
+                <div class="admin-card overflow-x-auto">
+                    <table class="w-full text-sm text-left min-w-[800px]">
+                        <thead class="bg-gray-800 text-white uppercase text-xs">
+                            <tr><th class="p-3">Date</th><th class="p-3">Bill No</th><th class="p-3">Vendor</th><th class="p-3">Remarks</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-right">Paid (Rs)</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Action</th></tr>
+                        </thead>
+                        <tbody id="tblBills"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PAYMENTS HISTORY (WITH EDIT) -->
+            <div id="tab-pay_payments" class="tab-content max-w-6xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-800">Payment History</h2>
+                    <button onclick="window.openM('modalAddPayment')" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Make Payment</button>
+                </div>
+                <div class="admin-card overflow-x-auto">
+                    <table class="w-full text-sm text-left min-w-[800px]">
+                        <thead class="bg-gray-800 text-white uppercase text-xs">
+                            <tr><th class="p-3">Date</th><th class="p-3">Pay ID</th><th class="p-3">Vendor</th><th class="p-3">Description</th><th class="p-3">Method</th><th class="p-3 text-right">Amount (Rs)</th><th class="p-3 text-center">Action</th></tr>
+                        </thead>
+                        <tbody id="tblPayments"></tbody>
+                    </table>
+                </div>
+            </div>
 
             <div id="tab-attendance" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Staff Attendance</h2><div class="admin-card mb-6 bg-red-50 border border-red-200"><form onsubmit="window.loadAttendance(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Date</label><input type="date" id="attDate" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div><button type="submit" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 w-full md:w-auto">View Attendance</button></form></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Staff Name</th><th class="p-3">Site</th><th class="p-3">Time In</th><th class="p-3">Time Out</th><th class="p-3">Status / Reason</th><th class="p-3 text-right">Action</th></tr></thead><tbody id="attendanceTable" class="divide-y"><tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">Select date to load records.</td></tr></tbody></table></div></div>
             <div id="tab-users" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Access Control & Users</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="admin-card h-fit border-t-4 border-blue-600"><h3 class="font-bold border-b pb-2 mb-4">Create System User</h3><form onsubmit="window.addUser(event)" class="space-y-4"><input type="email" id="uEmail" placeholder="Email Address" class="w-full border p-2 rounded-lg" required><div class="relative"><input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded-lg pr-10" required><div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400" onclick="window.togglePass('uPass', 'eyeIconUser')"><i id="eyeIconUser" class="fa-solid fa-eye"></i></div></div><div class="bg-gray-50 p-3 rounded-lg border"><label class="text-xs font-bold text-gray-500 uppercase block mb-2">Grant Panel Access</label><label class="flex items-center gap-2 mb-2"><input type="checkbox" class="role-cb w-4 h-4" value="admin"><span class="font-bold text-gray-700">Admin Panel</span></label><label class="flex items-center gap-2 mb-2"><input type="checkbox" class="role-cb w-4 h-4" value="supervisor"><span class="font-bold text-gray-700">Supervisor App</span></label><label class="flex items-center gap-2"><input type="checkbox" class="role-cb w-4 h-4" value="customer"><span class="font-bold text-gray-700">Client Portal</span></label></div><div><label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Assign Sites</label><div id="cbSites" class="border p-3 bg-white rounded-lg h-32 overflow-y-auto space-y-2"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Create User</button></form></div><div class="lg:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Email</th><th class="p-3">Access Levels</th><th class="p-3">Assigned Sites</th><th class="p-3 text-right">Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
             <div id="tab-reports" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Pending & Approved Reports</h2><div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>
-            <div id="tab-labours" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Labours (Master List)</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="admin-card h-fit border-t-4 border-orange-500"><h3 class="font-bold border-b pb-2 mb-4 text-orange-800">Register New Labour</h3><form onsubmit="window.addLabour(event)" class="space-y-4"><div><label class="text-xs font-bold text-gray-500">Full Name</label><input type="text" id="lName" class="w-full border p-2 rounded-lg font-bold" required></div><div><label class="text-xs font-bold text-gray-500">Job Role</label><select id="lType" class="w-full border p-2 rounded-lg"><option value="SK">Skilled (SK)</option><option value="USK">Unskilled (USK)</option></select></div><div><label class="text-xs font-bold text-gray-500">Daily Wage (Rs.)</label><input type="number" id="lWage" class="w-full border p-2 rounded-lg text-green-700 font-bold" required></div><div><label class="text-xs font-bold text-gray-500">OT Rate/Hr (Rs.)</label><input type="number" id="lOTRate" class="w-full border p-2 rounded-lg text-blue-700 font-bold" required></div><button type="submit" class="w-full bg-orange-500 text-white font-bold py-3 rounded-lg">Register</button></form></div><div class="md:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Name</th><th class="p-3">Role</th><th class="p-3">Daily Wage</th><th class="p-3">OT Rate</th><th class="p-3 text-right">Action</th></tr></thead><tbody id="laboursTable"></tbody></table></div></div></div>
+            
+            <!-- LABOURS MASTER (WITH EDIT) -->
+            <div id="tab-labours" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Labours (Master List)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="admin-card h-fit border-t-4 border-orange-500">
+                        <h3 class="font-bold border-b pb-2 mb-4 text-orange-800" id="labourFormTitle">Register New Labour</h3>
+                        <form id="labourForm" onsubmit="window.saveLabour(event)" class="space-y-4">
+                            <input type="hidden" id="editLabourId">
+                            <div><label class="text-xs font-bold text-gray-500">Full Name</label><input type="text" id="lName" class="w-full border p-2 rounded-lg font-bold" required></div>
+                            <div><label class="text-xs font-bold text-gray-500">Job Role</label><select id="lType" class="w-full border p-2 rounded-lg"><option value="SK">Skilled (SK)</option><option value="USK">Unskilled (USK)</option></select></div>
+                            <div><label class="text-xs font-bold text-gray-500">Daily Wage (Rs.)</label><input type="number" step="0.01" id="lWage" class="w-full border p-2 rounded-lg text-green-700 font-bold" required></div>
+                            <div><label class="text-xs font-bold text-gray-500">OT Rate/Hr (Rs.)</label><input type="number" step="0.01" id="lOTRate" class="w-full border p-2 rounded-lg text-blue-700 font-bold" required></div>
+                            <div class="flex gap-2">
+                                <button type="submit" id="btnSaveLabour" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow">Register</button>
+                                <button type="button" id="btnCancelLabour" onclick="window.cancelEditLabour()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold px-4 py-3 rounded-lg">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 admin-card overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                <tr><th class="p-3">Name</th><th class="p-3">Role</th><th class="p-3">Daily Wage</th><th class="p-3">OT Rate</th><th class="p-3 text-right">Action</th></tr>
+                            </thead>
+                            <tbody id="laboursTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="tab-payroll" class="tab-content max-w-6xl mx-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Weekly Payroll</h2><button onclick="window.exportPayroll()" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm"><i class="fa-solid fa-file-excel mr-2"></i> Export</button></div><div class="admin-card mb-6 bg-orange-50 border border-orange-200"><form onsubmit="window.generatePayroll(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Select Site</label><select id="paySite" class="border p-2 rounded-lg w-full md:w-48 font-bold"><option value="ALL">All Sites</option></select></div><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">From (Sunday)</label><input type="date" id="payFrom" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">To (Saturday)</label><input type="date" id="payTo" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div><button type="submit" class="bg-orange-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Calculate</button></form></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[800px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Labour Name</th><th class="p-3 text-center">Days</th><th class="p-3 text-center">OT Hrs</th><th class="p-3 text-right">Base Pay</th><th class="p-3 text-right">OT Pay</th><th class="p-3 text-right text-red-300">Advances</th><th class="p-3 text-right font-black text-green-300 border-l border-gray-600">Net Payable</th></tr></thead><tbody id="payrollTable" class="divide-y"><tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">Select dates to generate.</td></tr></tbody><tfoot id="payrollFooter" class="bg-gray-100 hidden font-black text-gray-800"></tfoot></table></div></div>
             <div id="tab-finance" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Financial Analytics</h2><div class="admin-card mb-6 bg-green-50 border border-green-200"><form onsubmit="window.calcFinance(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Select Site</label><select id="finSite" class="border p-2 rounded-lg w-full md:w-48 font-bold"><option value="ALL">All Sites</option></select></div><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Calculate Total Costs</button></form></div><div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"><div class="admin-card text-center"><h4 class="font-bold text-gray-500 uppercase mb-2">Total Labour Cost</h4><p class="text-2xl font-black text-blue-700" id="finLabCost">Rs. 0</p></div><div class="admin-card text-center"><h4 class="font-bold text-gray-500 uppercase mb-2">Material/Sub Cost</h4><p class="text-2xl font-black text-orange-700" id="finMatCost">Rs. 0</p></div><div class="admin-card text-center bg-gray-800 text-white"><h4 class="font-bold text-gray-400 uppercase mb-2">Total Expense</h4><p class="text-2xl font-black text-green-400" id="finTotalCost">Rs. 0</p></div></div></div>
-            <div id="tab-sites" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Sites</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="admin-card h-fit"><h3 class="font-bold border-b pb-2 mb-4">Add New Site</h3><form onsubmit="window.addSite(event)" class="space-y-4"><input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded-lg font-bold" required><div class="bg-blue-50 p-3 rounded border border-blue-200"><label class="text-xs font-bold text-blue-800 mb-1 block">Maps Link</label><div class="flex gap-2 mb-2"><input type="text" id="sLocLink" class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div><input type="text" id="sLoc" class="w-full border p-2 rounded font-bold text-gray-700 bg-white" required></div><select id="sStat" class="w-full border p-2 rounded font-bold"><option>Ongoing</option><option>Completed</option></select><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Add Site</button></form></div><div class="md:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Site</th><th class="p-3">Location</th><th class="p-3">Status</th><th class="p-3 text-right">Action</th></tr></thead><tbody id="sitesTable"></tbody></table></div></div></div>
+            
+            <!-- MANAGE SITES (WITH EDIT) -->
+            <div id="tab-sites" class="tab-content max-w-6xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Sites</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="admin-card h-fit border-t-4 border-blue-600">
+                        <h3 class="font-bold border-b pb-2 mb-4" id="siteFormTitle">Add New Site</h3>
+                        <form id="siteForm" onsubmit="window.saveSite(event)" class="space-y-4">
+                            <input type="hidden" id="editSiteId">
+                            <input type="text" id="sName" placeholder="Site Name" class="w-full border p-2 rounded-lg font-bold" required>
+                            <div class="bg-blue-50 p-3 rounded border border-blue-200">
+                                <label class="text-xs font-bold text-blue-800 mb-1 block">Maps Link</label>
+                                <div class="flex gap-2 mb-2"><input type="text" id="sLocLink" class="w-full border p-2 rounded text-sm"><button type="button" onclick="window.extractGPS()" class="bg-blue-600 text-white px-3 rounded font-bold text-sm">Extract</button></div>
+                                <input type="text" id="sLoc" placeholder="Latitude, Longitude" class="w-full border p-2 rounded font-bold text-gray-700 bg-white" required>
+                            </div>
+                            <select id="sStat" class="w-full border p-2 rounded font-bold"><option>Ongoing</option><option>Completed</option></select>
+                            <div class="flex gap-2">
+                                <button type="submit" id="btnSaveSite" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow">Add Site</button>
+                                <button type="button" id="btnCancelSite" onclick="window.cancelEditSite()" class="hidden bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold px-4 py-3 rounded-lg">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="md:col-span-2 admin-card overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+                                <tr><th class="p-3">Site</th><th class="p-3">Location</th><th class="p-3">Status</th><th class="p-3 text-right">Action</th></tr>
+                            </thead>
+                            <tbody id="sitesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div id="tab-inventory" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Inventory Tracking</h2><div class="admin-card mb-6 bg-purple-50 border border-purple-200"><form onsubmit="window.loadInventory(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Select Site</label><select id="invSite" class="border p-2 rounded-lg w-full md:w-48 font-bold"><option value="ALL">All Sites</option></select></div><button type="submit" class="bg-purple-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Load Material Logs</button></form></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[600px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date</th><th class="p-3">Site</th><th class="p-3">Material Name</th><th class="p-3">Supplier</th><th class="p-3 text-right">Qty</th><th class="p-3 text-right">Price (Rs)</th></tr></thead><tbody id="inventoryTable" class="divide-y"><tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">Select a site to view materials.</td></tr></tbody></table></div></div>
             
             <!-- ADMIN DPR ENTRY -->
@@ -224,7 +357,7 @@
                             <div><h3 class="font-bold text-purple-800 mb-2"><i class="fa-solid fa-user-tie mr-2"></i>Visitors & Notes</h3><div class="flex flex-wrap md:flex-nowrap gap-2 mb-2"><select id="vName" class="border p-2 rounded-lg font-bold text-purple-900 bg-purple-50 w-full md:w-auto"><option value="">Select Category...</option><option>Engineer</option><option>Architect</option><option>Boss</option><option>QS</option><option>Client</option></select><input type="time" id="vTime" class="border p-2 rounded-lg w-full md:w-auto mt-2 md:mt-0"><input type="text" id="vNote" placeholder="Note" class="border p-2 rounded-lg flex-1 mt-2 md:mt-0"><button type="button" onclick="window.addD('visits',['vName','vNote','vTime'],['n','no','t'])" class="bg-purple-600 text-white font-bold rounded-lg px-4 py-2 w-full md:w-auto mt-2 md:mt-0">Add</button></div><div class="overflow-x-auto"><table class="w-full text-sm bg-gray-50 rounded-lg"><tbody id="tb-visits"></tbody></table></div></div>
                             <hr>
                             
-                            <!-- LABOUR SECTION WITH MANDATORY WORK DONE & MOBILE-FRIENDLY EARLY LEAVE / TRANSFER -->
+                            <!-- LABOUR SECTION -->
                             <div>
                                 <h3 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-helmet-safety mr-2"></i>Labour, Daily Work & Advances</h3>
                                 <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 space-y-3 mb-3">
@@ -262,7 +395,7 @@
                             </div>
                             <hr>
                             
-                            <!-- DIRECT BUILT-IN IMAGE UPLOADER (NO CLOUDINARY ERRORS) -->
+                            <!-- IMAGE UPLOADER -->
                             <div>
                                 <h3 class="font-bold text-indigo-800 mb-2"><i class="fa-solid fa-camera mr-2"></i>Upload Evidence (Photos & Bills)</h3>
                                 <p class="text-xs text-gray-500 mb-3">ෆොටෝ ස්වයංක්‍රීයව Compress වී කෙලින්ම සිස්ටම් එකට ඇතුළත් වේ.</p>
@@ -290,7 +423,11 @@
         </div> 
     </div>
 
+    <!-- ========================================== -->
     <!-- MODALS SECTION -->
+    <!-- ========================================== -->
+
+    <!-- Transfer Machinery Modal -->
     <div id="modalTransferMach" class="modal">
         <div class="modal-content" style="max-width: 480px;">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -327,8 +464,54 @@
         </div>
     </div>
 
-    <div id="modalAddBill" class="modal"><div class="modal-content" style="max-width: 600px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-indigo-900"><i class="fa-solid fa-file-invoice mr-2"></i>Add New Bill</h3><button onclick="window.closeM('modalAddBill')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><form onsubmit="window.addBill(event)" class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="text-xs font-bold text-gray-500">Select Vendor</label><select id="bVendor" class="w-full border p-2 rounded-lg font-bold text-indigo-900 bg-indigo-50" required><option value="">Select...</option></select></div><div><label class="text-xs font-bold text-gray-500">Date</label><input type="date" id="bDate" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Bill Number</label><input type="text" id="bNumber" class="w-full border p-2 rounded-lg" required></div><div><label class="text-xs font-bold text-gray-500">Amount (Rs)</label><input type="number" id="bAmount" class="w-full border p-2 rounded-lg font-bold text-red-600" required></div><div class="md:col-span-2"><label class="text-xs font-bold text-gray-500">Remarks / Items</label><input type="text" id="bRemarks" class="w-full border p-2 rounded-lg" placeholder="e.g. Cement 50 bags, Steel..." required></div></div><button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition mt-4">Save Bill</button></form></div></div>
+    <!-- Add / Edit Bill Modal -->
+    <div id="modalAddBill" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="font-bold text-xl text-indigo-900" id="billModalTitle"><i class="fa-solid fa-file-invoice mr-2"></i>Add New Bill</h3>
+                <button onclick="window.closeM('modalAddBill')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <form onsubmit="window.saveBill(event)" class="space-y-4">
+                <input type="hidden" id="editBillId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500">Select Vendor</label><select id="bVendor" class="w-full border p-2 rounded-lg font-bold text-indigo-900 bg-indigo-50" required><option value="">Select...</option></select></div>
+                    <div><label class="text-xs font-bold text-gray-500">Date</label><input type="date" id="bDate" class="w-full border p-2 rounded-lg" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">Bill Number</label><input type="text" id="bNumber" class="w-full border p-2 rounded-lg" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">Amount (Rs)</label><input type="number" step="0.01" id="bAmount" class="w-full border p-2 rounded-lg font-bold text-red-600" required></div>
+                    <div class="md:col-span-2"><label class="text-xs font-bold text-gray-500">Remarks / Items</label><input type="text" id="bRemarks" class="w-full border p-2 rounded-lg" placeholder="e.g. Cement 50 bags, Steel..." required></div>
+                </div>
+                <button type="submit" id="btnSaveBill" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition mt-4">Save Bill</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Make New Payment Modal -->
     <div id="modalAddPayment" class="modal"><div class="modal-content" style="max-width: 800px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-green-900"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Make New Payment</h3><button onclick="window.closeM('modalAddPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div><label class="text-xs font-bold text-green-700">1. Select Vendor</label><select id="pVendor" class="w-full border-2 border-green-200 p-2 rounded-lg font-bold text-green-900 bg-green-50" onchange="window.loadVendorBillsForPayment()"><option value="">Select Vendor...</option></select></div><div><label class="text-xs font-bold text-green-700">2. Payment Date</label><input type="date" id="pDate" class="w-full border p-2 rounded-lg" required></div></div><div id="pBillsContainer" class="hidden mb-4 bg-gray-50 p-4 rounded-lg border"><h4 class="font-bold text-sm text-gray-700 mb-2">3. Allocate amounts to Pending Bills</h4><div class="overflow-x-auto max-h-48 custom-scrollbar"><table class="w-full text-sm text-left bg-white"><thead class="bg-gray-200 text-gray-600 text-xs"><tr><th class="p-2 text-center">Select</th><th class="p-2">Bill No</th><th class="p-2 text-right">Due Amt</th><th class="p-2">Pay Amount (Rs)</th></tr></thead><tbody id="pBillsTable"></tbody></table></div><div class="text-right font-black text-green-700 mt-2">Total Allocating: Rs. <span id="pTotalCalc">0.00</span></div></div><form onsubmit="window.processPayment(event)" class="space-y-4 border-t pt-4"><h4 class="font-bold text-sm text-gray-700">4. Payment Details</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="md:col-span-3"><label class="text-xs font-bold text-gray-500">Description / Reason</label><input type="text" id="pDesc" class="w-full border p-2 rounded-lg" placeholder="e.g. Advance payment for cement" required></div><div><label class="text-xs font-bold text-gray-500">Method</label><select id="pMethod" class="w-full border p-2 rounded-lg" required onchange="window.toggleChequeFields()"><option value="CASH">Cash</option><option value="DFCC_BANK">DFCC Bank Transfer</option><option value="SAMPATH_BANK">Sampath Bank Transfer</option><option value="DFCC_CHEQUE">DFCC Cheque</option><option value="SAMPATH_CHEQUE">Sampath Cheque</option></select></div><div id="pChequeFields" class="hidden md:col-span-2 grid grid-cols-2 gap-2"><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-500">Cheque No</label><input type="text" id="pChequeNo" class="w-full border-2 border-orange-200 p-2 rounded-lg"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-500">Cheque Date</label><input type="date" id="pChequeDate" class="w-full border-2 border-orange-200 p-2 rounded-lg"></div></div></div><button type="submit" id="btnSubmitPayment" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3 rounded-lg transition shadow-lg mt-4">Confirm Payment</button></form></div></div>
+
+    <!-- NEW: Edit Payment / Cheque Modal -->
+    <div id="modalEditPayment" class="modal">
+        <div class="modal-content" style="max-width: 550px;">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="font-bold text-xl text-indigo-900"><i class="fa-solid fa-pen-to-square mr-2"></i>Edit Payment / Cheque Details</h3>
+                <button onclick="window.closeM('modalEditPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <form onsubmit="window.saveEditedPayment(event)" class="space-y-4">
+                <input type="hidden" id="epDocId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Vendor / Payee Name</label><input type="text" id="epVendorName" class="w-full border p-2 rounded-lg font-bold"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Payment Date</label><input type="date" id="epDate" class="w-full border p-2 rounded-lg" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Amount (Rs)</label><input type="number" step="0.01" id="epAmount" class="w-full border p-2 rounded-lg font-bold text-green-700" required></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Method</label><select id="epMethod" class="w-full border p-2 rounded-lg font-bold"><option value="CASH">Cash</option><option value="DFCC_BANK">DFCC Bank</option><option value="SAMPATH_BANK">Sampath Bank</option><option value="DFCC_CHEQUE">DFCC Cheque</option><option value="SAMPATH_CHEQUE">Sampath Cheque</option></select></div>
+                    <div class="md:col-span-2"><label class="text-xs font-bold text-gray-500 uppercase">Description / Reason</label><input type="text" id="epDesc" class="w-full border p-2 rounded-lg"></div>
+                    <div><label class="text-xs font-bold text-orange-600 uppercase">Cheque No (If Cheque)</label><input type="text" id="epChequeNo" class="w-full border p-2 rounded-lg font-bold"></div>
+                    <div><label class="text-xs font-bold text-orange-600 uppercase">Cheque Date</label><input type="date" id="epChequeDate" class="w-full border p-2 rounded-lg"></div>
+                    <div class="md:col-span-2"><label class="text-xs font-bold text-orange-600 uppercase">Cheque Status</label><select id="epChequeStatus" class="w-full border p-2 rounded-lg font-bold"><option value="">N/A (Not a Cheque)</option><option value="PENDING">PENDING (Unrealized)</option><option value="REALIZED">REALIZED (Passed)</option></select></div>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow">Update Payment / Cheque</button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalViewPayment" class="modal"><div class="modal-content" style="max-width: 600px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-indigo-900"><i class="fa-solid fa-receipt mr-2"></i>Payment Details</h3><button onclick="window.closeM('modalViewPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><div class="bg-gray-50 p-4 rounded-lg mb-4 text-sm"><div class="grid grid-cols-2 gap-2 mb-2"><div><span class="font-bold text-gray-500">Pay ID:</span> <span id="vPayId" class="font-bold text-gray-800"></span></div><div><span class="font-bold text-gray-500">Date:</span> <span id="vPayDate" class="font-bold text-gray-800"></span></div><div><span class="font-bold text-gray-500">Method:</span> <span id="vPayMethod" class="font-bold text-gray-800"></span></div><div><span class="font-bold text-gray-500">Total:</span> <span id="vPayTotal" class="font-black text-green-600"></span></div><div class="col-span-2"><span class="font-bold text-gray-500">Description:</span> <span id="vPayDesc" class="font-bold text-gray-700"></span></div></div><div id="vPayChequeDiv" class="hidden bg-orange-100 text-orange-800 p-2 rounded border border-orange-200 mt-2 font-bold text-xs"></div></div><h4 class="font-bold text-sm text-gray-700 mb-2">Settled Bills</h4><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-200 text-gray-600 text-xs"><tr><th class="p-2">Bill No</th><th class="p-2 text-right">Amount Paid (Rs)</th></tr></thead><tbody id="vPayAllocations"></tbody></table></div></div></div>
     
     <div id="modalView" class="modal"><div class="modal-content"><div class="flex justify-between items-center border-b pb-4 mb-4"><h2 class="text-2xl font-black text-gray-800"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>DPR Details</h2><button onclick="window.closeM('modalView')" class="text-gray-400 hover:text-red-500 transition text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><div id="mvClosedDiv" class="hidden bg-red-100 text-red-800 p-3 rounded-lg font-black mb-4 border border-red-300"></div><div id="mvNotesCon" class="hidden bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4"><span class="font-bold text-yellow-800 text-xs uppercase block mb-1">Special Notes</span><p id="mvNotes" class="text-sm font-bold text-gray-700"></p></div><div class="flex flex-wrap justify-between bg-gray-50 p-4 rounded-xl mb-4 font-bold text-gray-700 text-sm border"><span id="mvDate"></span><span id="mvSite" class="text-blue-700"></span><span id="mvWeather"></span></div><div class="space-y-4 max-h-[55vh] overflow-y-auto pr-2 custom-scrollbar"><div id="mvUploadsCon" class="hidden"><h4 class="font-bold text-gray-800 mb-2">Attached Evidence</h4><div class="flex flex-wrap gap-4 mb-4"><div id="mvPhotos" class="flex flex-wrap gap-2"></div><div id="mvBills" class="flex flex-wrap gap-2"></div></div></div><div class="border rounded-xl overflow-hidden"><div class="bg-orange-50 font-bold p-3 text-orange-800 border-b">Delays</div><table class="w-full text-sm"><tbody id="mvDelays" class="divide-y"></tbody></table></div><div class="border rounded-xl overflow-hidden"><div class="bg-teal-50 font-bold p-3 text-teal-800 border-b">Measurements</div><table class="w-full text-sm"><tbody id="mvMeasures" class="divide-y"></tbody></table></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="border rounded-xl overflow-hidden"><div class="bg-green-50 font-bold p-3 text-green-800 border-b text-xs">Suppliers</div><table class="w-full text-xs"><tbody id="mvSups" class="divide-y"></tbody></table></div><div class="border rounded-xl overflow-hidden"><div class="bg-lime-50 font-bold p-3 text-lime-800 border-b text-xs">Sub-Contractors</div><table class="w-full text-xs"><tbody id="mvSubs" class="divide-y"></tbody></table></div></div><div class="border rounded-xl overflow-hidden"><div class="bg-purple-50 font-bold p-3 text-purple-800 border-b">Visitors & Notes</div><table class="w-full text-sm"><tbody id="mvVisits" class="divide-y"></tbody></table></div><div class="border rounded-xl overflow-hidden shadow-sm"><div class="bg-blue-50 font-bold p-3 text-blue-800 border-b">Workers, Daily Work & Advances</div><div class="overflow-x-auto"><table class="w-full text-sm text-left min-w-[650px]"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="p-2 border-b">Name</th><th class="p-2 border-b">Role</th><th class="p-2 border-b">Work Done</th><th class="p-2 border-b">OT</th><th class="p-2 border-b">Adv</th><th class="p-2 border-b text-red-500">Left</th><th class="p-2 border-b text-red-500">Remarks</th></tr></thead><tbody id="mvWorkers" class="divide-y"></tbody></table></div></div></div></div></div>
@@ -386,15 +569,180 @@
 
         window.updateUserPass = async (e) => { e.preventDefault(); const curP = document.getElementById('cpCurrent').value; const newP = document.getElementById('cpNew').value; const conP = document.getElementById('cpConfirm').value; if(newP !== conP) return alert("New Passwords do not match!"); const btn = document.getElementById('btnUpdatePass'); btn.innerText = "Updating..."; try { const user = auth.currentUser; const cred = EmailAuthProvider.credential(user.email, curP); await reauthenticateWithCredential(user, cred); await updatePassword(user, newP); alert("Password updated successfully!"); window.closeM('modalChangePass'); e.target.reset(); } catch(err) { alert("Error: " + err.message); } btn.innerText = "Update Password"; };
 
+        // ==========================================
+        // VENDORS (ADD, EDIT BANK DETAILS & DELETE)
+        // ==========================================
         let allVendors = []; let allBills = [];
 
-        window.loadPayVendors = async (isInit = false) => { const snap = await getDocs(collection(db, "pay_vendors")); allVendors = []; const tb = document.getElementById('tblVendors'); if(tb && !isInit) tb.innerHTML = ''; const drpB = document.getElementById('bVendor'); const drpP = document.getElementById('pVendor'); if(drpB) drpB.innerHTML = '<option value="">Select Vendor...</option>'; if(drpP) drpP.innerHTML = '<option value="">Select Vendor...</option>'; snap.forEach(d => { const v = d.data(); v.id = d.id; allVendors.push(v); if(tb && !isInit) { let bankInfo = v.accNo ? `${v.bankName} - ${v.branch}<br><span class="text-gray-500">${v.accNo} (${v.accName})</span>` : '-'; tb.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3 font-bold">${v.name}</td><td class="p-3">${v.contact}<br><span class="text-xs text-gray-500">${v.address}</span></td><td class="p-3 text-xs">${bankInfo}</td><td class="p-3 text-right"><button onclick="window.delPayVendor('${d.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`; } let o = document.createElement('option'); o.value = d.id; o.innerText = v.name; if(drpB) drpB.appendChild(o.cloneNode(true)); if(drpP) drpP.appendChild(o.cloneNode(true)); }); if(tb && !isInit && allVendors.length===0) tb.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400 font-bold">No Vendors Found</td></tr>`; };
-        window.addVendor = async (e) => { e.preventDefault(); const payload = { name: document.getElementById('vName').value, contact: document.getElementById('vContact').value, address: document.getElementById('vAddress').value, accName: document.getElementById('vAccName').value, bankName: document.getElementById('vBankName').value, branch: document.getElementById('vBranch').value, accNo: document.getElementById('vAccNo').value, timestamp: new Date() }; try { await addDoc(collection(db, "pay_vendors"), payload); e.target.reset(); window.loadPayVendors(); alert("Vendor Added!"); } catch(er){ alert(er.message); } };
+        window.loadPayVendors = async (isInit = false) => { 
+            const snap = await getDocs(collection(db, "pay_vendors")); 
+            allVendors = []; 
+            const tb = document.getElementById('tblVendors'); if(tb && !isInit) tb.innerHTML = ''; 
+            const drpB = document.getElementById('bVendor'); const drpP = document.getElementById('pVendor'); 
+            if(drpB) drpB.innerHTML = '<option value="">Select Vendor...</option>'; 
+            if(drpP) drpP.innerHTML = '<option value="">Select Vendor...</option>'; 
+            
+            snap.forEach(d => { 
+                const v = d.data(); v.id = d.id; allVendors.push(v); 
+                if(tb && !isInit) { 
+                    let bankInfo = v.accNo ? `<span class="font-bold text-indigo-900">${v.bankName || ''} - ${v.branch || ''}</span><br><span class="text-gray-600 font-semibold">${v.accNo}</span> <span class="text-gray-400">(${v.accName || '-'})</span>` : '<span class="text-gray-400 italic">No Bank Info</span>'; 
+                    tb.innerHTML += `<tr class="border-b hover:bg-indigo-50/40">
+                        <td class="p-3 font-bold text-gray-800">${v.name}</td>
+                        <td class="p-3">${v.contact || '-'}<br><span class="text-xs text-gray-500">${v.address || ''}</span></td>
+                        <td class="p-3 text-xs">${bankInfo}</td>
+                        <td class="p-3 text-right space-x-2">
+                            <button onclick="window.editPayVendor('${d.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold transition" title="Edit Vendor / Bank Details"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
+                            <button onclick="window.delPayVendor('${d.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`; 
+                } 
+                let o = document.createElement('option'); o.value = d.id; o.innerText = v.name; 
+                if(drpB) drpB.appendChild(o.cloneNode(true)); 
+                if(drpP) drpP.appendChild(o.cloneNode(true)); 
+            }); 
+            if(tb && !isInit && allVendors.length===0) tb.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400 font-bold">No Vendors Found</td></tr>`; 
+        };
+
+        window.editPayVendor = (id) => {
+            const v = allVendors.find(x => x.id === id);
+            if(!v) return;
+            document.getElementById('editVendorId').value = v.id;
+            document.getElementById('vName').value = v.name || '';
+            document.getElementById('vContact').value = v.contact || '';
+            document.getElementById('vAddress').value = v.address || '';
+            document.getElementById('vAccName').value = v.accName || '';
+            document.getElementById('vBankName').value = v.bankName || '';
+            document.getElementById('vBranch').value = v.branch || '';
+            document.getElementById('vAccNo').value = v.accNo || '';
+            document.getElementById('vendorFormTitle').innerText = "Edit Vendor & Bank Details";
+            document.getElementById('btnSaveVendor').innerText = "Update Vendor";
+            document.getElementById('btnCancelVendor').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelEditVendor = () => {
+            document.getElementById('vendorForm').reset();
+            document.getElementById('editVendorId').value = '';
+            document.getElementById('vendorFormTitle').innerText = "Add New Vendor";
+            document.getElementById('btnSaveVendor').innerText = "Save Vendor";
+            document.getElementById('btnCancelVendor').classList.add('hidden');
+        };
+
+        window.saveVendor = async (e) => { 
+            e.preventDefault(); 
+            const editId = document.getElementById('editVendorId').value;
+            const payload = { 
+                name: document.getElementById('vName').value.trim(), 
+                contact: document.getElementById('vContact').value.trim(), 
+                address: document.getElementById('vAddress').value.trim(), 
+                accName: document.getElementById('vAccName').value.trim(), 
+                bankName: document.getElementById('vBankName').value.trim(), 
+                branch: document.getElementById('vBranch').value.trim(), 
+                accNo: document.getElementById('vAccNo').value.trim()
+            }; 
+            try { 
+                if(editId) {
+                    await updateDoc(doc(db, "pay_vendors", editId), payload);
+                    alert("Vendor Updated Successfully!");
+                } else {
+                    payload.timestamp = new Date();
+                    await addDoc(collection(db, "pay_vendors"), payload); 
+                    alert("Vendor Added!"); 
+                }
+                window.cancelEditVendor();
+                window.loadPayVendors(); 
+            } catch(er){ alert(er.message); } 
+        };
         window.delPayVendor = async (id) => { if(confirm("Delete Vendor?")) { await deleteDoc(doc(db, "pay_vendors", id)); window.loadPayVendors(); } };
 
-        window.loadPayBills = async () => { const snap = await getDocs(query(collection(db, "pay_bills"), orderBy("date", "desc"))); allBills = []; const tb = document.getElementById('tblBills'); tb.innerHTML = ''; snap.forEach(d => { const b = d.data(); b.id = d.id; allBills.push(b); let vName = allVendors.find(x => x.id === b.vendorId)?.name || 'Unknown'; let statBadge = b.status === 'SETTLED' ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Settled</span>` : (b.paid > 0 ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">Partial</span>` : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Pending</span>`); tb.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3">${b.date}</td><td class="p-3 font-bold">${b.billNo}</td><td class="p-3">${vName}</td><td class="p-3 text-xs text-gray-500">${b.remarks}</td><td class="p-3 text-right font-bold text-red-600">${parseFloat(b.amount).toLocaleString()}</td><td class="p-3 text-right font-bold text-green-600">${parseFloat(b.paid).toLocaleString()}</td><td class="p-3 text-center">${statBadge}</td><td class="p-3 text-center"><button onclick="window.delPayBill('${d.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`; }); if(allBills.length===0) tb.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-bold">No Bills Recorded</td></tr>`; };
-        window.addBill = async (e) => { e.preventDefault(); const payload = { vendorId: document.getElementById('bVendor').value, date: document.getElementById('bDate').value, billNo: document.getElementById('bNumber').value, amount: parseFloat(document.getElementById('bAmount').value), paid: 0, remarks: document.getElementById('bRemarks').value, status: 'PENDING', timestamp: new Date() }; try { await addDoc(collection(db, "pay_bills"), payload); window.closeM('modalAddBill'); e.target.reset(); window.loadPayBills(); window.calculateAnalytics(); alert("Bill Added!"); } catch(er){ alert(er.message); } };
+        // ==========================================
+        // BILLS & INVOICES (ADD, EDIT & DELETE)
+        // ==========================================
+        window.loadPayBills = async () => { 
+            const snap = await getDocs(query(collection(db, "pay_bills"), orderBy("date", "desc"))); 
+            allBills = []; 
+            const tb = document.getElementById('tblBills'); tb.innerHTML = ''; 
+            snap.forEach(d => { 
+                const b = d.data(); b.id = d.id; allBills.push(b); 
+                let vName = allVendors.find(x => x.id === b.vendorId)?.name || 'Unknown'; 
+                let statBadge = b.status === 'SETTLED' ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Settled</span>` : (b.paid > 0 ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">Partial</span>` : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Pending</span>`); 
+                tb.innerHTML += `<tr class="border-b hover:bg-gray-50">
+                    <td class="p-3">${b.date}</td>
+                    <td class="p-3 font-bold">${b.billNo}</td>
+                    <td class="p-3">${vName}</td>
+                    <td class="p-3 text-xs text-gray-500">${b.remarks}</td>
+                    <td class="p-3 text-right font-bold text-red-600">${parseFloat(b.amount).toLocaleString()}</td>
+                    <td class="p-3 text-right font-bold text-green-600">${parseFloat(b.paid || 0).toLocaleString()}</td>
+                    <td class="p-3 text-center">${statBadge}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="window.editPayBill('${d.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Bill"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delPayBill('${d.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+            }); 
+            if(allBills.length===0) tb.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-bold">No Bills Recorded</td></tr>`; 
+        };
+
+        window.openAddBillModal = () => {
+            document.getElementById('editBillId').value = '';
+            document.getElementById('bVendor').value = '';
+            document.getElementById('bDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('bNumber').value = '';
+            document.getElementById('bAmount').value = '';
+            document.getElementById('bRemarks').value = '';
+            document.getElementById('billModalTitle').innerHTML = `<i class="fa-solid fa-file-invoice mr-2"></i>Add New Bill`;
+            document.getElementById('btnSaveBill').innerText = "Save Bill";
+            window.openM('modalAddBill');
+        };
+
+        window.editPayBill = (id) => {
+            const b = allBills.find(x => x.id === id);
+            if(!b) return;
+            document.getElementById('editBillId').value = b.id;
+            document.getElementById('bVendor').value = b.vendorId || '';
+            document.getElementById('bDate').value = b.date || '';
+            document.getElementById('bNumber').value = b.billNo || '';
+            document.getElementById('bAmount').value = b.amount || 0;
+            document.getElementById('bRemarks').value = b.remarks || '';
+            document.getElementById('billModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i>Edit Bill`;
+            document.getElementById('btnSaveBill').innerText = "Update Bill";
+            window.openM('modalAddBill');
+        };
+
+        window.saveBill = async (e) => { 
+            e.preventDefault(); 
+            const editId = document.getElementById('editBillId').value;
+            const newAmt = parseFloat(document.getElementById('bAmount').value);
+            try { 
+                if(editId) {
+                    const existing = allBills.find(x => x.id === editId);
+                    const curPaid = existing ? (existing.paid || 0) : 0;
+                    const newStatus = curPaid >= newAmt ? 'SETTLED' : 'PENDING';
+                    await updateDoc(doc(db, "pay_bills", editId), {
+                        vendorId: document.getElementById('bVendor').value,
+                        date: document.getElementById('bDate').value,
+                        billNo: document.getElementById('bNumber').value,
+                        amount: newAmt,
+                        remarks: document.getElementById('bRemarks').value,
+                        status: newStatus
+                    });
+                    alert("Bill Updated!");
+                } else {
+                    const payload = { vendorId: document.getElementById('bVendor').value, date: document.getElementById('bDate').value, billNo: document.getElementById('bNumber').value, amount: newAmt, paid: 0, remarks: document.getElementById('bRemarks').value, status: 'PENDING', timestamp: new Date() }; 
+                    await addDoc(collection(db, "pay_bills"), payload); 
+                    alert("Bill Added!"); 
+                }
+                window.closeM('modalAddBill'); 
+                window.loadPayBills(); 
+                window.calculateAnalytics(); 
+            } catch(er){ alert(er.message); } 
+        };
         window.delPayBill = async (id) => { if(confirm("Delete Bill?")) { await deleteDoc(doc(db, "pay_bills", id)); window.loadPayBills(); window.calculateAnalytics(); } };
+
+        // ==========================================
+        // PAYMENTS & CHEQUES (ADD, EDIT & DELETE)
+        // ==========================================
+        let allPaymentsList = [];
 
         window.toggleChequeFields = () => { const m = document.getElementById('pMethod').value; const cf = document.getElementById('pChequeFields'); if(m.includes('CHEQUE')) { cf.classList.remove('hidden'); document.getElementById('pChequeNo').required = true; document.getElementById('pChequeDate').required = true; } else { cf.classList.add('hidden'); document.getElementById('pChequeNo').required = false; document.getElementById('pChequeDate').required = false; } };
         window.loadVendorBillsForPayment = () => { const vId = document.getElementById('pVendor').value; const con = document.getElementById('pBillsContainer'); const tb = document.getElementById('pBillsTable'); if(!vId) { con.classList.add('hidden'); return; } tb.innerHTML = ''; let hasPending = false; allBills.forEach(b => { if(b.vendorId === vId && b.status !== 'SETTLED') { hasPending = true; let due = b.amount - b.paid; tb.innerHTML += `<tr class="border-b"><td class="p-2 text-center"><input type="checkbox" class="bill-cb w-4 h-4" value="${b.id}" data-due="${due}" onchange="window.calcPaymentTotal()"></td><td class="p-2 font-bold text-xs">${b.billNo} <span class="font-normal text-gray-500 block">${b.remarks}</span></td><td class="p-2 text-right font-bold text-red-500">${due.toLocaleString()}</td><td class="p-2"><input type="number" id="payamt_${b.id}" class="w-full border p-1 rounded text-right pay-input" max="${due}" disabled oninput="window.calcPaymentTotal()"></td></tr>`; } }); if(hasPending) { con.classList.remove('hidden'); document.getElementById('pTotalCalc').innerText = '0.00'; } else { tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 font-bold">No pending bills for this vendor.</td></tr>`; con.classList.remove('hidden'); } };
@@ -408,7 +756,8 @@
             const btn = document.getElementById('btnSubmitPayment'); btn.innerText = "Processing..."; btn.disabled = true; 
             const method = document.getElementById('pMethod').value; let cqNo = "", cqDate = "", cqStatus = ""; 
             if(method.includes('CHEQUE')) { cqNo = document.getElementById('pChequeNo').value; cqDate = document.getElementById('pChequeDate').value; cqStatus = 'PENDING'; } 
-            const payPayload = { payId: "PAY-" + Math.floor(Math.random()*100000), vendorId: vId, date: document.getElementById('pDate').value, description: document.getElementById('pDesc').value, method: method, totalAmount: totalPay, chequeNo: cqNo, chequeDate: cqDate, chequeStatus: cqStatus, allocations: allocations, timestamp: new Date() }; 
+            const vNameObj = allVendors.find(x => x.id === vId);
+            const payPayload = { payId: "PAY-" + Math.floor(Math.random()*100000), vendorId: vId, vendorName: vNameObj ? vNameObj.name : '', date: document.getElementById('pDate').value, description: document.getElementById('pDesc').value, method: method, totalAmount: totalPay, chequeNo: cqNo, chequeDate: cqDate, chequeStatus: cqStatus, allocations: allocations, timestamp: new Date() }; 
             try { 
                 await addDoc(collection(db, "pay_history"), payPayload); 
                 for(let alloc of allocations) { const billRef = doc(db, "pay_bills", alloc.billId); const bSnap = await getDoc(billRef); if(bSnap.exists()) { let curPaid = bSnap.data().paid || 0; let newPaid = curPaid + alloc.amount; let newStatus = newPaid >= bSnap.data().amount ? 'SETTLED' : 'PENDING'; await updateDoc(billRef, { paid: newPaid, status: newStatus }); } } 
@@ -416,8 +765,82 @@
             } catch (err) { alert("Error: " + err.message); } btn.innerText = "Confirm Payment"; btn.disabled = false; 
         };
         
-        window.loadPayHistory = async () => { const snap = await getDocs(query(collection(db, "pay_history"), orderBy("timestamp", "desc"))); const tb = document.getElementById('tblPayments'); tb.innerHTML = ''; snap.forEach(d => { const p = d.data(); let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || 'Record'; let methodBadge = p.method.includes('CHEQUE') ? `<span class="text-orange-600 font-bold text-xs"><i class="fa-solid fa-money-check"></i> ${p.method.replace('_', ' ')}</span><br><span class="text-gray-500 text-[10px]">No: ${p.chequeNo}</span>` : `<span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-building-columns"></i> ${p.method.replace('_', ' ')}</span>`; tb.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3">${p.date}</td><td class="p-3 font-bold text-indigo-700">${p.payId}</td><td class="p-3 font-bold">${vName}</td><td class="p-3 text-xs text-gray-500">${p.description || '-'}</td><td class="p-3">${methodBadge}</td><td class="p-3 text-right font-black text-green-700">${parseFloat(p.totalAmount).toLocaleString()}</td><td class="p-3 text-center"><button onclick="window.viewPayment('${d.id}')" class="text-blue-500 hover:text-blue-700"><i class="fa-solid fa-eye"></i></button></td></tr>`; }); if(snap.empty) tb.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">No Payments Recorded</td></tr>`; };
-        window.viewPayment = async (id) => { const docRef = doc(db, "pay_history", id); const snap = await getDoc(docRef); if(!snap.exists()) return; const p = snap.data(); document.getElementById('vPayId').innerText = p.payId; document.getElementById('vPayDate').innerText = p.date; document.getElementById('vPayMethod').innerText = p.method.replace('_', ' '); document.getElementById('vPayTotal').innerText = "Rs. " + p.totalAmount.toLocaleString(); document.getElementById('vPayDesc').innerText = p.description || 'N/A'; const cqDiv = document.getElementById('vPayChequeDiv'); if(p.method.includes('CHEQUE')) { cqDiv.classList.remove('hidden'); cqDiv.innerHTML = `Cheque No: ${p.chequeNo} | Date: ${p.chequeDate} | Status: ${p.chequeStatus}`; } else { cqDiv.classList.add('hidden'); } const atb = document.getElementById('vPayAllocations'); atb.innerHTML = ''; if(p.allocations && p.allocations.length > 0) { p.allocations.forEach(a => { let bill = allBills.find(b => b.id === a.billId); let bTxt = bill ? `${bill.billNo} <span class="text-gray-500 font-normal">(${bill.remarks})</span>` : a.billId; atb.innerHTML += `<tr class="border-b"><td class="p-2 font-bold text-xs">${bTxt}</td><td class="p-2 text-right font-bold text-green-600">${a.amount.toLocaleString()}</td></tr>`; }); } else { atb.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-gray-500">Bulk Upload - No Bills Allocated</td></tr>`; } window.openM('modalViewPayment'); };
+        window.loadPayHistory = async () => { 
+            const snap = await getDocs(query(collection(db, "pay_history"), orderBy("timestamp", "desc"))); 
+            allPaymentsList = [];
+            const tb = document.getElementById('tblPayments'); tb.innerHTML = ''; 
+            snap.forEach(d => { 
+                const p = d.data(); p.id = d.id; allPaymentsList.push(p);
+                let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || 'Record'; 
+                let methodBadge = p.method.includes('CHEQUE') ? `<span class="text-orange-600 font-bold text-xs"><i class="fa-solid fa-money-check"></i> ${p.method.replace('_', ' ')}</span><br><span class="text-gray-500 text-[10px]">No: ${p.chequeNo}</span>` : `<span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-building-columns"></i> ${p.method.replace('_', ' ')}</span>`; 
+                tb.innerHTML += `<tr class="border-b hover:bg-gray-50">
+                    <td class="p-3">${p.date}</td>
+                    <td class="p-3 font-bold text-indigo-700">${p.payId}</td>
+                    <td class="p-3 font-bold">${vName}</td>
+                    <td class="p-3 text-xs text-gray-500">${p.description || p.reason || '-'}</td>
+                    <td class="p-3">${methodBadge}</td>
+                    <td class="p-3 text-right font-black text-green-700">${parseFloat(p.totalAmount).toLocaleString()}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="window.viewPayment('${d.id}')" class="text-blue-500 hover:text-blue-700 p-1" title="View"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.openEditPaymentModal('${d.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Edit Payment/Cheque"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delPaymentRecord('${d.id}')" class="text-red-400 hover:text-red-600 p-1" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+            }); 
+            if(snap.empty) tb.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">No Payments Recorded</td></tr>`; 
+        };
+
+        window.openEditPaymentModal = async (id) => {
+            const snap = await getDoc(doc(db, "pay_history", id));
+            if(!snap.exists()) return;
+            const p = snap.data();
+            let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || '';
+            document.getElementById('epDocId').value = id;
+            document.getElementById('epVendorName').value = vName;
+            document.getElementById('epDate').value = p.date || '';
+            document.getElementById('epAmount').value = p.totalAmount || 0;
+            document.getElementById('epMethod').value = p.method || 'CASH';
+            document.getElementById('epDesc').value = p.description || p.reason || '';
+            document.getElementById('epChequeNo').value = p.chequeNo || '';
+            document.getElementById('epChequeDate').value = p.chequeDate || '';
+            document.getElementById('epChequeStatus').value = p.chequeStatus || '';
+            window.openM('modalEditPayment');
+        };
+
+        window.saveEditedPayment = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('epDocId').value;
+            const payload = {
+                vendorName: document.getElementById('epVendorName').value.trim(),
+                date: document.getElementById('epDate').value,
+                totalAmount: parseFloat(document.getElementById('epAmount').value || 0),
+                method: document.getElementById('epMethod').value,
+                description: document.getElementById('epDesc').value.trim(),
+                reason: document.getElementById('epDesc').value.trim(),
+                chequeNo: document.getElementById('epChequeNo').value.trim(),
+                chequeDate: document.getElementById('epChequeDate').value,
+                chequeStatus: document.getElementById('epChequeStatus').value
+            };
+            try {
+                await updateDoc(doc(db, "pay_history", id), payload);
+                window.closeM('modalEditPayment');
+                window.loadPayHistory();
+                window.loadPayCheques();
+                window.calculateAnalytics();
+                alert("Payment / Cheque Updated!");
+            } catch(err) { alert("Error: " + err.message); }
+        };
+
+        window.delPaymentRecord = async (id) => {
+            if(confirm("Delete this payment/cheque record permanently?")) {
+                await deleteDoc(doc(db, "pay_history", id));
+                window.loadPayHistory();
+                window.loadPayCheques();
+                window.calculateAnalytics();
+            }
+        };
+
+        window.viewPayment = async (id) => { const docRef = doc(db, "pay_history", id); const snap = await getDoc(docRef); if(!snap.exists()) return; const p = snap.data(); document.getElementById('vPayId').innerText = p.payId; document.getElementById('vPayDate').innerText = p.date; document.getElementById('vPayMethod').innerText = p.method.replace('_', ' '); document.getElementById('vPayTotal').innerText = "Rs. " + p.totalAmount.toLocaleString(); document.getElementById('vPayDesc').innerText = p.description || p.reason || 'N/A'; const cqDiv = document.getElementById('vPayChequeDiv'); if(p.method.includes('CHEQUE')) { cqDiv.classList.remove('hidden'); cqDiv.innerHTML = `Cheque No: ${p.chequeNo} | Date: ${p.chequeDate} | Status: ${p.chequeStatus}`; } else { cqDiv.classList.add('hidden'); } const atb = document.getElementById('vPayAllocations'); atb.innerHTML = ''; if(p.allocations && p.allocations.length > 0) { p.allocations.forEach(a => { let bill = allBills.find(b => b.id === a.billId); let bTxt = bill ? `${bill.billNo} <span class="text-gray-500 font-normal">(${bill.remarks})</span>` : a.billId; atb.innerHTML += `<tr class="border-b"><td class="p-2 font-bold text-xs">${bTxt}</td><td class="p-2 text-right font-bold text-green-600">${a.amount.toLocaleString()}</td></tr>`; }); } else { atb.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-gray-500">Bulk Upload - No Bills Allocated</td></tr>`; } window.openM('modalViewPayment'); };
 
         window.loadPayCheques = async () => { 
             const filterVal = document.getElementById('cqFilter').value; 
@@ -439,9 +862,22 @@
                 if (filterVal === 'PENDING' && p.chequeStatus !== 'PENDING') continue; 
                 if (filterVal === 'REALIZED' && p.chequeStatus !== 'REALIZED') continue; 
                 let badge = p.chequeStatus === 'PENDING' ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold animate-pulse">Unrealized</span>` : `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Realized</span>`; 
-                let actionBtn = p.chequeStatus === 'PENDING' ? `<button onclick="window.markChequeRealized('${p.id}')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">Mark Realized</button>` : `<i class="fa-solid fa-check text-green-500"></i>`; 
+                let actionBtn = p.chequeStatus === 'PENDING' ? `<button onclick="window.markChequeRealized('${p.id}')" class="bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow-sm">Mark Realized</button>` : `<i class="fa-solid fa-check text-green-500"></i>`; 
                 let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || 'Bulk Upload'; 
-                tb.innerHTML += `<tr class="border-b hover:bg-orange-50"><td class="p-3 font-bold">${p.chequeDate}</td><td class="p-3 font-bold text-indigo-700">${p.chequeNo}</td><td class="p-3 text-xs">${p.method.split('_')[0]}</td><td class="p-3">${vName}</td><td class="p-3 text-xs text-gray-500">${p.description || p.reason || '-'}</td><td class="p-3 text-right font-black text-red-600">${parseFloat(p.totalAmount).toLocaleString()}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${actionBtn}</td></tr>`; 
+                tb.innerHTML += `<tr class="border-b hover:bg-orange-50">
+                    <td class="p-3 font-bold">${p.chequeDate}</td>
+                    <td class="p-3 font-bold text-indigo-700">${p.chequeNo}</td>
+                    <td class="p-3 text-xs">${p.method.split('_')[0]}</td>
+                    <td class="p-3">${vName}</td>
+                    <td class="p-3 text-xs text-gray-500">${p.description || p.reason || '-'}</td>
+                    <td class="p-3 text-right font-black text-red-600">${parseFloat(p.totalAmount).toLocaleString()}</td>
+                    <td class="p-3 text-center">${badge}</td>
+                    <td class="p-3 text-center space-x-1">
+                        ${actionBtn}
+                        <button onclick="window.openEditPaymentModal('${p.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Cheque"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delPaymentRecord('${p.id}')" class="text-red-400 hover:text-red-600 p-1" title="Delete Cheque"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
             } 
             document.getElementById('cqStatUnrealized').innerText = "Rs. " + cqUnrealized.toLocaleString(); 
             document.getElementById('cqStatRealized').innerText = "Rs. " + cqRealized.toLocaleString(); 
@@ -449,13 +885,17 @@
         };
         window.markChequeRealized = async (id) => { if(confirm("Mark this cheque as realized?")) { await updateDoc(doc(db, "pay_history", id), { chequeStatus: 'REALIZED' }); window.loadPayCheques(); window.calculateAnalytics(); } };
 
+        // ==========================================
+        // LORRY PETTY CASH (ADD, EDIT & DELETE)
+        // ==========================================
+        let allLorryRecords = [];
         window.loadPayLorry = async () => { 
             const filterMonth = document.getElementById('lcMonthFilter')?.value; 
             const snap = await getDocs(query(collection(db, "pay_lorry"))); 
             const tb = document.getElementById('tblLorry'); tb.innerHTML = ''; 
-            let records = []; 
-            snap.forEach(d => { let r = d.data(); r.id = d.id; records.push(r); }); 
-            records.sort((a,b) => {
+            allLorryRecords = []; 
+            snap.forEach(d => { let r = d.data(); r.id = d.id; allLorryRecords.push(r); }); 
+            allLorryRecords.sort((a,b) => {
                 let dDiff = new Date(a.date) - new Date(b.date);
                 if (dDiff !== 0) return dDiff; 
                 if (a.type === 'ADVANCE' && b.type === 'EXPENSE') return -1;
@@ -464,7 +904,7 @@
                 return 0;
             });
             let bal = 0; let broughtForward = 0; let displayRecords = [];
-            records.forEach(r => { 
+            allLorryRecords.forEach(r => { 
                 if(r.type === 'ADVANCE') bal += parseFloat(r.amount); else bal -= parseFloat(r.amount); 
                 r.runBal = bal; 
                 if (filterMonth) {
@@ -478,17 +918,70 @@
             displayRecords.forEach(r => { 
                 let adv = r.type === 'ADVANCE' ? r.amount.toLocaleString() : '-'; 
                 let exp = r.type === 'EXPENSE' ? r.amount.toLocaleString() : '-'; 
-                tb.innerHTML += `<tr class="border-b hover:bg-blue-50"><td class="p-3">${r.date}</td><td class="p-3 font-bold">${r.desc}</td><td class="p-3 text-right font-bold text-green-600">${adv}</td><td class="p-3 text-right font-bold text-red-600">${exp}</td><td class="p-3 text-right font-black text-blue-800 bg-blue-100">${r.runBal.toLocaleString()}</td><td class="p-3 text-center"><button onclick="window.delLorry('${r.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`; 
+                tb.innerHTML += `<tr class="border-b hover:bg-blue-50">
+                    <td class="p-3">${r.date}</td>
+                    <td class="p-3 font-bold">${r.desc}</td>
+                    <td class="p-3 text-right font-bold text-green-600">${adv}</td>
+                    <td class="p-3 text-right font-bold text-red-600">${exp}</td>
+                    <td class="p-3 text-right font-black text-blue-800 bg-blue-100">${r.runBal.toLocaleString()}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="window.editLorry('${r.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Record"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delLorry('${r.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
             }); 
             if (filterMonth && displayRecords.length > 0) {
                 tb.innerHTML += `<tr class="border-b bg-gray-200"><td class="p-3 font-bold" colspan="4">Brought Forward (පෙර ශේෂය)</td><td class="p-3 text-right font-black text-gray-800">${broughtForward.toLocaleString()}</td><td></td></tr>`;
             }
             if(displayRecords.length === 0) tb.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">No Lorry Records Found for this period</td></tr>`; 
         };
-        window.addLorryCash = async (e) => { e.preventDefault(); const payload = { type: document.getElementById('lcType').value, date: document.getElementById('lcDate').value, desc: document.getElementById('lcDesc').value, amount: parseFloat(document.getElementById('lcAmount').value), timestamp: new Date() }; try { await addDoc(collection(db, "pay_lorry"), payload); e.target.reset(); document.getElementById('lcDate').value = new Date().toISOString().split('T')[0]; window.loadPayLorry(); } catch(err) { alert(err.message); } };
+
+        window.editLorry = (id) => {
+            const r = allLorryRecords.find(x => x.id === id);
+            if(!r) return;
+            document.getElementById('editLorryId').value = r.id;
+            document.getElementById('lcType').value = r.type;
+            document.getElementById('lcDate').value = r.date;
+            document.getElementById('lcDesc').value = r.desc;
+            document.getElementById('lcAmount').value = r.amount;
+            document.getElementById('btnSaveLorry').innerText = "Update Record";
+            document.getElementById('btnCancelLorry').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelEditLorry = () => {
+            document.getElementById('lorryForm').reset();
+            document.getElementById('editLorryId').value = '';
+            document.getElementById('lcDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('btnSaveLorry').innerText = "Save Record";
+            document.getElementById('btnCancelLorry').classList.add('hidden');
+        };
+
+        window.saveLorryCash = async (e) => { 
+            e.preventDefault(); 
+            const editId = document.getElementById('editLorryId').value;
+            const payload = { 
+                type: document.getElementById('lcType').value, 
+                date: document.getElementById('lcDate').value, 
+                desc: document.getElementById('lcDesc').value.trim(), 
+                amount: parseFloat(document.getElementById('lcAmount').value)
+            }; 
+            try { 
+                if(editId) {
+                    await updateDoc(doc(db, "pay_lorry", editId), payload);
+                } else {
+                    payload.timestamp = new Date();
+                    await addDoc(collection(db, "pay_lorry"), payload); 
+                }
+                window.cancelEditLorry();
+                window.loadPayLorry(); 
+            } catch(err) { alert(err.message); } 
+        };
         window.delLorry = async (id) => { if(confirm("Delete Lorry Record?")) { await deleteDoc(doc(db, "pay_lorry", id)); window.loadPayLorry(); } };
 
-        // MACHINERY & TOOLS FUNCTIONS
+        // ==========================================
+        // MACHINERY & TOOLS (ADD, EDIT, TRANSFER, DELETE)
+        // ==========================================
         let allMachinery = [];
         window.loadMachinery = async () => {
             const filterLoc = document.getElementById('machFilterSite')?.value || 'ALL';
@@ -514,8 +1007,9 @@
                     <td class="p-3">${locBadge}</td>
                     <td class="p-3 text-xs text-gray-500">${m.lastLog || 'Initial Entry'}</td>
                     <td class="p-3 text-center">${condBadge}</td>
-                    <td class="p-3 text-right space-x-2">
-                        <button onclick="window.openTransferMachModal('${m.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-bold shadow-sm transition"><i class="fa-solid fa-right-left mr-1"></i>Transfer</button>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="window.openTransferMachModal('${m.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow-sm transition"><i class="fa-solid fa-right-left mr-1"></i>Transfer</button>
+                        <button onclick="window.editMachinery('${m.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Machinery"><i class="fa-solid fa-pen"></i></button>
                         <button onclick="window.delMachinery('${m.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>`;
@@ -543,25 +1037,54 @@
             }
         };
 
-        window.addMachinery = async (e) => {
+        window.editMachinery = (id) => {
+            const m = allMachinery.find(x => x.id === id);
+            if(!m) return;
+            document.getElementById('editMachId').value = m.id;
+            document.getElementById('machName').value = m.name || '';
+            document.getElementById('machCode').value = m.code || '';
+            document.getElementById('machQty').value = m.qty || 1;
+            document.getElementById('machSite').value = m.site || 'Head Office';
+            document.getElementById('machStatus').value = m.status || m.condition || 'Working';
+            document.getElementById('machFormTitle').innerText = "Edit Machinery / Equipment";
+            document.getElementById('btnSaveMach').innerText = "Update Machinery";
+            document.getElementById('btnCancelMach').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelEditMach = () => {
+            document.getElementById('machForm').reset();
+            document.getElementById('editMachId').value = '';
+            document.getElementById('machQty').value = 1;
+            document.getElementById('machFormTitle').innerText = "Add Machinery / Equipment";
+            document.getElementById('btnSaveMach').innerText = "Add Machinery";
+            document.getElementById('btnCancelMach').classList.add('hidden');
+        };
+
+        window.saveMachinery = async (e) => {
             e.preventDefault();
+            const editId = document.getElementById('editMachId').value;
             const siteVal = document.getElementById('machSite').value;
             const today = new Date().toISOString().split('T')[0];
             const payload = {
-                name: document.getElementById('machName').value,
-                code: document.getElementById('machCode').value || '-',
+                name: document.getElementById('machName').value.trim(),
+                code: document.getElementById('machCode').value.trim() || '-',
                 qty: parseInt(document.getElementById('machQty').value || 1),
                 site: siteVal,
-                status: document.getElementById('machStatus').value,
-                lastLog: `Added to ${siteVal} (${today})`,
-                timestamp: new Date()
+                status: document.getElementById('machStatus').value
             };
             try {
-                await addDoc(collection(db, "machinery"), payload);
-                e.target.reset();
-                document.getElementById('machQty').value = 1;
+                if(editId) {
+                    await updateDoc(doc(db, "machinery", editId), payload);
+                    alert("Machinery Updated!");
+                } else {
+                    payload.lastLog = `Added to ${siteVal} (${today})`;
+                    payload.timestamp = new Date();
+                    await addDoc(collection(db, "machinery"), payload);
+                    alert("Machinery Added Successfully!");
+                }
+                window.cancelEditMach();
                 window.loadMachinery();
-                alert("Machinery Added Successfully!");
             } catch(err) { alert("Error: " + err.message); }
         };
 
@@ -772,6 +1295,9 @@
         window.saveAdminRecord = async (statusType) => { const date = document.getElementById('eDate').value; const siteVal = document.getElementById('eSite').value; if(!date || !siteVal) return alert("Date and Site are required!"); const isClosed = document.getElementById('eSiteClosedCb').checked; const closeReason = document.getElementById('eCloseReason').value; if(isClosed && !closeReason) return alert("Please enter the reason for closing the site!"); document.getElementById('adminFormStatus').innerText = "Saving..."; const curId = document.getElementById('editDocId').value; const payload = { date: date, docNo: document.getElementById('eDocNo').value, siteId: siteVal, weather: document.getElementById('eWeather').value, data: dData, preparedBy: document.getElementById('adminName').value + " (Admin)", status: statusType, approvedBy: (statusType === "Approved" ? document.getElementById('adminName').value : ""), timestamp: new Date(), siteClosed: isClosed, closeReason: closeReason, notes: document.getElementById('eGeneralNotes').value }; try { if(curId) { await updateDoc(doc(db, "daily_reports", curId), payload); } else { const res = await addDoc(collection(db, "daily_reports"), payload); document.getElementById('editDocId').value = res.id; } alert(statusType === "Draft" ? "Draft Saved Successfully!" : "Report Saved & Approved!"); if(statusType === "Approved") { document.getElementById('dprForm').reset(); document.getElementById('editDocId').value = ""; window.toggleAdminSiteClosed(); dData = { delays:[], measures:[], sups:[], subs:[], visits:[], workers:[], photos:[], bills:[] }; window.renderAllTbs(); document.getElementById('adminFormStatus').innerText = "New Record"; document.getElementById('adminFormStatus').className = "bg-gray-200 text-gray-700 font-bold px-3 py-1 rounded-full text-sm"; window.switchTab('reports'); } else { document.getElementById('adminFormStatus').innerText = "Draft Saved"; document.getElementById('adminFormStatus').className = "bg-yellow-200 text-yellow-800 font-bold px-3 py-1 rounded-full text-sm"; } } catch(er) { alert("Error: " + er.message); } };
         window.extractGPS = () => { const link = document.getElementById('sLocLink').value; const match = link.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/); if(match) { document.getElementById('sLoc').value = match[1] + "," + match[2]; alert("GPS Extracted!"); } else { alert("Coordinates not found in link."); } };
 
+        // ==========================================
+        // SITES (ADD, EDIT, TOGGLE & DELETE)
+        // ==========================================
         let globalSites = []; 
         window.loadSites = async () => { 
             const snap = await getDocs(collection(db, "sites")); globalSites = []; 
@@ -780,8 +1306,13 @@
             
             let ongoingCount = 0;
             snap.forEach(d => { 
-                const s = d.data(); globalSites.push({id:d.id, name:s.name, status:s.status}); 
-                if(tb) { let badge = s.status === 'Ongoing' ? `<span class="bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded text-xs">Ongoing</span>` : `<span class="bg-gray-200 text-gray-600 font-bold px-2 py-1 rounded text-xs">Completed</span>`; let tr=document.createElement('tr'); tr.className="border-b hover:bg-gray-50"; tr.innerHTML=`<td class="p-3 font-bold text-gray-800">${s.name}</td><td class="p-3 text-gray-500">${s.location}</td><td class="p-3">${badge}</td><td class="p-3 text-right"><button onclick="window.toggleSite('${d.id}','${s.status}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-xs font-bold transition">Toggle</button></td>`; tb.appendChild(tr); } 
+                const s = d.data(); globalSites.push({id:d.id, name:s.name, location:s.location, status:s.status}); 
+                if(tb) { 
+                    let badge = s.status === 'Ongoing' ? `<span class="bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded text-xs">Ongoing</span>` : `<span class="bg-gray-200 text-gray-600 font-bold px-2 py-1 rounded text-xs">Completed</span>`; 
+                    let tr=document.createElement('tr'); tr.className="border-b hover:bg-gray-50"; 
+                    tr.innerHTML=`<td class="p-3 font-bold text-gray-800">${s.name}</td><td class="p-3 text-gray-500">${s.location}</td><td class="p-3">${badge}</td><td class="p-3 text-right space-x-1"><button onclick="window.toggleSite('${d.id}','${s.status}')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2.5 py-1 rounded text-xs font-bold transition">Toggle</button><button onclick="window.editSite('${d.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Site"><i class="fa-solid fa-pen"></i></button><button onclick="window.delSite('${d.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button></td>`; 
+                    tb.appendChild(tr); 
+                } 
                 if(s.status==='Ongoing') { 
                     ongoingCount++;
                     if(cb) { let lbl=document.createElement('label'); lbl.className='flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer'; lbl.innerHTML=`<input type="checkbox" value="${s.name}" class="scb w-4 h-4 text-blue-600 rounded"><span class="font-semibold text-gray-700">${s.name}</span>`; cb.appendChild(lbl); } 
@@ -791,8 +1322,43 @@
             }); 
             const ss = document.getElementById('statSites'); if(ss) ss.innerText = ongoingCount;
         }; 
-        window.addSite = async (e) => { e.preventDefault(); await addDoc(collection(db, "sites"), {name:document.getElementById('sName').value, location:document.getElementById('sLoc').value, status:document.getElementById('sStat').value}); e.target.reset(); window.loadSites(); }; 
+
+        window.editSite = (id) => {
+            const s = globalSites.find(x => x.id === id);
+            if(!s) return;
+            document.getElementById('editSiteId').value = s.id;
+            document.getElementById('sName').value = s.name || '';
+            document.getElementById('sLoc').value = s.location || '';
+            document.getElementById('sStat').value = s.status || 'Ongoing';
+            document.getElementById('siteFormTitle').innerText = "Edit Site";
+            document.getElementById('btnSaveSite').innerText = "Update Site";
+            document.getElementById('btnCancelSite').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelEditSite = () => {
+            document.getElementById('siteForm').reset();
+            document.getElementById('editSiteId').value = '';
+            document.getElementById('siteFormTitle').innerText = "Add New Site";
+            document.getElementById('btnSaveSite').innerText = "Add Site";
+            document.getElementById('btnCancelSite').classList.add('hidden');
+        };
+
+        window.saveSite = async (e) => { 
+            e.preventDefault(); 
+            const editId = document.getElementById('editSiteId').value;
+            const payload = { name: document.getElementById('sName').value.trim(), location: document.getElementById('sLoc').value.trim(), status: document.getElementById('sStat').value };
+            if(editId) {
+                await updateDoc(doc(db, "sites", editId), payload);
+                alert("Site Updated!");
+            } else {
+                await addDoc(collection(db, "sites"), payload); 
+            }
+            window.cancelEditSite();
+            window.loadSites(); 
+        }; 
         window.toggleSite = async (id, cur) => { await updateDoc(doc(db, "sites", id), {status: cur==='Ongoing'?'Completed':'Ongoing'}); window.loadSites(); };
+        window.delSite = async (id) => { if(confirm("Delete this Site?")) { await deleteDoc(doc(db, "sites", id)); window.loadSites(); } };
         
         let allReports = []; window.loadReports = async () => { const snap = await getDocs(query(collection(db, "daily_reports"), orderBy("timestamp", "desc"))); const grid = document.getElementById('reportsGrid'); grid.innerHTML=''; allReports=[]; snap.forEach((d) => { const r = d.data(); r.id = d.id; allReports.push(r); if(r.status === "Draft") return; let badge = r.status==="Approved" ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black uppercase"><i class="fa-solid fa-check mr-1"></i>Approved</span>` : `<span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-black uppercase animate-pulse"><i class="fa-solid fa-clock mr-1"></i>Pending</span>`; let acts = `<div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100"><div class="flex gap-2">`; acts += `<button onclick="window.viewRep('${r.id}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition flex justify-center items-center" title="View"><i class="fa-solid fa-eye"></i></button>`; acts += `<button onclick="window.adminEditRep('${r.id}')" class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white transition flex justify-center items-center" title="Edit"><i class="fa-solid fa-pen"></i></button>`; acts += `<button onclick="window.exportRep('${r.id}')" class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-600 hover:text-white transition flex justify-center items-center" title="Export Excel"><i class="fa-solid fa-file-excel"></i></button>`; acts += `</div><div class="flex gap-2">`; if(r.status !== "Approved") acts += `<button onclick="window.approveRep('${r.id}')" class="px-4 py-2 rounded-lg bg-green-500 text-white font-bold text-sm shadow-md hover:bg-green-600 transition">Approve</button>`; acts += `<button onclick="window.delRep('${r.id}')" class="w-10 h-10 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex justify-center items-center" title="Delete"><i class="fa-solid fa-trash"></i></button></div></div>`; let closedLabel = r.siteClosed ? `<span class="bg-red-500 text-white px-2 py-1 rounded-full text-[10px] uppercase ml-2">Closed</span>` : ``; let card = document.createElement('div'); card.className = "admin-card relative shadow-sm"; card.innerHTML = `<div class="flex justify-between items-start mb-2"><h3 class="font-black text-xl text-gray-800">${r.date} ${closedLabel}</h3>${badge}</div><p class="text-blue-700 font-bold text-sm mb-1"><i class="fa-solid fa-location-dot mr-1"></i>${r.siteId || 'Unknown Site'}</p><p class="text-gray-400 text-xs font-semibold mb-4">Prep: ${r.preparedBy || 'System'}</p>${acts}`; grid.appendChild(card); }); };
         
@@ -803,9 +1369,74 @@
         window.exportRep = async (id) => { try { const r = allReports.find(x => x.id === id); if(!r) return; const siteNameForFile = r.siteId || 'Unknown_Site'; const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('DPR'); const tf={name:'Arial',size:14,bold:true,color:{argb:'FFFFFFFF'}}, hf={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}}, nf={name:'Arial',size:10}; ws.mergeCells('A1:J2'); ws.getCell('A1').value=`NIWASA CONSTRUCTIONS - DPR (${siteNameForFile})`; ws.getCell('A1').font=tf; ws.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1F4E78'}}; ws.getCell('A1').alignment={horizontal:'center',vertical:'middle'}; ws.getCell('A4').value="Date: "+r.date; ws.getCell('D4').value="Weather: "+r.weather; ws.getCell('G4').value="Status: "+r.status; let row = 6; const addS = (t, h, arr, k) => { ws.mergeCells(`A${row}:J${row}`); ws.getCell(`A${row}`).value=t; ws.getCell(`A${row}`).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFD9E1F2'}}; ws.getCell(`A${row}`).font={bold:true}; row++; h.forEach((hd, i)=>{ws.getCell(row,i+1).value=hd; ws.getCell(row,i+1).font=hf; ws.getCell(row,i+1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF2F75B5'}};}); row++; if(arr&&arr.length){arr.forEach(it=>{k.forEach((key,i)=>{ws.getCell(row,i+1).value=it[key]||'-'; ws.getCell(row,i+1).font=nf;});row++;});}else{ws.getCell(row,1).value="No records.";row++;} row++; }; const d=r.data||{}; addS("Delays",["From","To","Reason"],d.delays,['f','t','r']); addS("Measurements",["Desc","Unit/Qty"],d.measures,['d','u']); addS("Suppliers",["Material","Qty","Supplier","Price(Rs)"],d.sups,['m','q','n','p']); addS("Sub-Contractors",["Task","Qty","Name","Price(Rs)"],d.subs,['t','q','n','p']); addS("Visitors & Notes",["Name/Role","Note","Time"],d.visits,['n','no','t']); addS("Workers & Advances",["Name","Type","Work Done","OT","Adv","Left Early","Remarks"],d.workers,['n','t','work','o','a','lt','rem']); ws.columns=[{width:18},{width:12},{width:25},{width:15},{width:15},{width:15},{width:25},{width:15},{width:15},{width:15}]; const buf = await wb.xlsx.writeBuffer(); const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); saveAs(blob, `DPR_${siteNameForFile}_${r.date}.xlsx`); } catch(err) { alert("Export Error: " + err.message); } };
         window.approveRep = async (id) => { if(confirm("Approve this report?")) { await updateDoc(doc(db, "daily_reports", id), { status: "Approved", approvedBy: document.getElementById('adminEmail').value }); window.loadReports(); } }; window.delRep = async (id) => { if(confirm("Permanently delete?")) { await deleteDoc(doc(db, "daily_reports", id)); window.loadReports(); window.calculateAnalytics(); } };
 
+        // ==========================================
+        // LABOURS MASTER (ADD, EDIT & DELETE)
+        // ==========================================
         let allLaboursList = [];
-        window.loadLabours = async () => { const snap = await getDocs(collection(db, "labours")); allLaboursList = []; const tb = document.getElementById('laboursTable'); const dl = document.getElementById('labourNames'); if(tb) tb.innerHTML = ''; if(dl) dl.innerHTML = ''; snap.forEach(d => { const l = d.data(); allLaboursList.push(l); let badge = l.type === 'SK' ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">SK</span>` : `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">USK</span>`; if(tb) tb.innerHTML += `<tr class="border-b hover:bg-gray-50"><td class="p-3 font-bold">${l.name}</td><td class="p-3">${badge}</td><td class="p-3 text-green-700 font-bold">Rs. ${l.dailyRate}</td><td class="p-3 text-blue-700 font-bold">Rs. ${l.otRate}</td><td class="p-3 text-right"><button onclick="window.delLabour('${d.id}')" class="text-red-400 hover:text-red-600 transition"><i class="fa-solid fa-trash"></i></button></td></tr>`; if(dl) dl.innerHTML += `<option value="${l.name}">`; }); };
-        window.addLabour = async (e) => { e.preventDefault(); await addDoc(collection(db, "labours"), { name: document.getElementById('lName').value, type: document.getElementById('lType').value, dailyRate: parseFloat(document.getElementById('lWage').value), otRate: parseFloat(document.getElementById('lOTRate').value), addedAt: new Date() }); e.target.reset(); window.loadLabours(); }; window.delLabour = async (id) => { if(confirm("Remove?")) { await deleteDoc(doc(db, "labours", id)); window.loadLabours(); } };
+        window.loadLabours = async () => { 
+            const snap = await getDocs(collection(db, "labours")); 
+            allLaboursList = []; 
+            const tb = document.getElementById('laboursTable'); const dl = document.getElementById('labourNames'); 
+            if(tb) tb.innerHTML = ''; if(dl) dl.innerHTML = ''; 
+            snap.forEach(d => { 
+                const l = d.data(); l.id = d.id; allLaboursList.push(l); 
+                let badge = l.type === 'SK' ? `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">SK</span>` : `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">USK</span>`; 
+                if(tb) tb.innerHTML += `<tr class="border-b hover:bg-gray-50">
+                    <td class="p-3 font-bold">${l.name}</td>
+                    <td class="p-3">${badge}</td>
+                    <td class="p-3 text-green-700 font-bold">Rs. ${l.dailyRate}</td>
+                    <td class="p-3 text-blue-700 font-bold">Rs. ${l.otRate}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="window.editLabour('${d.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Labour"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delLabour('${d.id}')" class="text-red-400 hover:text-red-600 transition p-1"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+                if(dl) dl.innerHTML += `<option value="${l.name}">`; 
+            }); 
+        };
+
+        window.editLabour = (id) => {
+            const l = allLaboursList.find(x => x.id === id);
+            if(!l) return;
+            document.getElementById('editLabourId').value = l.id;
+            document.getElementById('lName').value = l.name || '';
+            document.getElementById('lType').value = l.type || 'SK';
+            document.getElementById('lWage').value = l.dailyRate || 0;
+            document.getElementById('lOTRate').value = l.otRate || 0;
+            document.getElementById('labourFormTitle').innerText = "Edit Labour Details";
+            document.getElementById('btnSaveLabour').innerText = "Update Labour";
+            document.getElementById('btnCancelLabour').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelEditLabour = () => {
+            document.getElementById('labourForm').reset();
+            document.getElementById('editLabourId').value = '';
+            document.getElementById('labourFormTitle').innerText = "Register New Labour";
+            document.getElementById('btnSaveLabour').innerText = "Register";
+            document.getElementById('btnCancelLabour').classList.add('hidden');
+        };
+
+        window.saveLabour = async (e) => { 
+            e.preventDefault(); 
+            const editId = document.getElementById('editLabourId').value;
+            const payload = { 
+                name: document.getElementById('lName').value.trim(), 
+                type: document.getElementById('lType').value, 
+                dailyRate: parseFloat(document.getElementById('lWage').value), 
+                otRate: parseFloat(document.getElementById('lOTRate').value)
+            };
+            if(editId) {
+                await updateDoc(doc(db, "labours", editId), payload);
+                alert("Labour Updated!");
+            } else {
+                payload.addedAt = new Date();
+                await addDoc(collection(db, "labours"), payload); 
+            }
+            window.cancelEditLabour();
+            window.loadLabours(); 
+        }; 
+        window.delLabour = async (id) => { if(confirm("Remove?")) { await deleteDoc(doc(db, "labours", id)); window.loadLabours(); } };
 
         let lastPayrollData = []; window.generatePayroll = async (e) => { e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); btn.innerText = "Calculating..."; const sDate = document.getElementById('payFrom').value; const eDate = document.getElementById('payTo').value; const targetSite = document.getElementById('paySite').value; const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); lRates[l.name] = { daily: l.dailyRate, ot: l.otRate }; }); const q = query(collection(db, "daily_reports"), where("date", ">=", sDate), where("date", "<=", eDate)); const rSnap = await getDocs(q); let payMap = {}; rSnap.forEach(docSnap => { const r = docSnap.data(); if(r.status !== "Approved" || r.siteClosed) return; if(targetSite !== "ALL" && r.siteId !== targetSite) return; if(r.data && r.data.workers) { r.data.workers.forEach(w => { if(!payMap[w.n]) payMap[w.n] = { days: 0, otHrs: 0, adv: 0 }; payMap[w.n].days += 1; if(w.o && w.o !== '-' && !isNaN(w.o)) payMap[w.n].otHrs += parseFloat(w.o); if(w.a && w.a !== '-' && !isNaN(w.a)) payMap[w.n].adv += parseFloat(w.a); }); } }); const tb = document.getElementById('payrollTable'); tb.innerHTML = ''; let totalBase=0, totalOTPay=0, totalAdv=0, totalNet=0; lastPayrollData = []; if(Object.keys(payMap).length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">No approved work records found for this period.</td></tr>'; document.getElementById('payrollFooter').classList.add('hidden'); btn.innerText = "Calculate Salary"; return; } for (const [name, data] of Object.entries(payMap)) { let rates = lRates[name] || { daily: 0, ot: 0 }; let basePay = data.days * rates.daily; let otPay = data.otHrs * rates.ot; let gross = basePay + otPay; let netPay = gross - data.adv; totalBase += basePay; totalOTPay += otPay; totalAdv += data.adv; totalNet += netPay; lastPayrollData.push({ name, days: data.days, otHrs: data.otHrs, basePay, otPay, adv: data.adv, netPay, rateErr: !lRates[name] }); let alertIcon = !lRates[name] ? `<i class="fa-solid fa-triangle-exclamation text-yellow-500 ml-2" title="Labour not found in Master List! Rate is 0"></i>` : ''; tb.innerHTML += `<tr class="hover:bg-orange-50 border-b"><td class="p-3 font-bold">${name} ${alertIcon}</td><td class="p-3 text-center">${data.days}</td><td class="p-3 text-center">${data.otHrs}</td><td class="p-3 text-right">Rs. ${basePay.toLocaleString()}</td><td class="p-3 text-right">Rs. ${otPay.toLocaleString()}</td><td class="p-3 text-right text-red-500">Rs. ${data.adv.toLocaleString()}</td><td class="p-3 text-right font-black text-green-700 bg-green-50 border-l border-gray-200">Rs. ${netPay.toLocaleString()}</td></tr>`; } document.getElementById('payrollFooter').classList.remove('hidden'); document.getElementById('payrollFooter').innerHTML = `<tr><td colspan="3" class="p-3 text-right uppercase text-gray-500">Total Payroll Value:</td><td class="p-3 text-right">Rs. ${totalBase.toLocaleString()}</td><td class="p-3 text-right">Rs. ${totalOTPay.toLocaleString()}</td><td class="p-3 text-right text-red-600">Rs. ${totalAdv.toLocaleString()}</td><td class="p-3 text-right text-lg text-green-800 border-l border-gray-300">Rs. ${totalNet.toLocaleString()}</td></tr>`; btn.innerText = "Calculate Salary"; };
         window.exportPayroll = async () => { if(lastPayrollData.length === 0) return alert("Please calculate payroll first!"); const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('Weekly Payroll'); ws.mergeCells('A1:G2'); ws.getCell('A1').value = `NIWASA CONSTRUCTIONS - WEEKLY PAYROLL`; ws.getCell('A1').font = {name:'Arial', size:14, bold:true, color:{argb:'FFFFFFFF'}}; ws.getCell('A1').fill = {type:'pattern', pattern:'solid', fgColor:{argb:'FFED7D31'}}; ws.getCell('A1').alignment = {horizontal:'center', vertical:'middle'}; ws.getCell('A4').value = "From: " + document.getElementById('payFrom').value; ws.getCell('C4').value = "To: " + document.getElementById('payTo').value; ws.getCell('F4').value = "Site: " + document.getElementById('paySite').value; const headers = ["Labour Name", "Days Worked", "Total OT (Hrs)", "Base Pay (Rs)", "OT Pay (Rs)", "Advances (Rs)", "Net Payable (Rs)"]; headers.forEach((h, i) => { ws.getCell(6, i+1).value = h; ws.getCell(6, i+1).font = {bold:true, color:{argb:'FFFFFFFF'}}; ws.getCell(6, i+1).fill = {type:'pattern', pattern:'solid', fgColor:{argb:'FF44546A'}}; }); let row = 7; lastPayrollData.forEach(d => { ws.getCell(row, 1).value = d.name; ws.getCell(row, 2).value = d.days; ws.getCell(row, 3).value = d.otHrs; ws.getCell(row, 4).value = d.basePay; ws.getCell(row, 5).value = d.otPay; ws.getCell(row, 6).value = d.adv; ws.getCell(row, 7).value = d.netPay; ws.getCell(row, 7).font = {bold:true, color:{argb:'FF385723'}}; row++; }); ws.columns = [{width:20}, {width:15}, {width:15}, {width:15}, {width:15}, {width:15}, {width:20}]; const buf = await wb.xlsx.writeBuffer(); saveAs(new Blob([buf]), `Weekly_Payroll_${document.getElementById('payTo').value}.xlsx`); };
