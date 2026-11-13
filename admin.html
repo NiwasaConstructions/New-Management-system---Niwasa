@@ -70,9 +70,17 @@
 
         <div class="flex-1 overflow-y-auto p-4 md:p-10 custom-scrollbar">
             
-            <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-6">Overview Dashboard</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"><div class="admin-card border-l-4 border-blue-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-3xl font-black text-blue-900 mt-2" id="statSites">0</p></div><div class="admin-card border-l-4 border-green-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Labours Today</h3><p class="text-3xl font-black text-green-700 mt-2" id="statLabours">0</p></div><div class="admin-card border-l-4 border-red-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Cost Today (Rs)</h3><p class="text-3xl font-black text-red-600 mt-2" id="statAdvances">0</p></div><div class="admin-card border-l-4 border-indigo-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Total Dues (Rs)</h3><p class="text-3xl font-black text-indigo-600 mt-2" id="statDues">0.00</p></div></div></div>
+            <div id="tab-dashboard" class="tab-content active max-w-6xl mx-auto">
+                <h2 class="text-2xl md:text-3xl font-black text-gray-800 mb-6">Overview Dashboard</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="admin-card border-l-4 border-blue-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Active Sites</h3><p class="text-3xl font-black text-blue-900 mt-2" id="statSites">0</p></div>
+                    <div class="admin-card border-l-4 border-green-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Labours Today</h3><p class="text-3xl font-black text-green-700 mt-2" id="statLabours">0</p></div>
+                    <div class="admin-card border-l-4 border-red-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Cost Today (Rs)</h3><p class="text-3xl font-black text-red-600 mt-2" id="statAdvances">0</p></div>
+                    <div class="admin-card border-l-4 border-indigo-500 !mb-0"><h3 class="text-gray-500 font-bold text-sm uppercase">Total Dues (Rs)</h3><p class="text-3xl font-black text-indigo-600 mt-2" id="statDues">0.00</p></div>
+                </div>
+            </div>
 
-            <!-- MACHINERY & TOOLS MANAGEMENT TAB (WITH EDIT) -->
+            <!-- MACHINERY & TOOLS MANAGEMENT TAB -->
             <div id="tab-machinery" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800"><i class="fa-solid fa-screwdriver-wrench text-amber-600 mr-2"></i>Machinery & Tools</h2>
@@ -147,9 +155,12 @@
                 </div>
             </div>
 
-            <!-- CHEQUES MANAGEMENT (WITH EDIT) -->
+            <!-- CHEQUES MANAGEMENT -->
             <div id="tab-pay_cheques" class="tab-content max-w-6xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Cheques Management</h2></div>
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h2 class="text-2xl md:text-3xl font-black text-gray-800">Cheques Management</h2>
+                    <button onclick="window.openMakePaymentModal('DFCC_CHEQUE')" class="bg-orange-600 hover:bg-orange-700 text-white font-bold px-4 py-2 rounded-lg text-sm shadow">+ Issue New Cheque</button>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div class="bg-orange-50 border border-orange-200 p-4 rounded-xl shadow-sm text-center"><h4 class="text-orange-800 font-bold text-sm uppercase">Total Unrealized</h4><p class="text-2xl font-black text-orange-600 mt-1" id="cqStatUnrealized">Rs. 0.00</p></div>
                     <div class="bg-green-50 border border-green-200 p-4 rounded-xl shadow-sm text-center"><h4 class="text-green-800 font-bold text-sm uppercase">Total Realized</h4><p class="text-2xl font-black text-green-600 mt-1" id="cqStatRealized">Rs. 0.00</p></div>
@@ -165,7 +176,7 @@
                 </div>
             </div>
 
-            <!-- LORRY PETTY CASH (WITH EDIT) -->
+            <!-- LORRY PETTY CASH -->
             <div id="tab-pay_lorry" class="tab-content max-w-6xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Lorry Petty Cash</h2></div>
                 <div class="flex justify-between items-center mb-6 bg-gray-100 p-4 rounded-xl border border-gray-200">
@@ -189,7 +200,7 @@
                 <div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[700px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Date</th><th class="p-3">Description</th><th class="p-3 text-right text-green-400">Advance (+)</th><th class="p-3 text-right text-red-400">Expense (-)</th><th class="p-3 text-right font-bold text-blue-300">Balance (Rs)</th><th class="p-3 text-center">Action</th></tr></thead><tbody id="tblLorry"></tbody></table></div>
             </div>
 
-            <!-- VENDORS (WITH FULL EDIT FOR BANK DETAILS & INFO) -->
+            <!-- VENDORS -->
             <div id="tab-pay_vendors" class="tab-content max-w-6xl mx-auto">
                 <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Vendors</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -223,11 +234,11 @@
                 </div>
             </div>
 
-            <!-- BILLS & INVOICES (WITH EDIT) -->
+            <!-- BILLS & INVOICES -->
             <div id="tab-pay_bills" class="tab-content max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800">Bills & Invoices</h2>
-                    <button onclick="window.openAddBillModal()" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Add New Bill</button>
+                    <button onclick="window.openAddBillModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-lg text-sm shadow">+ Add New Bill</button>
                 </div>
                 <div class="admin-card overflow-x-auto">
                     <table class="w-full text-sm text-left min-w-[800px]">
@@ -239,11 +250,11 @@
                 </div>
             </div>
 
-            <!-- PAYMENTS HISTORY (WITH EDIT) -->
+            <!-- PAYMENTS HISTORY -->
             <div id="tab-pay_payments" class="tab-content max-w-6xl mx-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl md:text-3xl font-black text-gray-800">Payment History</h2>
-                    <button onclick="window.openM('modalAddPayment')" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm">+ Make Payment</button>
+                    <button onclick="window.openMakePaymentModal('CASH')" class="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg text-sm shadow">+ Make Payment</button>
                 </div>
                 <div class="admin-card overflow-x-auto">
                     <table class="w-full text-sm text-left min-w-[800px]">
@@ -259,7 +270,7 @@
             <div id="tab-users" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Access Control & Users</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="admin-card h-fit border-t-4 border-blue-600"><h3 class="font-bold border-b pb-2 mb-4">Create System User</h3><form onsubmit="window.addUser(event)" class="space-y-4"><input type="email" id="uEmail" placeholder="Email Address" class="w-full border p-2 rounded-lg" required><div class="relative"><input type="password" id="uPass" placeholder="Password" class="w-full border p-2 rounded-lg pr-10" required><div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400" onclick="window.togglePass('uPass', 'eyeIconUser')"><i id="eyeIconUser" class="fa-solid fa-eye"></i></div></div><div class="bg-gray-50 p-3 rounded-lg border"><label class="text-xs font-bold text-gray-500 uppercase block mb-2">Grant Panel Access</label><label class="flex items-center gap-2 mb-2"><input type="checkbox" class="role-cb w-4 h-4" value="admin"><span class="font-bold text-gray-700">Admin Panel</span></label><label class="flex items-center gap-2 mb-2"><input type="checkbox" class="role-cb w-4 h-4" value="supervisor"><span class="font-bold text-gray-700">Supervisor App</span></label><label class="flex items-center gap-2"><input type="checkbox" class="role-cb w-4 h-4" value="customer"><span class="font-bold text-gray-700">Client Portal</span></label></div><div><label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Assign Sites</label><div id="cbSites" class="border p-3 bg-white rounded-lg h-32 overflow-y-auto space-y-2"></div></div><button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Create User</button></form></div><div class="lg:col-span-2 admin-card overflow-x-auto"><table class="w-full text-sm text-left"><thead class="bg-gray-50 text-gray-500 uppercase text-xs"><tr><th class="p-3">Email</th><th class="p-3">Access Levels</th><th class="p-3">Assigned Sites</th><th class="p-3 text-right">Actions</th></tr></thead><tbody id="usersTable"></tbody></table></div></div></div>
             <div id="tab-reports" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Pending & Approved Reports</h2><div id="reportsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div></div>
             
-            <!-- LABOURS MASTER (WITH EDIT) -->
+            <!-- LABOURS MASTER -->
             <div id="tab-labours" class="tab-content max-w-6xl mx-auto">
                 <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Labours (Master List)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -291,7 +302,7 @@
             <div id="tab-payroll" class="tab-content max-w-6xl mx-auto"><div class="flex justify-between items-center mb-6"><h2 class="text-2xl md:text-3xl font-black text-gray-800">Weekly Payroll</h2><button onclick="window.exportPayroll()" class="bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-sm"><i class="fa-solid fa-file-excel mr-2"></i> Export</button></div><div class="admin-card mb-6 bg-orange-50 border border-orange-200"><form onsubmit="window.generatePayroll(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Select Site</label><select id="paySite" class="border p-2 rounded-lg w-full md:w-48 font-bold"><option value="ALL">All Sites</option></select></div><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">From (Sunday)</label><input type="date" id="payFrom" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">To (Saturday)</label><input type="date" id="payTo" class="border p-2 rounded-lg font-bold w-full md:w-auto" required></div><button type="submit" class="bg-orange-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Calculate</button></form></div><div class="admin-card overflow-x-auto"><table class="w-full text-sm text-left min-w-[800px]"><thead class="bg-gray-800 text-white uppercase text-xs"><tr><th class="p-3">Labour Name</th><th class="p-3 text-center">Days</th><th class="p-3 text-center">OT Hrs</th><th class="p-3 text-right">Base Pay</th><th class="p-3 text-right">OT Pay</th><th class="p-3 text-right text-red-300">Advances</th><th class="p-3 text-right font-black text-green-300 border-l border-gray-600">Net Payable</th></tr></thead><tbody id="payrollTable" class="divide-y"><tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">Select dates to generate.</td></tr></tbody><tfoot id="payrollFooter" class="bg-gray-100 hidden font-black text-gray-800"></tfoot></table></div></div>
             <div id="tab-finance" class="tab-content max-w-6xl mx-auto"><h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Financial Analytics</h2><div class="admin-card mb-6 bg-green-50 border border-green-200"><form onsubmit="window.calcFinance(event)" class="flex flex-wrap items-end gap-4"><div><label class="text-xs font-bold text-gray-500 uppercase block mb-1">Select Site</label><select id="finSite" class="border p-2 rounded-lg w-full md:w-48 font-bold"><option value="ALL">All Sites</option></select></div><button type="submit" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg w-full md:w-auto">Calculate Total Costs</button></form></div><div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"><div class="admin-card text-center"><h4 class="font-bold text-gray-500 uppercase mb-2">Total Labour Cost</h4><p class="text-2xl font-black text-blue-700" id="finLabCost">Rs. 0</p></div><div class="admin-card text-center"><h4 class="font-bold text-gray-500 uppercase mb-2">Material/Sub Cost</h4><p class="text-2xl font-black text-orange-700" id="finMatCost">Rs. 0</p></div><div class="admin-card text-center bg-gray-800 text-white"><h4 class="font-bold text-gray-400 uppercase mb-2">Total Expense</h4><p class="text-2xl font-black text-green-400" id="finTotalCost">Rs. 0</p></div></div></div>
             
-            <!-- MANAGE SITES (WITH EDIT) -->
+            <!-- MANAGE SITES -->
             <div id="tab-sites" class="tab-content max-w-6xl mx-auto">
                 <h2 class="text-2xl md:text-3xl font-black mb-6 text-gray-800">Manage Sites</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -391,7 +402,14 @@
                                     </div>
                                     <button type="button" onclick="window.addAdminWorker()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg px-4 py-3 w-full shadow transition">+ Add Labour to Report</button>
                                 </div>
-                                <div class="overflow-x-auto"><table class="w-full text-sm bg-gray-50 rounded-lg min-w-[650px]"><tbody id="tb-workers"></tbody></table></div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm bg-gray-50 rounded-lg min-w-[650px]">
+                                        <thead class="bg-gray-200 text-gray-600 text-xs uppercase">
+                                            <tr><th class="p-2">Name</th><th class="p-2">Role</th><th class="p-2">Work Done</th><th class="p-2">OT</th><th class="p-2">Adv</th><th class="p-2">Left</th><th class="p-2">Remarks</th><th class="p-2 text-center">Action</th></tr>
+                                        </thead>
+                                        <tbody id="tb-workers"></tbody>
+                                    </table>
+                                </div>
                             </div>
                             <hr>
                             
@@ -477,7 +495,8 @@
                     <div><label class="text-xs font-bold text-gray-500">Select Vendor</label><select id="bVendor" class="w-full border p-2 rounded-lg font-bold text-indigo-900 bg-indigo-50" required><option value="">Select...</option></select></div>
                     <div><label class="text-xs font-bold text-gray-500">Date</label><input type="date" id="bDate" class="w-full border p-2 rounded-lg" required></div>
                     <div><label class="text-xs font-bold text-gray-500">Bill Number</label><input type="text" id="bNumber" class="w-full border p-2 rounded-lg" required></div>
-                    <div><label class="text-xs font-bold text-gray-500">Amount (Rs)</label><input type="number" step="0.01" id="bAmount" class="w-full border p-2 rounded-lg font-bold text-red-600" required></div>
+                    <div><label class="text-xs font-bold text-gray-500">Total Bill Amount (Rs)</label><input type="number" step="0.01" id="bAmount" class="w-full border p-2 rounded-lg font-bold text-red-600" required></div>
+                    <div id="bPaidWrapper" class="hidden md:col-span-2"><label class="text-xs font-bold text-green-700">Already Paid Amount (Rs) - (Edit if needed)</label><input type="number" step="0.01" id="bPaid" class="w-full border p-2 rounded-lg font-bold text-green-700" value="0"></div>
                     <div class="md:col-span-2"><label class="text-xs font-bold text-gray-500">Remarks / Items</label><input type="text" id="bRemarks" class="w-full border p-2 rounded-lg" placeholder="e.g. Cement 50 bags, Steel..." required></div>
                 </div>
                 <button type="submit" id="btnSaveBill" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition mt-4">Save Bill</button>
@@ -485,10 +504,72 @@
         </div>
     </div>
 
-    <!-- Make New Payment Modal -->
-    <div id="modalAddPayment" class="modal"><div class="modal-content" style="max-width: 800px;"><div class="flex justify-between items-center border-b pb-3 mb-4"><h3 class="font-bold text-xl text-green-900"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Make New Payment</h3><button onclick="window.closeM('modalAddPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div><label class="text-xs font-bold text-green-700">1. Select Vendor</label><select id="pVendor" class="w-full border-2 border-green-200 p-2 rounded-lg font-bold text-green-900 bg-green-50" onchange="window.loadVendorBillsForPayment()"><option value="">Select Vendor...</option></select></div><div><label class="text-xs font-bold text-green-700">2. Payment Date</label><input type="date" id="pDate" class="w-full border p-2 rounded-lg" required></div></div><div id="pBillsContainer" class="hidden mb-4 bg-gray-50 p-4 rounded-lg border"><h4 class="font-bold text-sm text-gray-700 mb-2">3. Allocate amounts to Pending Bills</h4><div class="overflow-x-auto max-h-48 custom-scrollbar"><table class="w-full text-sm text-left bg-white"><thead class="bg-gray-200 text-gray-600 text-xs"><tr><th class="p-2 text-center">Select</th><th class="p-2">Bill No</th><th class="p-2 text-right">Due Amt</th><th class="p-2">Pay Amount (Rs)</th></tr></thead><tbody id="pBillsTable"></tbody></table></div><div class="text-right font-black text-green-700 mt-2">Total Allocating: Rs. <span id="pTotalCalc">0.00</span></div></div><form onsubmit="window.processPayment(event)" class="space-y-4 border-t pt-4"><h4 class="font-bold text-sm text-gray-700">4. Payment Details</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="md:col-span-3"><label class="text-xs font-bold text-gray-500">Description / Reason</label><input type="text" id="pDesc" class="w-full border p-2 rounded-lg" placeholder="e.g. Advance payment for cement" required></div><div><label class="text-xs font-bold text-gray-500">Method</label><select id="pMethod" class="w-full border p-2 rounded-lg" required onchange="window.toggleChequeFields()"><option value="CASH">Cash</option><option value="DFCC_BANK">DFCC Bank Transfer</option><option value="SAMPATH_BANK">Sampath Bank Transfer</option><option value="DFCC_CHEQUE">DFCC Cheque</option><option value="SAMPATH_CHEQUE">Sampath Cheque</option></select></div><div id="pChequeFields" class="hidden md:col-span-2 grid grid-cols-2 gap-2"><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-500">Cheque No</label><input type="text" id="pChequeNo" class="w-full border-2 border-orange-200 p-2 rounded-lg"></div><div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-500">Cheque Date</label><input type="date" id="pChequeDate" class="w-full border-2 border-orange-200 p-2 rounded-lg"></div></div></div><button type="submit" id="btnSubmitPayment" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3 rounded-lg transition shadow-lg mt-4">Confirm Payment</button></form></div></div>
+    <!-- Make New Payment Modal (FIXED BILL LOADING & SUPPORTS DIRECT/ADVANCE PAYMENTS) -->
+    <div id="modalAddPayment" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="font-bold text-xl text-green-900"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Make New Payment / Issue Cheque</h3>
+                <button onclick="window.closeM('modalAddPayment')" class="text-gray-400 hover:text-red-500 text-2xl"><i class="fa-solid fa-circle-xmark"></i></button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="text-xs font-bold text-green-700">1. Select Vendor *</label>
+                    <select id="pVendor" class="w-full border-2 border-green-200 p-2 rounded-lg font-bold text-green-900 bg-green-50" onchange="window.loadVendorBillsForPayment()">
+                        <option value="">Select Vendor...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-green-700">2. Payment Date *</label>
+                    <input type="date" id="pDate" class="w-full border p-2 rounded-lg" required>
+                </div>
+            </div>
+            <div id="pBillsContainer" class="hidden mb-4 bg-gray-50 p-4 rounded-lg border">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="font-bold text-sm text-gray-700">3. Allocate to Pending Bills (බිල්පත් තිබේ නම් තෝරන්න)</h4>
+                    <span class="text-xs text-gray-500">බිල්පතක් නැති Advance ගෙවීමක් නම් යටින් කෙලින්ම ගාණ ඇතුළත් කරන්න</span>
+                </div>
+                <div class="overflow-x-auto max-h-48 custom-scrollbar">
+                    <table class="w-full text-sm text-left bg-white">
+                        <thead class="bg-gray-200 text-gray-600 text-xs">
+                            <tr><th class="p-2 text-center">Select</th><th class="p-2">Bill No & Date</th><th class="p-2 text-right">Due Amt (Rs)</th><th class="p-2">Pay Amount (Rs)</th></tr>
+                        </thead>
+                        <tbody id="pBillsTable"></tbody>
+                    </table>
+                </div>
+                <div class="text-right font-black text-green-700 mt-2">Allocated from Bills: Rs. <span id="pTotalCalc">0.00</span></div>
+            </div>
+            <form onsubmit="window.processPayment(event)" class="space-y-4 border-t pt-4">
+                <h4 class="font-bold text-sm text-gray-700">4. Payment Details</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-gray-500">Description / Reason *</label>
+                        <input type="text" id="pDesc" class="w-full border p-2 rounded-lg" placeholder="e.g. Bill settlement / Advance payment" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-green-700">Total Payment Amount (Rs) *</label>
+                        <input type="number" step="0.01" id="pDirectAmount" class="w-full border-2 border-green-400 p-2 rounded-lg font-black text-green-800 bg-green-50" placeholder="0.00" required>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500">Method *</label>
+                        <select id="pMethod" class="w-full border p-2 rounded-lg font-bold" required onchange="window.toggleChequeFields()">
+                            <option value="CASH">Cash</option>
+                            <option value="DFCC_BANK">DFCC Bank Transfer</option>
+                            <option value="SAMPATH_BANK">Sampath Bank Transfer</option>
+                            <option value="DFCC_CHEQUE">DFCC Cheque</option>
+                            <option value="SAMPATH_CHEQUE">Sampath Cheque</option>
+                        </select>
+                    </div>
+                    <div id="pChequeFields" class="hidden md:col-span-2 grid grid-cols-2 gap-2">
+                        <div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-600">Cheque No *</label><input type="text" id="pChequeNo" class="w-full border-2 border-orange-200 p-2 rounded-lg font-bold"></div>
+                        <div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-orange-600">Cheque Date *</label><input type="date" id="pChequeDate" class="w-full border-2 border-orange-200 p-2 rounded-lg font-bold"></div>
+                    </div>
+                </div>
+                <button type="submit" id="btnSubmitPayment" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-3 rounded-lg transition shadow-lg mt-4">Confirm Payment</button>
+            </form>
+        </div>
+    </div>
 
-    <!-- NEW: Edit Payment / Cheque Modal -->
+    <!-- Edit Payment / Cheque Modal -->
     <div id="modalEditPayment" class="modal">
         <div class="modal-content" style="max-width: 550px;">
             <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -537,7 +618,7 @@
         window.togglePass = (id, iconId) => { const el = document.getElementById(id); const icon = document.getElementById(iconId); if(el.type === 'password') { el.type = 'text'; icon.className='fa-solid fa-eye-slash'; } else { el.type = 'password'; icon.className='fa-solid fa-eye'; } }; 
         window.logout = () => signOut(auth).then(()=> window.location.href="index.html");
 
-        window.switchTab = (tab) => { 
+        window.switchTab = async (tab) => { 
             if(window.innerWidth < 768) { document.getElementById('sidebarMenu').classList.add('-translate-x-full'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); }
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active')); 
             document.querySelectorAll('.nav-btn').forEach(e=>{e.classList.remove('bg-blue-50', 'text-blue-700', 'bg-orange-50', 'text-orange-700', 'bg-green-50', 'text-green-700', 'bg-purple-50', 'text-purple-700', 'bg-red-50', 'text-red-700', 'bg-indigo-50', 'text-indigo-700', 'bg-amber-50', 'text-amber-700');});
@@ -552,19 +633,30 @@
                 else if(tab.startsWith('pay_')) navBtn.classList.add('bg-indigo-50', 'text-indigo-700');
                 else navBtn.classList.add('bg-blue-50', 'text-blue-700'); 
             }
-            if(tab === 'dashboard') window.calculateAnalytics(); if(tab === 'reports') window.loadReports(); if(tab === 'sites') window.loadSites(); if(tab === 'users') window.loadUsers(); if(tab === 'labours') window.loadLabours();
+            if(tab === 'dashboard') window.calculateAnalytics(); 
+            if(tab === 'reports') window.loadReports(); 
+            if(tab === 'sites') window.loadSites(); 
+            if(tab === 'users') window.loadUsers(); 
+            if(tab === 'labours') window.loadLabours();
             if(tab === 'machinery') window.loadMachinery();
             if(tab === 'entry') { window.loadSites(); window.loadLabours(); }
-            if(tab === 'pay_vendors') window.loadPayVendors(); if(tab === 'pay_bills') window.loadPayBills(); if(tab === 'pay_payments') window.loadPayHistory(); if(tab === 'pay_cheques') window.loadPayCheques(); if(tab === 'pay_lorry') window.loadPayLorry();
+            if(tab === 'pay_vendors') window.loadPayVendors(); 
+            if(tab === 'pay_bills') { await window.loadPayVendors(true); window.loadPayBills(); } 
+            if(tab === 'pay_payments') { await window.loadPayVendors(true); await window.loadPayBills(true); window.loadPayHistory(); } 
+            if(tab === 'pay_cheques') { await window.loadPayVendors(true); window.loadPayCheques(); } 
+            if(tab === 'pay_lorry') window.loadPayLorry();
         };
 
-        auth.onAuthStateChanged(user => { 
+        auth.onAuthStateChanged(async user => { 
             if(!user) return window.location.href = "index.html"; 
             const n = user.email.split('@')[0]; 
             document.getElementById('adminHeaderName').innerText = n + " (Super Admin)"; document.getElementById('adminEmail').value = n; document.getElementById('adminName').value = n; 
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('eDate').value = today; document.getElementById('attDate').value = today; document.getElementById('lcDate').value = today; document.getElementById('bDate').value = today; document.getElementById('pDate').value = today; document.getElementById('tmDate').value = today;
-            window.loadSites(); window.loadLabours(); window.loadPayVendors(true); window.calculateAnalytics();
+            window.loadSites(); window.loadLabours(); 
+            await window.loadPayVendors(true); 
+            await window.loadPayBills(true); 
+            window.calculateAnalytics();
         });
 
         window.updateUserPass = async (e) => { e.preventDefault(); const curP = document.getElementById('cpCurrent').value; const newP = document.getElementById('cpNew').value; const conP = document.getElementById('cpConfirm').value; if(newP !== conP) return alert("New Passwords do not match!"); const btn = document.getElementById('btnUpdatePass'); btn.innerText = "Updating..."; try { const user = auth.currentUser; const cred = EmailAuthProvider.credential(user.email, curP); await reauthenticateWithCredential(user, cred); await updatePassword(user, newP); alert("Password updated successfully!"); window.closeM('modalChangePass'); e.target.reset(); } catch(err) { alert("Error: " + err.message); } btn.innerText = "Update Password"; };
@@ -584,6 +676,10 @@
             
             snap.forEach(d => { 
                 const v = d.data(); v.id = d.id; allVendors.push(v); 
+            });
+            allVendors.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+
+            allVendors.forEach(v => {
                 if(tb && !isInit) { 
                     let bankInfo = v.accNo ? `<span class="font-bold text-indigo-900">${v.bankName || ''} - ${v.branch || ''}</span><br><span class="text-gray-600 font-semibold">${v.accNo}</span> <span class="text-gray-400">(${v.accName || '-'})</span>` : '<span class="text-gray-400 italic">No Bank Info</span>'; 
                     tb.innerHTML += `<tr class="border-b hover:bg-indigo-50/40">
@@ -591,12 +687,12 @@
                         <td class="p-3">${v.contact || '-'}<br><span class="text-xs text-gray-500">${v.address || ''}</span></td>
                         <td class="p-3 text-xs">${bankInfo}</td>
                         <td class="p-3 text-right space-x-2">
-                            <button onclick="window.editPayVendor('${d.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold transition" title="Edit Vendor / Bank Details"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
-                            <button onclick="window.delPayVendor('${d.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="window.editPayVendor('${v.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2.5 py-1 rounded text-xs font-bold transition" title="Edit Vendor / Bank Details"><i class="fa-solid fa-pen mr-1"></i>Edit</button>
+                            <button onclick="window.delPayVendor('${v.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>`; 
                 } 
-                let o = document.createElement('option'); o.value = d.id; o.innerText = v.name; 
+                let o = document.createElement('option'); o.value = v.id; o.innerText = v.name; 
                 if(drpB) drpB.appendChild(o.cloneNode(true)); 
                 if(drpP) drpP.appendChild(o.cloneNode(true)); 
             }); 
@@ -658,25 +754,32 @@
         // ==========================================
         // BILLS & INVOICES (ADD, EDIT & DELETE)
         // ==========================================
-        window.loadPayBills = async () => { 
-            const snap = await getDocs(query(collection(db, "pay_bills"), orderBy("date", "desc"))); 
+        window.loadPayBills = async (silent = false) => { 
+            const snap = await getDocs(collection(db, "pay_bills")); 
             allBills = []; 
-            const tb = document.getElementById('tblBills'); tb.innerHTML = ''; 
-            snap.forEach(d => { 
-                const b = d.data(); b.id = d.id; allBills.push(b); 
-                let vName = allVendors.find(x => x.id === b.vendorId)?.name || 'Unknown'; 
-                let statBadge = b.status === 'SETTLED' ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Settled</span>` : (b.paid > 0 ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">Partial</span>` : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Pending</span>`); 
+            snap.forEach(d => { const b = d.data(); b.id = d.id; allBills.push(b); });
+            allBills.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+            if(silent) return;
+            const tb = document.getElementById('tblBills'); if(!tb) return;
+            tb.innerHTML = ''; 
+            allBills.forEach(b => { 
+                let vName = allVendors.find(x => x.id === b.vendorId)?.name || b.vendorName || 'Unknown'; 
+                let amt = parseFloat(b.amount || 0);
+                let paid = parseFloat(b.paid || 0);
+                let isSettled = (b.status === 'SETTLED') || (paid >= amt && amt > 0);
+                let statBadge = isSettled ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Settled</span>` : (paid > 0 ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold">Partial</span>` : `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-bold">Pending</span>`); 
                 tb.innerHTML += `<tr class="border-b hover:bg-gray-50">
                     <td class="p-3">${b.date}</td>
                     <td class="p-3 font-bold">${b.billNo}</td>
                     <td class="p-3">${vName}</td>
                     <td class="p-3 text-xs text-gray-500">${b.remarks}</td>
-                    <td class="p-3 text-right font-bold text-red-600">${parseFloat(b.amount).toLocaleString()}</td>
-                    <td class="p-3 text-right font-bold text-green-600">${parseFloat(b.paid || 0).toLocaleString()}</td>
+                    <td class="p-3 text-right font-bold text-red-600">${amt.toLocaleString()}</td>
+                    <td class="p-3 text-right font-bold text-green-600">${paid.toLocaleString()}</td>
                     <td class="p-3 text-center">${statBadge}</td>
                     <td class="p-3 text-center space-x-2">
-                        <button onclick="window.editPayBill('${d.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Bill"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="window.delPayBill('${d.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="window.editPayBill('${b.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="Edit Bill"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delPayBill('${b.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>`; 
             }); 
@@ -689,6 +792,8 @@
             document.getElementById('bDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('bNumber').value = '';
             document.getElementById('bAmount').value = '';
+            document.getElementById('bPaid').value = 0;
+            document.getElementById('bPaidWrapper').classList.add('hidden');
             document.getElementById('bRemarks').value = '';
             document.getElementById('billModalTitle').innerHTML = `<i class="fa-solid fa-file-invoice mr-2"></i>Add New Bill`;
             document.getElementById('btnSaveBill').innerText = "Save Bill";
@@ -703,6 +808,8 @@
             document.getElementById('bDate').value = b.date || '';
             document.getElementById('bNumber').value = b.billNo || '';
             document.getElementById('bAmount').value = b.amount || 0;
+            document.getElementById('bPaid').value = b.paid || 0;
+            document.getElementById('bPaidWrapper').classList.remove('hidden');
             document.getElementById('bRemarks').value = b.remarks || '';
             document.getElementById('billModalTitle').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i>Edit Bill`;
             document.getElementById('btnSaveBill').innerText = "Update Bill";
@@ -712,82 +819,236 @@
         window.saveBill = async (e) => { 
             e.preventDefault(); 
             const editId = document.getElementById('editBillId').value;
-            const newAmt = parseFloat(document.getElementById('bAmount').value);
+            const vId = document.getElementById('bVendor').value;
+            const vObj = allVendors.find(x => x.id === vId);
+            const newAmt = parseFloat(document.getElementById('bAmount').value || 0);
             try { 
                 if(editId) {
-                    const existing = allBills.find(x => x.id === editId);
-                    const curPaid = existing ? (existing.paid || 0) : 0;
+                    const curPaid = parseFloat(document.getElementById('bPaid').value || 0);
                     const newStatus = curPaid >= newAmt ? 'SETTLED' : 'PENDING';
                     await updateDoc(doc(db, "pay_bills", editId), {
-                        vendorId: document.getElementById('bVendor').value,
+                        vendorId: vId,
+                        vendorName: vObj ? vObj.name : '',
                         date: document.getElementById('bDate').value,
-                        billNo: document.getElementById('bNumber').value,
+                        billNo: document.getElementById('bNumber').value.trim(),
                         amount: newAmt,
-                        remarks: document.getElementById('bRemarks').value,
+                        paid: curPaid,
+                        remarks: document.getElementById('bRemarks').value.trim(),
                         status: newStatus
                     });
                     alert("Bill Updated!");
                 } else {
-                    const payload = { vendorId: document.getElementById('bVendor').value, date: document.getElementById('bDate').value, billNo: document.getElementById('bNumber').value, amount: newAmt, paid: 0, remarks: document.getElementById('bRemarks').value, status: 'PENDING', timestamp: new Date() }; 
+                    const payload = { 
+                        vendorId: vId, 
+                        vendorName: vObj ? vObj.name : '',
+                        date: document.getElementById('bDate').value, 
+                        billNo: document.getElementById('bNumber').value.trim(), 
+                        amount: newAmt, 
+                        paid: 0, 
+                        remarks: document.getElementById('bRemarks').value.trim(), 
+                        status: 'PENDING', 
+                        timestamp: new Date() 
+                    }; 
                     await addDoc(collection(db, "pay_bills"), payload); 
                     alert("Bill Added!"); 
                 }
                 window.closeM('modalAddBill'); 
-                window.loadPayBills(); 
+                await window.loadPayBills(); 
                 window.calculateAnalytics(); 
             } catch(er){ alert(er.message); } 
         };
         window.delPayBill = async (id) => { if(confirm("Delete Bill?")) { await deleteDoc(doc(db, "pay_bills", id)); window.loadPayBills(); window.calculateAnalytics(); } };
 
         // ==========================================
-        // PAYMENTS & CHEQUES (ADD, EDIT & DELETE)
+        // PAYMENTS & CHEQUES (FIXED BILL MATCHING & DIRECT PAYMENTS)
         // ==========================================
         let allPaymentsList = [];
 
-        window.toggleChequeFields = () => { const m = document.getElementById('pMethod').value; const cf = document.getElementById('pChequeFields'); if(m.includes('CHEQUE')) { cf.classList.remove('hidden'); document.getElementById('pChequeNo').required = true; document.getElementById('pChequeDate').required = true; } else { cf.classList.add('hidden'); document.getElementById('pChequeNo').required = false; document.getElementById('pChequeDate').required = false; } };
-        window.loadVendorBillsForPayment = () => { const vId = document.getElementById('pVendor').value; const con = document.getElementById('pBillsContainer'); const tb = document.getElementById('pBillsTable'); if(!vId) { con.classList.add('hidden'); return; } tb.innerHTML = ''; let hasPending = false; allBills.forEach(b => { if(b.vendorId === vId && b.status !== 'SETTLED') { hasPending = true; let due = b.amount - b.paid; tb.innerHTML += `<tr class="border-b"><td class="p-2 text-center"><input type="checkbox" class="bill-cb w-4 h-4" value="${b.id}" data-due="${due}" onchange="window.calcPaymentTotal()"></td><td class="p-2 font-bold text-xs">${b.billNo} <span class="font-normal text-gray-500 block">${b.remarks}</span></td><td class="p-2 text-right font-bold text-red-500">${due.toLocaleString()}</td><td class="p-2"><input type="number" id="payamt_${b.id}" class="w-full border p-1 rounded text-right pay-input" max="${due}" disabled oninput="window.calcPaymentTotal()"></td></tr>`; } }); if(hasPending) { con.classList.remove('hidden'); document.getElementById('pTotalCalc').innerText = '0.00'; } else { tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 font-bold">No pending bills for this vendor.</td></tr>`; con.classList.remove('hidden'); } };
-        window.calcPaymentTotal = () => { let total = 0; document.querySelectorAll('.bill-cb').forEach(cb => { let input = document.getElementById(`payamt_${cb.value}`); if(cb.checked) { input.disabled = false; if(!input.value) input.value = cb.dataset.due; total += parseFloat(input.value || 0); } else { input.disabled = true; input.value = ''; } }); document.getElementById('pTotalCalc').innerText = total.toLocaleString(); };
+        window.openMakePaymentModal = async (defaultMethod = 'CASH') => {
+            await window.loadPayVendors(true);
+            await window.loadPayBills(true);
+            document.getElementById('pVendor').value = '';
+            document.getElementById('pDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('pDesc').value = '';
+            document.getElementById('pDirectAmount').value = '';
+            document.getElementById('pMethod').value = defaultMethod;
+            document.getElementById('pChequeNo').value = '';
+            document.getElementById('pChequeDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('pBillsContainer').classList.add('hidden');
+            window.toggleChequeFields();
+            window.openM('modalAddPayment');
+        };
+
+        window.toggleChequeFields = () => { 
+            const m = document.getElementById('pMethod').value; 
+            const cf = document.getElementById('pChequeFields'); 
+            if(m.includes('CHEQUE')) { 
+                cf.classList.remove('hidden'); 
+                document.getElementById('pChequeNo').required = true; 
+                document.getElementById('pChequeDate').required = true; 
+            } else { 
+                cf.classList.add('hidden'); 
+                document.getElementById('pChequeNo').required = false; 
+                document.getElementById('pChequeDate').required = false; 
+            } 
+        };
+
+        // FIXED: Fetches latest bills & matches by ID OR Vendor Name
+        window.loadVendorBillsForPayment = async () => { 
+            const vId = document.getElementById('pVendor').value; 
+            const con = document.getElementById('pBillsContainer'); 
+            const tb = document.getElementById('pBillsTable'); 
+            if(!vId) { con.classList.add('hidden'); return; } 
+
+            // Always ensure allBills is up-to-date from Firestore
+            await window.loadPayBills(true);
+
+            const selectedVendor = allVendors.find(x => x.id === vId);
+            const selectedNameNorm = selectedVendor ? (selectedVendor.name || '').trim().toLowerCase() : '';
+
+            tb.innerHTML = ''; 
+            let hasPending = false; 
+            allBills.forEach(b => { 
+                const billVendorObj = allVendors.find(x => x.id === b.vendorId);
+                const billVendorNameNorm = (b.vendorName || billVendorObj?.name || '').trim().toLowerCase();
+                const isSameVendor = (b.vendorId === vId) || (selectedNameNorm && billVendorNameNorm === selectedNameNorm);
+
+                const amt = parseFloat(b.amount || 0);
+                const paid = parseFloat(b.paid || 0);
+                const due = amt - paid;
+
+                if(isSameVendor && due > 0 && b.status !== 'SETTLED') { 
+                    hasPending = true; 
+                    tb.innerHTML += `<tr class="border-b hover:bg-green-50/50">
+                        <td class="p-2 text-center"><input type="checkbox" class="bill-cb w-4 h-4 cursor-pointer" value="${b.id}" data-due="${due}" onchange="window.calcPaymentTotal()"></td>
+                        <td class="p-2 font-bold text-xs">#${b.billNo} <span class="text-gray-400 font-normal">(${b.date})</span><span class="font-normal text-gray-500 block">${b.remarks || ''}</span></td>
+                        <td class="p-2 text-right font-bold text-red-500">${due.toLocaleString()}</td>
+                        <td class="p-2"><input type="number" step="0.01" id="payamt_${b.id}" class="w-full border p-1.5 rounded text-right font-bold pay-input" max="${due}" disabled oninput="window.calcPaymentTotal()"></td>
+                    </tr>`; 
+                } 
+            }); 
+            con.classList.remove('hidden'); 
+            document.getElementById('pTotalCalc').innerText = '0.00'; 
+            if(!hasPending) { 
+                tb.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500 font-bold">No pending bills for this vendor. (ඔබට යටින් Total Payment Amount එකට කෙලින්ම මුදල ඇතුළත් කර Advance/Cheque ගෙවීමක් කළ හැක)</td></tr>`; 
+            } 
+        };
+
+        window.calcPaymentTotal = () => { 
+            let total = 0; 
+            let checkedCount = 0;
+            document.querySelectorAll('.bill-cb').forEach(cb => { 
+                let input = document.getElementById(`payamt_${cb.value}`); 
+                if(cb.checked) { 
+                    checkedCount++;
+                    input.disabled = false; 
+                    if(!input.value) input.value = cb.dataset.due; 
+                    total += parseFloat(input.value || 0); 
+                } else { 
+                    input.disabled = true; 
+                    input.value = ''; 
+                } 
+            }); 
+            document.getElementById('pTotalCalc').innerText = total.toLocaleString(); 
+            if(checkedCount > 0) {
+                document.getElementById('pDirectAmount').value = total;
+            }
+        };
         
         window.processPayment = async (e) => { 
-            e.preventDefault(); const vId = document.getElementById('pVendor').value; if(!vId) return alert("Select Vendor!"); 
-            let allocations = []; let totalPay = 0; 
-            document.querySelectorAll('.bill-cb:checked').forEach(cb => { let pAmt = parseFloat(document.getElementById(`payamt_${cb.value}`).value || 0); if(pAmt > 0) { allocations.push({ billId: cb.value, amount: pAmt }); totalPay += pAmt; } }); 
-            if(allocations.length === 0 || totalPay <= 0) return alert("Select at least one bill and enter amount!"); 
+            e.preventDefault(); 
+            const vId = document.getElementById('pVendor').value; 
+            if(!vId) return alert("කරුණාකර Vendor කෙනෙකු තෝරන්න (Select Vendor)!"); 
+            
+            let allocations = []; 
+            let allocatedSum = 0; 
+            document.querySelectorAll('.bill-cb:checked').forEach(cb => { 
+                let pAmt = parseFloat(document.getElementById(`payamt_${cb.value}`).value || 0); 
+                if(pAmt > 0) { 
+                    allocations.push({ billId: cb.value, amount: pAmt }); 
+                    allocatedSum += pAmt; 
+                } 
+            }); 
+
+            const directAmt = parseFloat(document.getElementById('pDirectAmount').value || 0);
+            const totalPay = allocations.length > 0 ? allocatedSum : directAmt;
+
+            if(totalPay <= 0) return alert("කරුණාකර ගෙවන මුදල ඇතුළත් කරන්න (Enter payment amount)!"); 
+            
             const btn = document.getElementById('btnSubmitPayment'); btn.innerText = "Processing..."; btn.disabled = true; 
-            const method = document.getElementById('pMethod').value; let cqNo = "", cqDate = "", cqStatus = ""; 
-            if(method.includes('CHEQUE')) { cqNo = document.getElementById('pChequeNo').value; cqDate = document.getElementById('pChequeDate').value; cqStatus = 'PENDING'; } 
+            const method = document.getElementById('pMethod').value; 
+            let cqNo = "", cqDate = "", cqStatus = ""; 
+            if(method.includes('CHEQUE')) { 
+                cqNo = document.getElementById('pChequeNo').value.trim(); 
+                cqDate = document.getElementById('pChequeDate').value; 
+                const todayStr = new Date().toISOString().split('T')[0];
+                cqStatus = (cqDate && cqDate <= todayStr) ? 'REALIZED' : 'PENDING'; 
+            } 
             const vNameObj = allVendors.find(x => x.id === vId);
-            const payPayload = { payId: "PAY-" + Math.floor(Math.random()*100000), vendorId: vId, vendorName: vNameObj ? vNameObj.name : '', date: document.getElementById('pDate').value, description: document.getElementById('pDesc').value, method: method, totalAmount: totalPay, chequeNo: cqNo, chequeDate: cqDate, chequeStatus: cqStatus, allocations: allocations, timestamp: new Date() }; 
+            const payPayload = { 
+                payId: "PAY-" + Math.floor(100000 + Math.random()*900000), 
+                vendorId: vId, 
+                vendorName: vNameObj ? vNameObj.name : '', 
+                date: document.getElementById('pDate').value, 
+                description: document.getElementById('pDesc').value.trim(), 
+                method: method, 
+                totalAmount: totalPay, 
+                chequeNo: cqNo, 
+                chequeDate: cqDate, 
+                chequeStatus: cqStatus, 
+                allocations: allocations, 
+                timestamp: new Date() 
+            }; 
             try { 
                 await addDoc(collection(db, "pay_history"), payPayload); 
-                for(let alloc of allocations) { const billRef = doc(db, "pay_bills", alloc.billId); const bSnap = await getDoc(billRef); if(bSnap.exists()) { let curPaid = bSnap.data().paid || 0; let newPaid = curPaid + alloc.amount; let newStatus = newPaid >= bSnap.data().amount ? 'SETTLED' : 'PENDING'; await updateDoc(billRef, { paid: newPaid, status: newStatus }); } } 
-                alert("Payment Successful!"); window.closeM('modalAddPayment'); e.target.reset(); document.getElementById('pBillsContainer').classList.add('hidden'); window.loadPayBills(); window.loadPayHistory(); window.loadPayCheques(); window.calculateAnalytics(); 
-            } catch (err) { alert("Error: " + err.message); } btn.innerText = "Confirm Payment"; btn.disabled = false; 
+                for(let alloc of allocations) { 
+                    const billRef = doc(db, "pay_bills", alloc.billId); 
+                    const bSnap = await getDoc(billRef); 
+                    if(bSnap.exists()) { 
+                        let curPaid = parseFloat(bSnap.data().paid || 0); 
+                        let newPaid = curPaid + alloc.amount; 
+                        let newStatus = newPaid >= parseFloat(bSnap.data().amount || 0) ? 'SETTLED' : 'PENDING'; 
+                        await updateDoc(billRef, { paid: newPaid, status: newStatus }); 
+                    } 
+                } 
+                alert("Payment Recorded Successfully!"); 
+                window.closeM('modalAddPayment'); 
+                e.target.reset(); 
+                document.getElementById('pBillsContainer').classList.add('hidden'); 
+                await window.loadPayBills(); 
+                window.loadPayHistory(); 
+                window.loadPayCheques(); 
+                window.calculateAnalytics(); 
+            } catch (err) { alert("Error: " + err.message); } 
+            btn.innerText = "Confirm Payment"; btn.disabled = false; 
         };
         
         window.loadPayHistory = async () => { 
-            const snap = await getDocs(query(collection(db, "pay_history"), orderBy("timestamp", "desc"))); 
+            const snap = await getDocs(collection(db, "pay_history")); 
             allPaymentsList = [];
-            const tb = document.getElementById('tblPayments'); tb.innerHTML = ''; 
-            snap.forEach(d => { 
-                const p = d.data(); p.id = d.id; allPaymentsList.push(p);
+            snap.forEach(d => { const p = d.data(); p.id = d.id; allPaymentsList.push(p); });
+            allPaymentsList.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+            const tb = document.getElementById('tblPayments'); if(!tb) return;
+            tb.innerHTML = ''; 
+            allPaymentsList.forEach(p => { 
                 let vName = allVendors.find(x => x.id === p.vendorId)?.name || p.vendorName || 'Record'; 
-                let methodBadge = p.method.includes('CHEQUE') ? `<span class="text-orange-600 font-bold text-xs"><i class="fa-solid fa-money-check"></i> ${p.method.replace('_', ' ')}</span><br><span class="text-gray-500 text-[10px]">No: ${p.chequeNo}</span>` : `<span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-building-columns"></i> ${p.method.replace('_', ' ')}</span>`; 
+                let methodBadge = (p.method || '').includes('CHEQUE') ? `<span class="text-orange-600 font-bold text-xs"><i class="fa-solid fa-money-check"></i> ${p.method.replace('_', ' ')}</span><br><span class="text-gray-500 text-[10px]">No: ${p.chequeNo}</span>` : `<span class="text-green-600 font-bold text-xs"><i class="fa-solid fa-building-columns"></i> ${(p.method || 'CASH').replace('_', ' ')}</span>`; 
                 tb.innerHTML += `<tr class="border-b hover:bg-gray-50">
                     <td class="p-3">${p.date}</td>
                     <td class="p-3 font-bold text-indigo-700">${p.payId}</td>
                     <td class="p-3 font-bold">${vName}</td>
                     <td class="p-3 text-xs text-gray-500">${p.description || p.reason || '-'}</td>
                     <td class="p-3">${methodBadge}</td>
-                    <td class="p-3 text-right font-black text-green-700">${parseFloat(p.totalAmount).toLocaleString()}</td>
+                    <td class="p-3 text-right font-black text-green-700">${parseFloat(p.totalAmount || 0).toLocaleString()}</td>
                     <td class="p-3 text-center space-x-2">
-                        <button onclick="window.viewPayment('${d.id}')" class="text-blue-500 hover:text-blue-700 p-1" title="View"><i class="fa-solid fa-eye"></i></button>
-                        <button onclick="window.openEditPaymentModal('${d.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Edit Payment/Cheque"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="window.delPaymentRecord('${d.id}')" class="text-red-400 hover:text-red-600 p-1" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="window.viewPayment('${p.id}')" class="text-blue-500 hover:text-blue-700 p-1" title="View"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.openEditPaymentModal('${p.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Edit Payment/Cheque"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="window.delPaymentRecord('${p.id}')" class="text-red-400 hover:text-red-600 p-1" title="Delete"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>`; 
             }); 
-            if(snap.empty) tb.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">No Payments Recorded</td></tr>`; 
+            if(allPaymentsList.length === 0) tb.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400 font-bold">No Payments Recorded</td></tr>`; 
         };
 
         window.openEditPaymentModal = async (id) => {
@@ -819,7 +1080,8 @@
                 reason: document.getElementById('epDesc').value.trim(),
                 chequeNo: document.getElementById('epChequeNo').value.trim(),
                 chequeDate: document.getElementById('epChequeDate').value,
-                chequeStatus: document.getElementById('epChequeStatus').value
+                chequeStatus: document.getElementById('epChequeStatus').value,
+                manualStatusOverride: true
             };
             try {
                 await updateDoc(doc(db, "pay_history", id), payload);
@@ -832,33 +1094,51 @@
         };
 
         window.delPaymentRecord = async (id) => {
-            if(confirm("Delete this payment/cheque record permanently?")) {
-                await deleteDoc(doc(db, "pay_history", id));
+            if(!confirm("Delete this payment/cheque record? (If bills were allocated, their balances will be restored)")) return;
+            try {
+                const pRef = doc(db, "pay_history", id);
+                const pSnap = await getDoc(pRef);
+                if(pSnap.exists()) {
+                    const pData = pSnap.data();
+                    if(pData.allocations && pData.allocations.length > 0) {
+                        for(let alloc of pData.allocations) {
+                            const bRef = doc(db, "pay_bills", alloc.billId);
+                            const bSnap = await getDoc(bRef);
+                            if(bSnap.exists()) {
+                                let curPaid = parseFloat(bSnap.data().paid || 0);
+                                let newPaid = Math.max(0, curPaid - parseFloat(alloc.amount || 0));
+                                await updateDoc(bRef, { paid: newPaid, status: 'PENDING' });
+                            }
+                        }
+                    }
+                }
+                await deleteDoc(pRef);
+                await window.loadPayBills();
                 window.loadPayHistory();
                 window.loadPayCheques();
                 window.calculateAnalytics();
-            }
+            } catch(err) { alert("Error: " + err.message); }
         };
 
-        window.viewPayment = async (id) => { const docRef = doc(db, "pay_history", id); const snap = await getDoc(docRef); if(!snap.exists()) return; const p = snap.data(); document.getElementById('vPayId').innerText = p.payId; document.getElementById('vPayDate').innerText = p.date; document.getElementById('vPayMethod').innerText = p.method.replace('_', ' '); document.getElementById('vPayTotal').innerText = "Rs. " + p.totalAmount.toLocaleString(); document.getElementById('vPayDesc').innerText = p.description || p.reason || 'N/A'; const cqDiv = document.getElementById('vPayChequeDiv'); if(p.method.includes('CHEQUE')) { cqDiv.classList.remove('hidden'); cqDiv.innerHTML = `Cheque No: ${p.chequeNo} | Date: ${p.chequeDate} | Status: ${p.chequeStatus}`; } else { cqDiv.classList.add('hidden'); } const atb = document.getElementById('vPayAllocations'); atb.innerHTML = ''; if(p.allocations && p.allocations.length > 0) { p.allocations.forEach(a => { let bill = allBills.find(b => b.id === a.billId); let bTxt = bill ? `${bill.billNo} <span class="text-gray-500 font-normal">(${bill.remarks})</span>` : a.billId; atb.innerHTML += `<tr class="border-b"><td class="p-2 font-bold text-xs">${bTxt}</td><td class="p-2 text-right font-bold text-green-600">${a.amount.toLocaleString()}</td></tr>`; }); } else { atb.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-gray-500">Bulk Upload - No Bills Allocated</td></tr>`; } window.openM('modalViewPayment'); };
+        window.viewPayment = async (id) => { const docRef = doc(db, "pay_history", id); const snap = await getDoc(docRef); if(!snap.exists()) return; const p = snap.data(); document.getElementById('vPayId').innerText = p.payId; document.getElementById('vPayDate').innerText = p.date; document.getElementById('vPayMethod').innerText = (p.method || '').replace('_', ' '); document.getElementById('vPayTotal').innerText = "Rs. " + parseFloat(p.totalAmount || 0).toLocaleString(); document.getElementById('vPayDesc').innerText = p.description || p.reason || 'N/A'; const cqDiv = document.getElementById('vPayChequeDiv'); if((p.method || '').includes('CHEQUE')) { cqDiv.classList.remove('hidden'); cqDiv.innerHTML = `Cheque No: ${p.chequeNo} | Date: ${p.chequeDate} | Status: ${p.chequeStatus}`; } else { cqDiv.classList.add('hidden'); } const atb = document.getElementById('vPayAllocations'); atb.innerHTML = ''; if(p.allocations && p.allocations.length > 0) { p.allocations.forEach(a => { let bill = allBills.find(b => b.id === a.billId); let bTxt = bill ? `#${bill.billNo} <span class="text-gray-500 font-normal">(${bill.remarks})</span>` : a.billId; atb.innerHTML += `<tr class="border-b"><td class="p-2 font-bold text-xs">${bTxt}</td><td class="p-2 text-right font-bold text-green-600">${parseFloat(a.amount || 0).toLocaleString()}</td></tr>`; }); } else { atb.innerHTML = `<tr><td colspan="2" class="p-2 text-center text-gray-500">Direct / Advance Payment (No specific bill allocated)</td></tr>`; } window.openM('modalViewPayment'); };
 
         window.loadPayCheques = async () => { 
             const filterVal = document.getElementById('cqFilter').value; 
-            const snap = await getDocs(query(collection(db, "pay_history"))); 
+            const snap = await getDocs(collection(db, "pay_history")); 
             let cheques = [];
             snap.forEach(d => { const p = d.data(); if(p.method === "DFCC_CHEQUE" || p.method === "SAMPATH_CHEQUE") { p.id = d.id; cheques.push(p); } });
-            cheques.sort((a,b) => new Date(a.chequeDate) - new Date(b.chequeDate));
+            cheques.sort((a,b) => new Date(a.chequeDate || 0) - new Date(b.chequeDate || 0));
             const tb = document.getElementById('tblCheques'); tb.innerHTML = ''; 
             let cqUnrealized = 0; let cqRealized = 0; 
             const todayDate = new Date().toISOString().split('T')[0];
 
             for(let p of cheques) { 
-                if(p.chequeStatus === 'PENDING' && p.chequeDate <= todayDate) {
+                if(p.chequeStatus === 'PENDING' && p.chequeDate && p.chequeDate <= todayDate && !p.manualStatusOverride) {
                     p.chequeStatus = 'REALIZED';
                     updateDoc(doc(db, "pay_history", p.id), { chequeStatus: 'REALIZED' });
                 }
-                if(p.chequeStatus === 'PENDING') cqUnrealized += parseFloat(p.totalAmount); 
-                if(p.chequeStatus === 'REALIZED') cqRealized += parseFloat(p.totalAmount); 
+                if(p.chequeStatus === 'PENDING') cqUnrealized += parseFloat(p.totalAmount || 0); 
+                if(p.chequeStatus === 'REALIZED') cqRealized += parseFloat(p.totalAmount || 0); 
                 if (filterVal === 'PENDING' && p.chequeStatus !== 'PENDING') continue; 
                 if (filterVal === 'REALIZED' && p.chequeStatus !== 'REALIZED') continue; 
                 let badge = p.chequeStatus === 'PENDING' ? `<span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-bold animate-pulse">Unrealized</span>` : `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Realized</span>`; 
@@ -867,10 +1147,10 @@
                 tb.innerHTML += `<tr class="border-b hover:bg-orange-50">
                     <td class="p-3 font-bold">${p.chequeDate}</td>
                     <td class="p-3 font-bold text-indigo-700">${p.chequeNo}</td>
-                    <td class="p-3 text-xs">${p.method.split('_')[0]}</td>
+                    <td class="p-3 text-xs">${(p.method || '').split('_')[0]}</td>
                     <td class="p-3">${vName}</td>
                     <td class="p-3 text-xs text-gray-500">${p.description || p.reason || '-'}</td>
-                    <td class="p-3 text-right font-black text-red-600">${parseFloat(p.totalAmount).toLocaleString()}</td>
+                    <td class="p-3 text-right font-black text-red-600">${parseFloat(p.totalAmount || 0).toLocaleString()}</td>
                     <td class="p-3 text-center">${badge}</td>
                     <td class="p-3 text-center space-x-1">
                         ${actionBtn}
@@ -883,7 +1163,7 @@
             document.getElementById('cqStatRealized').innerText = "Rs. " + cqRealized.toLocaleString(); 
             if(tb.innerHTML === '') tb.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-500 font-bold">No Cheques Found</td></tr>`; 
         };
-        window.markChequeRealized = async (id) => { if(confirm("Mark this cheque as realized?")) { await updateDoc(doc(db, "pay_history", id), { chequeStatus: 'REALIZED' }); window.loadPayCheques(); window.calculateAnalytics(); } };
+        window.markChequeRealized = async (id) => { if(confirm("Mark this cheque as realized?")) { await updateDoc(doc(db, "pay_history", id), { chequeStatus: 'REALIZED', manualStatusOverride: true }); window.loadPayCheques(); window.calculateAnalytics(); } };
 
         // ==========================================
         // LORRY PETTY CASH (ADD, EDIT & DELETE)
@@ -891,7 +1171,7 @@
         let allLorryRecords = [];
         window.loadPayLorry = async () => { 
             const filterMonth = document.getElementById('lcMonthFilter')?.value; 
-            const snap = await getDocs(query(collection(db, "pay_lorry"))); 
+            const snap = await getDocs(collection(db, "pay_lorry")); 
             const tb = document.getElementById('tblLorry'); tb.innerHTML = ''; 
             allLorryRecords = []; 
             snap.forEach(d => { let r = d.data(); r.id = d.id; allLorryRecords.push(r); }); 
@@ -905,19 +1185,19 @@
             });
             let bal = 0; let broughtForward = 0; let displayRecords = [];
             allLorryRecords.forEach(r => { 
-                if(r.type === 'ADVANCE') bal += parseFloat(r.amount); else bal -= parseFloat(r.amount); 
+                if(r.type === 'ADVANCE') bal += parseFloat(r.amount || 0); else bal -= parseFloat(r.amount || 0); 
                 r.runBal = bal; 
                 if (filterMonth) {
-                    if (r.date.startsWith(filterMonth)) displayRecords.push(r);
-                    else if (r.date < filterMonth) broughtForward = bal;
+                    if ((r.date || '').startsWith(filterMonth)) displayRecords.push(r);
+                    else if ((r.date || '') < filterMonth) broughtForward = bal;
                 } else {
                     displayRecords.push(r);
                 }
             }); 
             displayRecords.reverse(); 
             displayRecords.forEach(r => { 
-                let adv = r.type === 'ADVANCE' ? r.amount.toLocaleString() : '-'; 
-                let exp = r.type === 'EXPENSE' ? r.amount.toLocaleString() : '-'; 
+                let adv = r.type === 'ADVANCE' ? parseFloat(r.amount || 0).toLocaleString() : '-'; 
+                let exp = r.type === 'EXPENSE' ? parseFloat(r.amount || 0).toLocaleString() : '-'; 
                 tb.innerHTML += `<tr class="border-b hover:bg-blue-50">
                     <td class="p-3">${r.date}</td>
                     <td class="p-3 font-bold">${r.desc}</td>
@@ -1198,8 +1478,8 @@
         };
 
         window.adminAutoFillLabour = () => {
-            const nameVal = document.getElementById('wName').value;
-            const found = allLaboursList.find(x => x.name === nameVal);
+            const nameVal = document.getElementById('wName').value.trim().toLowerCase();
+            const found = allLaboursList.find(x => (x.name || '').trim().toLowerCase() === nameVal);
             if(found) document.getElementById('wType').value = found.type;
         };
 
@@ -1276,7 +1556,7 @@
             if(dData.photos) dData.photos.forEach((url, i) => { pCon.innerHTML += `<div class="relative"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border shadow-sm"><button type="button" onclick="window.delImg('photos',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; }); 
             const bCon = document.getElementById('list-bills'); bCon.innerHTML=''; 
             if(dData.bills) dData.bills.forEach((url, i) => { bCon.innerHTML += `<div class="relative"><img src="${url}" class="w-16 h-16 object-cover rounded-lg border border-pink-300 shadow-sm"><button type="button" onclick="window.delImg('bills',${i})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 text-xs"><i class="fa-solid fa-xmark"></i></button></div>`; }); 
-            const rTb = (arr, id, keys) => { const tb = document.getElementById(id); tb.innerHTML=''; arr.forEach((item, idx) => { let tr = document.createElement('tr'); tr.className = "hover:bg-gray-100 transition"; keys.forEach(k => { let td = document.createElement('td'); td.className="border p-2"; td.innerText = item[k]||'-'; tr.appendChild(td); }); let delTd = document.createElement('td'); delTd.className="border p-2 text-center"; delTd.innerHTML = `<button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-400 hover:text-red-600 font-bold"><i class="fa-solid fa-trash"></i></button>`; tr.appendChild(delTd); tb.appendChild(tr); }); }; 
+            const rTb = (arr, id, keys) => { const tb = document.getElementById(id); tb.innerHTML=''; if(!arr) return; arr.forEach((item, idx) => { let tr = document.createElement('tr'); tr.className = "hover:bg-gray-100 transition"; keys.forEach(k => { let td = document.createElement('td'); td.className="border p-2"; td.innerText = item[k]||'-'; tr.appendChild(td); }); let delTd = document.createElement('td'); delTd.className="border p-2 text-center"; delTd.innerHTML = `<button type="button" onclick="window.delRow('${id.split('-')[1]}',${idx})" class="text-red-400 hover:text-red-600 font-bold"><i class="fa-solid fa-trash"></i></button>`; tr.appendChild(delTd); tb.appendChild(tr); }); }; 
             rTb(dData.delays, 'tb-delays', ['f','t','r']); 
             rTb(dData.measures, 'tb-measures', ['d','u']); 
             rTb(dData.sups, 'tb-sups', ['m','q','n','p']); 
@@ -1438,14 +1718,14 @@
         }; 
         window.delLabour = async (id) => { if(confirm("Remove?")) { await deleteDoc(doc(db, "labours", id)); window.loadLabours(); } };
 
-        let lastPayrollData = []; window.generatePayroll = async (e) => { e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); btn.innerText = "Calculating..."; const sDate = document.getElementById('payFrom').value; const eDate = document.getElementById('payTo').value; const targetSite = document.getElementById('paySite').value; const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); lRates[l.name] = { daily: l.dailyRate, ot: l.otRate }; }); const q = query(collection(db, "daily_reports"), where("date", ">=", sDate), where("date", "<=", eDate)); const rSnap = await getDocs(q); let payMap = {}; rSnap.forEach(docSnap => { const r = docSnap.data(); if(r.status !== "Approved" || r.siteClosed) return; if(targetSite !== "ALL" && r.siteId !== targetSite) return; if(r.data && r.data.workers) { r.data.workers.forEach(w => { if(!payMap[w.n]) payMap[w.n] = { days: 0, otHrs: 0, adv: 0 }; payMap[w.n].days += 1; if(w.o && w.o !== '-' && !isNaN(w.o)) payMap[w.n].otHrs += parseFloat(w.o); if(w.a && w.a !== '-' && !isNaN(w.a)) payMap[w.n].adv += parseFloat(w.a); }); } }); const tb = document.getElementById('payrollTable'); tb.innerHTML = ''; let totalBase=0, totalOTPay=0, totalAdv=0, totalNet=0; lastPayrollData = []; if(Object.keys(payMap).length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">No approved work records found for this period.</td></tr>'; document.getElementById('payrollFooter').classList.add('hidden'); btn.innerText = "Calculate Salary"; return; } for (const [name, data] of Object.entries(payMap)) { let rates = lRates[name] || { daily: 0, ot: 0 }; let basePay = data.days * rates.daily; let otPay = data.otHrs * rates.ot; let gross = basePay + otPay; let netPay = gross - data.adv; totalBase += basePay; totalOTPay += otPay; totalAdv += data.adv; totalNet += netPay; lastPayrollData.push({ name, days: data.days, otHrs: data.otHrs, basePay, otPay, adv: data.adv, netPay, rateErr: !lRates[name] }); let alertIcon = !lRates[name] ? `<i class="fa-solid fa-triangle-exclamation text-yellow-500 ml-2" title="Labour not found in Master List! Rate is 0"></i>` : ''; tb.innerHTML += `<tr class="hover:bg-orange-50 border-b"><td class="p-3 font-bold">${name} ${alertIcon}</td><td class="p-3 text-center">${data.days}</td><td class="p-3 text-center">${data.otHrs}</td><td class="p-3 text-right">Rs. ${basePay.toLocaleString()}</td><td class="p-3 text-right">Rs. ${otPay.toLocaleString()}</td><td class="p-3 text-right text-red-500">Rs. ${data.adv.toLocaleString()}</td><td class="p-3 text-right font-black text-green-700 bg-green-50 border-l border-gray-200">Rs. ${netPay.toLocaleString()}</td></tr>`; } document.getElementById('payrollFooter').classList.remove('hidden'); document.getElementById('payrollFooter').innerHTML = `<tr><td colspan="3" class="p-3 text-right uppercase text-gray-500">Total Payroll Value:</td><td class="p-3 text-right">Rs. ${totalBase.toLocaleString()}</td><td class="p-3 text-right">Rs. ${totalOTPay.toLocaleString()}</td><td class="p-3 text-right text-red-600">Rs. ${totalAdv.toLocaleString()}</td><td class="p-3 text-right text-lg text-green-800 border-l border-gray-300">Rs. ${totalNet.toLocaleString()}</td></tr>`; btn.innerText = "Calculate Salary"; };
+        let lastPayrollData = []; window.generatePayroll = async (e) => { e.preventDefault(); const btn = e.target.querySelector('button[type="submit"]'); btn.innerText = "Calculating..."; const sDate = document.getElementById('payFrom').value; const eDate = document.getElementById('payTo').value; const targetSite = document.getElementById('paySite').value; const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); if(l.name) lRates[l.name.trim()] = { daily: l.dailyRate, ot: l.otRate }; }); const q = query(collection(db, "daily_reports"), where("date", ">=", sDate), where("date", "<=", eDate)); const rSnap = await getDocs(q); let payMap = {}; rSnap.forEach(docSnap => { const r = docSnap.data(); if(r.status !== "Approved" || r.siteClosed) return; if(targetSite !== "ALL" && r.siteId !== targetSite) return; if(r.data && r.data.workers) { r.data.workers.forEach(w => { const wName = (w.n || '').trim(); if(!wName) return; if(!payMap[wName]) payMap[wName] = { days: 0, otHrs: 0, adv: 0 }; payMap[wName].days += 1; if(w.o && w.o !== '-' && !isNaN(w.o)) payMap[wName].otHrs += parseFloat(w.o); if(w.a && w.a !== '-' && !isNaN(w.a)) payMap[wName].adv += parseFloat(w.a); }); } }); const tb = document.getElementById('payrollTable'); tb.innerHTML = ''; let totalBase=0, totalOTPay=0, totalAdv=0, totalNet=0; lastPayrollData = []; if(Object.keys(payMap).length === 0) { tb.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-red-500 font-bold">No approved work records found for this period.</td></tr>'; document.getElementById('payrollFooter').classList.add('hidden'); btn.innerText = "Calculate"; return; } for (const [name, data] of Object.entries(payMap)) { let rates = lRates[name] || { daily: 0, ot: 0 }; let basePay = data.days * rates.daily; let otPay = data.otHrs * rates.ot; let gross = basePay + otPay; let netPay = gross - data.adv; totalBase += basePay; totalOTPay += otPay; totalAdv += data.adv; totalNet += netPay; lastPayrollData.push({ name, days: data.days, otHrs: data.otHrs, basePay, otPay, adv: data.adv, netPay, rateErr: !lRates[name] }); let alertIcon = !lRates[name] ? `<i class="fa-solid fa-triangle-exclamation text-yellow-500 ml-2" title="Labour not found in Master List! Rate is 0"></i>` : ''; tb.innerHTML += `<tr class="hover:bg-orange-50 border-b"><td class="p-3 font-bold">${name} ${alertIcon}</td><td class="p-3 text-center">${data.days}</td><td class="p-3 text-center">${data.otHrs}</td><td class="p-3 text-right">Rs. ${basePay.toLocaleString()}</td><td class="p-3 text-right">Rs. ${otPay.toLocaleString()}</td><td class="p-3 text-right text-red-500">Rs. ${data.adv.toLocaleString()}</td><td class="p-3 text-right font-black text-green-700 bg-green-50 border-l border-gray-200">Rs. ${netPay.toLocaleString()}</td></tr>`; } document.getElementById('payrollFooter').classList.remove('hidden'); document.getElementById('payrollFooter').innerHTML = `<tr><td colspan="3" class="p-3 text-right uppercase text-gray-500">Total Payroll Value:</td><td class="p-3 text-right">Rs. ${totalBase.toLocaleString()}</td><td class="p-3 text-right">Rs. ${totalOTPay.toLocaleString()}</td><td class="p-3 text-right text-red-600">Rs. ${totalAdv.toLocaleString()}</td><td class="p-3 text-right text-lg text-green-800 border-l border-gray-300">Rs. ${totalNet.toLocaleString()}</td></tr>`; btn.innerText = "Calculate"; };
         window.exportPayroll = async () => { if(lastPayrollData.length === 0) return alert("Please calculate payroll first!"); const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet('Weekly Payroll'); ws.mergeCells('A1:G2'); ws.getCell('A1').value = `NIWASA CONSTRUCTIONS - WEEKLY PAYROLL`; ws.getCell('A1').font = {name:'Arial', size:14, bold:true, color:{argb:'FFFFFFFF'}}; ws.getCell('A1').fill = {type:'pattern', pattern:'solid', fgColor:{argb:'FFED7D31'}}; ws.getCell('A1').alignment = {horizontal:'center', vertical:'middle'}; ws.getCell('A4').value = "From: " + document.getElementById('payFrom').value; ws.getCell('C4').value = "To: " + document.getElementById('payTo').value; ws.getCell('F4').value = "Site: " + document.getElementById('paySite').value; const headers = ["Labour Name", "Days Worked", "Total OT (Hrs)", "Base Pay (Rs)", "OT Pay (Rs)", "Advances (Rs)", "Net Payable (Rs)"]; headers.forEach((h, i) => { ws.getCell(6, i+1).value = h; ws.getCell(6, i+1).font = {bold:true, color:{argb:'FFFFFFFF'}}; ws.getCell(6, i+1).fill = {type:'pattern', pattern:'solid', fgColor:{argb:'FF44546A'}}; }); let row = 7; lastPayrollData.forEach(d => { ws.getCell(row, 1).value = d.name; ws.getCell(row, 2).value = d.days; ws.getCell(row, 3).value = d.otHrs; ws.getCell(row, 4).value = d.basePay; ws.getCell(row, 5).value = d.otPay; ws.getCell(row, 6).value = d.adv; ws.getCell(row, 7).value = d.netPay; ws.getCell(row, 7).font = {bold:true, color:{argb:'FF385723'}}; row++; }); ws.columns = [{width:20}, {width:15}, {width:15}, {width:15}, {width:15}, {width:15}, {width:20}]; const buf = await wb.xlsx.writeBuffer(); saveAs(new Blob([buf]), `Weekly_Payroll_${document.getElementById('payTo').value}.xlsx`); };
 
         window.loadInventory = async (e) => { e.preventDefault(); const tSite = document.getElementById('invSite').value; const tb = document.getElementById('inventoryTable'); tb.innerHTML = ''; const rSnap = await getDocs(query(collection(db, "daily_reports"), orderBy("timestamp", "desc"))); let count = 0; rSnap.forEach(d => { const r = d.data(); if(r.status !== "Approved" || r.siteClosed) return; if(tSite !== "ALL" && r.siteId !== tSite) return; if(r.data && r.data.sups) { r.data.sups.forEach(s => { count++; tb.innerHTML += `<tr class="hover:bg-purple-50 border-b"><td class="p-3">${r.date}</td><td class="p-3 font-bold">${r.siteId}</td><td class="p-3 text-purple-900 font-bold">${s.m}</td><td class="p-3">${s.n}</td><td class="p-3 text-right font-bold">${s.q}</td><td class="p-3 text-right text-gray-500">${s.p!=='-' ? 'Rs. '+s.p : 'Not Stated'}</td></tr>`; }); } }); if(count === 0) tb.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-gray-400 font-bold">No materials recorded.</td></tr>'; };
-        window.calcFinance = async (e) => { e.preventDefault(); const tSite = document.getElementById('finSite').value; const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); lRates[l.name] = { daily: l.dailyRate, ot: l.otRate }; }); const rSnap = await getDocs(collection(db, "daily_reports")); let totLab=0, totMat=0; rSnap.forEach(d => { const r = d.data(); if(r.status !== "Approved" || r.siteClosed) return; if(tSite !== "ALL" && r.siteId !== tSite) return; if(r.data.workers) { r.data.workers.forEach(w => { let rates = lRates[w.n] || {daily:0, ot:0}; totLab += rates.daily; if(w.o && w.o!=='-') totLab += (parseFloat(w.o)*rates.ot); }); } if(r.data.sups) { r.data.sups.forEach(s => { if(s.p && s.p!=='-') totMat += parseFloat(s.p); }); } if(r.data.subs) { r.data.subs.forEach(s => { if(s.p && s.p!=='-') totMat += parseFloat(s.p); }); } }); document.getElementById('finLabCost').innerText = 'Rs. ' + totLab.toLocaleString(); document.getElementById('finMatCost').innerText = 'Rs. ' + totMat.toLocaleString(); document.getElementById('finTotalCost').innerText = 'Rs. ' + (totLab + totMat).toLocaleString(); };
+        window.calcFinance = async (e) => { e.preventDefault(); const tSite = document.getElementById('finSite').value; const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); if(l.name) lRates[l.name.trim()] = { daily: l.dailyRate, ot: l.otRate }; }); const rSnap = await getDocs(collection(db, "daily_reports")); let totLab=0, totMat=0; rSnap.forEach(d => { const r = d.data(); if(r.status !== "Approved" || r.siteClosed || !r.data) return; if(tSite !== "ALL" && r.siteId !== tSite) return; if(r.data.workers) { r.data.workers.forEach(w => { let rates = lRates[(w.n || '').trim()] || {daily:0, ot:0}; totLab += rates.daily; if(w.o && w.o!=='-' && !isNaN(w.o)) totLab += (parseFloat(w.o)*rates.ot); }); } if(r.data.sups) { r.data.sups.forEach(s => { if(s.p && s.p!=='-' && !isNaN(s.p)) totMat += parseFloat(s.p); }); } if(r.data.subs) { r.data.subs.forEach(s => { if(s.p && s.p!=='-' && !isNaN(s.p)) totMat += parseFloat(s.p); }); } }); document.getElementById('finLabCost').innerText = 'Rs. ' + totLab.toLocaleString(); document.getElementById('finMatCost').innerText = 'Rs. ' + totMat.toLocaleString(); document.getElementById('finTotalCost').innerText = 'Rs. ' + (totLab + totMat).toLocaleString(); };
         window.calculateAnalytics = async () => { 
-            const rSnap = await getDocs(collection(db, "daily_reports")); const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); lRates[l.name] = l.dailyRate; }); const today = new Date().toISOString().split('T')[0]; let tLab=0, tCost=0; rSnap.forEach(d => { const r = d.data(); if(r.date===today && !r.siteClosed && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{ let rate = lRates[w.n]||0; tCost += rate; }); } if(r.date===today && !r.siteClosed && r.data && r.data.sups) { r.data.sups.forEach(s=>{ if(s.p && s.p!=='-') tCost += parseFloat(s.p); }); } }); document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tCost.toLocaleString(); 
-            const bSnap = await getDocs(collection(db, "pay_bills")); let totDue = 0; bSnap.forEach(d => { let b = d.data(); if(b.status !== 'SETTLED') { totDue += (parseFloat(b.amount || 0) - parseFloat(b.paid || 0)); } }); const sd = document.getElementById('statDues'); if(sd) sd.innerText = totDue.toLocaleString();
+            const rSnap = await getDocs(collection(db, "daily_reports")); const lSnap = await getDocs(collection(db, "labours")); let lRates = {}; lSnap.forEach(d => { const l = d.data(); if(l.name) lRates[l.name.trim()] = l.dailyRate; }); const today = new Date().toISOString().split('T')[0]; let tLab=0, tCost=0; rSnap.forEach(d => { const r = d.data(); if(r.date===today && !r.siteClosed && r.data && r.data.workers) { tLab+=r.data.workers.length; r.data.workers.forEach(w=>{ let rate = lRates[(w.n || '').trim()]||0; tCost += rate; }); } if(r.date===today && !r.siteClosed && r.data && r.data.sups) { r.data.sups.forEach(s=>{ if(s.p && s.p!=='-' && !isNaN(s.p)) tCost += parseFloat(s.p); }); } }); document.getElementById('statLabours').innerText = tLab; document.getElementById('statAdvances').innerText = tCost.toLocaleString(); 
+            const bSnap = await getDocs(collection(db, "pay_bills")); let totDue = 0; bSnap.forEach(d => { let b = d.data(); if(b.status !== 'SETTLED') { totDue += Math.max(0, parseFloat(b.amount || 0) - parseFloat(b.paid || 0)); } }); const sd = document.getElementById('statDues'); if(sd) sd.innerText = totDue.toLocaleString();
         };
     </script>
 </body>
